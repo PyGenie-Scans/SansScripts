@@ -27,7 +27,8 @@ class ScanningInstrument(object):
 
     @abstractproperty
     def _poslist(self):
-        """The list of named positions that the instrument can run through in the sample changer"""
+        """The list of named positions that the instrument can run through in
+        the sample changer"""
         return []
 
     @abstractmethod
@@ -54,7 +55,8 @@ class ScanningInstrument(object):
 
     @abstractmethod
     def setup_dae_event_fastsave(self):
-        """Event mode with reduced detector histogram binning to decrease filesize."""
+        """Event mode with reduced detector histogram binning to decrease
+        filesize."""
         pass
 
     @abstractmethod
@@ -184,14 +186,14 @@ class ScanningInstrument(object):
         gen.begin()
         gen.waitfor(**kwargs)
         gen.end()
-        
 
-    def MeasureChanger(self, pos="", title="", thickness=1.0, sanstrans='', **kwargs):
+    def MeasureChanger(self, pos="", title="", thickness=1.0, sanstrans='',
+                       **kwargs):
         """Measure SANS or TRANS at a given sample changer position If no
         position is given the sample stack will not move.  Accepts any
         of the waitfor keyword arguments to specify the length of the
         measurement.
-        
+
         Parameters
         ==========
         pos = ""
@@ -202,14 +204,15 @@ class ScanningInstrument(object):
           The thickness of the sample in mm
         sanstrans = ''
           Whether to perform a 'SANS' measurement or a 'TRANS' measurement
-        
+
         Returns
         =======
         None
 
         """
-        # Check if a changer move is valid and if so move there if not do nothing
-        # Make sure we only have 1 period just in case. If more are needed write another function
+        # Check if a changer move is valid and if so move there if not
+        # do nothing Make sure we only have 1 period just in case. If
+        # more are needed write another function
         if gen.get_runstate() != "SETUP":
             error("Cannot start a measuremnt in a measurement")
             return
@@ -224,10 +227,10 @@ class ScanningInstrument(object):
                 title="", thickness=1.0, sanstrans='SANS', **kwargs):
         """Measure SANS or TRANS at a given sample stack position
 
-        If no position is given the sample stack will not move
-        Make sure we only have 1 period just in case. If more are needed write 
-        another function.
-        
+        If no position is given the sample stack will not move Make
+        sure we only have 1 period just in case. If more are needed
+        write another function.
+
         Parameters
         ==========
         xpos
@@ -302,7 +305,9 @@ def _local_wrapper(method):
         inner.__doc__ = getattr(ScanningInstrument, method).__doc__
     return inner
 
+
 #  Export all of the public methods into the global namespace
 for METHOD in dir(SCANNING):
-    if METHOD[0] != "_" and METHOD not in locals() and callable(getattr(SCANNING, METHOD)):
+    if METHOD[0] != "_" and METHOD not in locals() and \
+       callable(getattr(SCANNING, METHOD)):
         locals()[METHOD] = _local_wrapper(METHOD)
