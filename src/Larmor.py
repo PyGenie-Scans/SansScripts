@@ -186,7 +186,8 @@ class Larmor(ScanningInstrument):
             [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
              {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
-    def set_aperature(self, size):
+    @staticmethod
+    def set_aperature(size):
         if size.upper=="MEDIUM":
             gen.cset(a1hgap=20.0,a1vgap=20.0,s1hgap=14.0,s1vgap=14.0)
         else:

@@ -128,8 +128,9 @@ class ScanningInstrument(object):
         put the monitor in the beam"""
         pass
 
+    @staticmethod
     @abstractmethod
-    def set_aperature(self, size):
+    def set_aperature(size):
         """Set the beam aperature to the desired size
         Parameters
         ----------
