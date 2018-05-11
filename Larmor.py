@@ -24,6 +24,21 @@ class Larmor(ScanningInstrument):
         for tcb in tcbs:
             gen.change_tcb(**tcb)
         gen.change_finish()
+
+    def _set_choppers(lrange):
+        # now set the chopper phasing to the defaults
+        # T0 phase checked for November 2015 cycle 
+        # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
+        # Setting the T0 phase to 0 (50ms) does
+        if lrange==0:
+            #This is for 0.9-13.25
+            gen.cset(T0Phase=0)
+            gen.cset(TargetDiskPhase=2750)
+            gen.cset(InstrumentDiskPhase=2450)
+        else:
+            #This is for 0.65-12.95
+            gen.cset(TargetDiskPhase=1900)
+            gen.cset(InstrumentDiskPhase=1600)
     
     @dae_setter
     def setup_dae_scanning(self):
@@ -51,19 +66,7 @@ class Larmor(ScanningInstrument):
             tcbs=[{"low":5.0,"high":100000.0,"step":step,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
                   {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}])
-        # now set the chopper phasing to the defaults
-        # T0 phase checked for November 2015 cycle 
-        # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
-        # Setting the T0 phase to 0 (50ms) does
-        if lrange==0:
-            #This is for 0.9-13.25
-            gen.cset(T0Phase=0)
-            gen.cset(TargetDiskPhase=2750)
-            gen.cset(InstrumentDiskPhase=2450)
-        else:
-            #This is for 0.65-12.95
-            gen.cset(TargetDiskPhase=1900)
-            gen.cset(InstrumentDiskPhase=1600)
+        self._set_choppers(lrange)
 
     @dae_setter
     def setup_dae_event_fastsave(self,step=100.0,lrange=0):
@@ -80,19 +83,7 @@ class Larmor(ScanningInstrument):
                   # and decrease file write time
                   {"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0,"regime":3},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0,"regime":3}])
-        # now set the chopper phasing to the defaults
-        # T0 phase checked for November 2015 cycle 
-        # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
-        # Setting the T0 phase to 0 (50ms) does
-        if lrange==0:
-            #This is for 0.9-13.25
-            gen.cset(T0Phase=0)
-            gen.cset(TargetDiskPhase=2750)
-            gen.cset(InstrumentDiskPhase=2450)
-        else:
-            #This is for 0.65-12.95
-            gen.cset(TargetDiskPhase=1900)
-            gen.cset(InstrumentDiskPhase=1600)
+        self._set_choppers(lrange)
 
     @dae_setter
     def setup_dae_histogram(self,lrange=0):
@@ -101,19 +92,7 @@ class Larmor(ScanningInstrument):
         self._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
-        # now set the chopper phasing to the defaults
-        # T0 phase checked for November 2015 cycle 
-        # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
-        # Setting the T0 phase to 0 (50ms) does
-        if lrange==0:
-            #This is for 0.9-13.25
-            gen.cset(T0Phase=0)
-            gen.cset(TargetDiskPhase=2750)
-            gen.cset(InstrumentDiskPhase=2450)
-        else:
-            #This is for 0.65-12.95
-            gen.cset(TargetDiskPhase=1900)
-            gen.cset(InstrumentDiskPhase=1600)
+        self._set_choppers(lrange)
 
     @dae_setter
     def setup_dae_transmission(self,lrange=0):
@@ -125,19 +104,7 @@ class Larmor(ScanningInstrument):
             "C:\Instrument\Settings\Tables\wiring_monitors_only.dat",
             [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
              {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
-        # now set the chopper phasing to the defaults
-        # T0 phase checked for November 2015 cycle 
-        # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
-        # Setting the T0 phase to 0 (50ms) does
-        if lrange==0:
-            #This is for 0.9-13.25
-            gen.cset(T0Phase=0)
-            gen.cset(TargetDiskPhase=2750)
-            gen.cset(InstrumentDiskPhase=2450)
-        else:
-            #This is for 0.65-12.95
-            gen.cset(TargetDiskPhase=1900)
-            gen.cset(InstrumentDiskPhase=1600)
+        self._set_choppers(lrange)
 
     @dae_setter
     def setup_dae_monotest(self):
