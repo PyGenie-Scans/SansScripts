@@ -13,10 +13,19 @@ from functools import wraps
 from logging import info, warning, error
 from socket import gethostname
 from time import ctime
+from functools import wraps
 
 from six import add_metaclass
 import genie_python.genie as gen
 
+
+def needs_setup(f):
+    @wraps(f)
+    def with_setup(*args, **kwargs):
+        if gen.get_runstate() != "SETUP":
+            raise RuntimeError("Cannot start a measuremnt in a measurement")
+        return f(*args, **kwargs)
+    return with_setup
 
 @add_metaclass(ABCMeta)
 class ScanningInstrument(object):
@@ -187,8 +196,9 @@ class ScanningInstrument(object):
         gen.waitfor(**kwargs)
         gen.end()
 
-    def MeasureChanger(self, pos="", title="", thickness=1.0, sanstrans='',
-                       **kwargs):
+    @needs_setup
+    def measure_changer(self, pos="", title="", thickness=1.0, sanstrans='',
+                        **kwargs):
         """Measure SANS or TRANS at a given sample changer position If no
         position is given the sample stack will not move.  Accepts any
         of the waitfor keyword arguments to specify the length of the
@@ -213,9 +223,6 @@ class ScanningInstrument(object):
         # Check if a changer move is valid and if so move there if not
         # do nothing Make sure we only have 1 period just in case. If
         # more are needed write another function
-        if gen.get_runstate() != "SETUP":
-            error("Cannot start a measuremnt in a measurement")
-            return
         if pos:
             pos = pos.upper()
             if pos != "NONE" and self.check_move_pos(pos=pos):
@@ -223,7 +230,8 @@ class ScanningInstrument(object):
                 gen.cset(SamplePos=pos)
         self._measure(title, thickness, sanstrans, **kwargs)
 
-    def Measure(self, xpos=None, ypos=None, coarsezpos=None, finezpos=None,
+    @needs_setup
+    def measure(self, xpos=None, ypos=None, coarsezpos=None, finezpos=None,
                 title="", thickness=1.0, sanstrans='SANS', **kwargs):
         """Measure SANS or TRANS at a given sample stack position
 
