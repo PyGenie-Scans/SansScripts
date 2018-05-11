@@ -11,48 +11,51 @@ class Larmor(ScanningInstrument):
         ,'1WT','2WT','3WT','4WT','5WT','6WT','7WT','8WT','9WT','10WT','11WT','12WT','13WT','14WT']
 
     @staticmethod
-    def _generic_scan(detector, spectra, witing, low, high, step, trange, log):
+    def _generic_scan(detector, spectra, wiring, tcbs):
         gen.change(nperiods=1)
         gen.change_start()
-        gen.change_tables(detector=detecto)
+        gen.change_tables(detector=detector)
         gen.change_tables(spectra=spectra)
         gen.change_tables(wiring=wiring)
-        gen.change_tcb(low=low,high=high,step=step,trange=trange,log=log)
+        for tcb in tcbs:
+            gen.change_tcb(low=tcb["low"],high=tcb["high"],step=tcb["step"],
+                           trange=tcb["trange"],log=tcb["log"])
         gen.change_finish()
     
     @dae_setter
     def setup_dae_scanning(self):
-        self._generic_scan("C:\Instrument\Settings\Tables\detector.dat",
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
             "C:\Instrument\Settings\Tables\spectra_scanning_80.dat",
             "C:\Instrument\Settings\Tables\wiring.dat",
-            low=5.0,high=100000.0,step=100.0,trange=1,log=0)
+            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nr(self):
-        self._generic_scan("C:\Instrument\Settings\Tables\detector.dat",
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
             "C:\Instrument\Settings\Tables\spectra_nrscanning.dat",
             "C:\Instrument\Settings\Tables\wiring.dat",
-            low=5.0,high=100000.0,step=100.0,trange=1,log=0)
+            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nrscanning(self):
-        self._generic_scan("C:\Instrument\Settings\Tables\detector.dat",
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
             "U:\Users\Masks\spectra_scanning_auto.dat",
             "C:\Instrument\Settings\Tables\wiring.dat",
-            low=5.0,high=100000.0,step=100.0,trange=1,log=0)
+            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_event(self,step=100.0,lrange=0):
         # Normal event mode with full detector binning
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring_event.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=step,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_tcb(low=5.0,high=100000.0,step=2.0,trange=1,log=0,regime=2)
-        gen.change_finish()
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
+            "C:\Instrument\Settings\Tables\spectra_1To1.dat",
+            "C:\Instrument\Settings\Tables\wiring_event.dat",
+            [{"low":5.0,"high":100000.0,"step":step,"trange":1,"log":0},
+             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
+             {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
@@ -72,20 +75,18 @@ class Larmor(ScanningInstrument):
         # Event mode with reduced detector histogram binning to decrease filesize
         # This currently breaks mantid nexus read
         print "setup larmor event fastsave"
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring_event_fastsave.dat")
-        # change to log binning to reduce number of detector bins by a factor of 10 to decrease write time
-        gen.change_tcb(low=5.0,high=100000.0,step=0.1,trange=1,log=1)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_tcb(low=5.0,high=100000.0,step=2.0,trange=1,log=0,regime=2)
-        # 3rd time regime for monitors to allow flexible binning of detector to reduce file size
-        # and decrease file write time
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1,log=0,regime=3)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0,regime=3)
-        gen.change_finish()
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
+            "C:\Instrument\Settings\Tables\spectra_1To1.dat",
+            "C:\Instrument\Settings\Tables\wiring_event_fastsave.dat",
+            # change to log binning to reduce number of detector bins by a factor of 10 to decrease write time
+            [{"low"=5.0,"high"=100000.0,"step"=0.1,"trange"=1,"log"=1},
+             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
+             {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}
+             # 3rd time regime for monitors to allow flexible binning of detector to reduce file size
+             # and decrease file write time
+             {"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0,"regime":3},
+             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0,"regime":3}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
