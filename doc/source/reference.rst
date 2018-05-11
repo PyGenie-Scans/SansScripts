@@ -4,17 +4,17 @@ Reference
 This is the auto-generated reference from the doc strings in the
 source code.
 
-Scans.Defaults
+Instrument
 --------------
 .. automodule:: Instrument
    :members:
 
-Scans.Fit
+Util
 ---------
 .. automodule:: Util
    :members:
 
-Scans.Instrument
+Larmor
 ----------------
 .. automodule:: Larmor
    :members:
