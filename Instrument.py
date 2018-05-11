@@ -257,10 +257,8 @@ class ScanningInstrument(object):
     def printsamplepars():
         """Display the basic sample parameters on the console."""
         pars = gen.get_sample_pars()
-        print("Geometry="+pars['GEOMETRY'])
-        print("Width="+str(pars['WIDTH']))
-        print("Height="+str(pars['HEIGHT']))
-        print("Thickness="+str(pars['THICK']))
+        for par in ["Geometry", "Width", "Height", "Thickness"]:
+            print("{}={}".format(par, pars[par.upper()]))
 
 SCANNING = None
 
