@@ -100,6 +100,7 @@ class ScanningInstrument(object):
 
     @abstractmethod
     def setup_dae_bsalignment(self):
+        """Configure wiring tables for beamstop alignment."""
         pass
 
     @abstractmethod
@@ -119,14 +120,14 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def _configure_SANS_custom(self, size, mode):
+    def _configure_sans_custom(self, size, mode):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam)"""
         pass
 
     @abstractmethod
-    def _configure_TRANS_custom(self, size):
+    def _configure_trans_custom(self, size):
         """The specific actions required by the instrument
         to run a transmission measurement measurement (e.g.
         put the monitor in the beam"""
@@ -145,7 +146,7 @@ class ScanningInstrument(object):
 
         pass
 
-    def configure_SANS(self, size="", mode='event'):
+    def configure_sans(self, size="", mode='event'):
         """Setup to the instrument for a SANS measurement
 
         Parameters
@@ -165,9 +166,9 @@ class ScanningInstrument(object):
         else:
             self.setup_dae_event()
         self.set_aperature(size)
-        self._configure_SANS_custom(size, mode)
+        self._configure_sans_custom(size, mode)
 
-    def configure_TRANS(self, size=""):
+    def configure_trans(self, size=""):
         """Setup the instrument for a transmission measurement
 
         Parameters
@@ -180,7 +181,7 @@ class ScanningInstrument(object):
         self.setup_dae_transmission()
         gen.waitfor_move()
         self.set_aperature(size)
-        self._configure_TRANS_custom(self)
+        self._configure_trans_custom(self)
 
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False"""
@@ -191,9 +192,9 @@ class ScanningInstrument(object):
 
     def _measure(self, title, thickness, sanstrans, **kwargs):
         if sanstrans.upper() == 'TRANS':
-            self.configure_TRANS()
+            self.configure_trans()
         elif sanstrans.upper() == 'SANS':
-            self.configure_SANS()
+            self.configure_sans()
         else:
             warning("Unknown measurement mode {}".format(sanstrans))
         gen.waitfor_move()

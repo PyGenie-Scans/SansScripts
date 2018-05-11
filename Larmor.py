@@ -275,12 +275,12 @@ class Larmor(ScanningInstrument):
             pass
         gen.waitfor_move()
 
-    def _configure_SANS_custom(self, size="",mode='event'):
+    def _configure_sans_custom(self, size="",mode='event'):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
         gen.waitfor_move()
         
-    def _configure_TRANS_custom(self, size=""):
+    def _configure_trans_custom(self, size=""):
         # move the transmission monitor out
         gen.cset(m4trans=0.0)
         gen.waitfor_move()
