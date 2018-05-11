@@ -8,10 +8,9 @@ method for this entire project is:
 
 """
 
-from __future__ import print_function
 from abc import ABCMeta, abstractmethod, abstractproperty
 from functools import wraps
-from logging import info, warning
+from logging import info, warning, error
 from socket import gethostname
 from time import ctime
 
@@ -165,7 +164,7 @@ class ScanningInstrument(object):
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False"""
         if pos.upper() not in self._poslist:
-            print("Error in script, position {} does not exist".format(pos))
+            warning("Error in script, position {} does not exist".format(pos))
             return False
         return True
 
@@ -178,7 +177,7 @@ class ScanningInstrument(object):
             warning("Unknown measurement mode {}".format(sanstrans))
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
-        print("Using the following Sample Parameters")
+        info("Using the following Sample Parameters")
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
         gen.begin()
@@ -211,12 +210,12 @@ class ScanningInstrument(object):
         # Check if a changer move is valid and if so move there if not do nothing
         # Make sure we only have 1 period just in case. If more are needed write another function
         if gen.get_runstate() != "SETUP":
-            print("Error:  Cannot start a measuremnt in a measurement")
+            error("Cannot start a measuremnt in a measurement")
             return
         if pos:
             pos = pos.upper()
             if pos != "NONE" and self.check_move_pos(pos=pos):
-                print("Moving to position "+pos+" "+ctime())
+                info("Moving to position "+pos+" "+ctime())
                 gen.cset(SamplePos=pos)
         self._measure(title, thickness, sanstrans, **kwargs)
 
@@ -242,7 +241,7 @@ class ScanningInstrument(object):
             move["FineZ"] = finezpos
         if move:
             positions = [str(k)+": "+str(move[k]) for k in move]
-            print("Moving to position "+", ".join(positions))
+            info("Moving to position "+", ".join(positions))
             gen.waitfor_move()
         self._measure(title, thickness, sanstrans, **kwargs)
 
@@ -251,7 +250,7 @@ class ScanningInstrument(object):
         """Display the basic sample parameters on the console."""
         pars = gen.get_sample_pars()
         for par in ["Geometry", "Width", "Height", "Thickness"]:
-            print("{}={}".format(par, pars[par.upper()]))
+            info("{}={}".format(par, pars[par.upper()]))
 
 SCANNING = None
 
