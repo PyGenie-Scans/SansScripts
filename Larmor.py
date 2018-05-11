@@ -11,51 +11,46 @@ class Larmor(ScanningInstrument):
         ,'1WT','2WT','3WT','4WT','5WT','6WT','7WT','8WT','9WT','10WT','11WT','12WT','13WT','14WT']
 
     @staticmethod
-    def _generic_scan(detector, spectra, wiring, tcbs):
+    def _generic_scan(
+            detector="C:\Instrument\Settings\Tables\detector.dat",
+            spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat",
+            wiring="C:\Instrument\Settings\Tables\wiring.dat",
+            tcbs=[]):
         gen.change(nperiods=1)
         gen.change_start()
         gen.change_tables(detector=detector)
         gen.change_tables(spectra=spectra)
         gen.change_tables(wiring=wiring)
         for tcb in tcbs:
-            gen.change_tcb(low=tcb["low"],high=tcb["high"],step=tcb["step"],
-                           trange=tcb["trange"],log=tcb["log"])
+            gen.change_tcb(**tcb)
         gen.change_finish()
     
     @dae_setter
     def setup_dae_scanning(self):
         self._generic_scan(
-            "C:\Instrument\Settings\Tables\detector.dat",
-            "C:\Instrument\Settings\Tables\spectra_scanning_80.dat",
-            "C:\Instrument\Settings\Tables\wiring.dat",
-            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
+            spectra="C:\Instrument\Settings\Tables\spectra_scanning_80.dat",
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nr(self):
         self._generic_scan(
-            "C:\Instrument\Settings\Tables\detector.dat",
-            "C:\Instrument\Settings\Tables\spectra_nrscanning.dat",
-            "C:\Instrument\Settings\Tables\wiring.dat",
-            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
+            spectra="C:\Instrument\Settings\Tables\spectra_nrscanning.dat",
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nrscanning(self):
         self._generic_scan(
-            "C:\Instrument\Settings\Tables\detector.dat",
-            "U:\Users\Masks\spectra_scanning_auto.dat",
-            "C:\Instrument\Settings\Tables\wiring.dat",
-            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
+            spectra="U:\Users\Masks\spectra_scanning_auto.dat",
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_event(self,step=100.0,lrange=0):
         # Normal event mode with full detector binning
         self._generic_scan(
-            "C:\Instrument\Settings\Tables\detector.dat",
-            "C:\Instrument\Settings\Tables\spectra_1To1.dat",
-            "C:\Instrument\Settings\Tables\wiring_event.dat",
-            [{"low":5.0,"high":100000.0,"step":step,"trange":1,"log":0},
-             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
-             {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}])
+            wiring="C:\Instrument\Settings\Tables\wiring_event.dat",
+            tcbs=[{"low":5.0,"high":100000.0,"step":step,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
+                  {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
@@ -76,17 +71,15 @@ class Larmor(ScanningInstrument):
         # This currently breaks mantid nexus read
         print "setup larmor event fastsave"
         self._generic_scan(
-            "C:\Instrument\Settings\Tables\detector.dat",
-            "C:\Instrument\Settings\Tables\spectra_1To1.dat",
-            "C:\Instrument\Settings\Tables\wiring_event_fastsave.dat",
+            wiring="C:\Instrument\Settings\Tables\wiring_event_fastsave.dat",
             # change to log binning to reduce number of detector bins by a factor of 10 to decrease write time
-            [{"low"=5.0,"high"=100000.0,"step"=0.1,"trange"=1,"log"=1},
-             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
-             {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2}
-             # 3rd time regime for monitors to allow flexible binning of detector to reduce file size
-             # and decrease file write time
-             {"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0,"regime":3},
-             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0,"regime":3}])
+            tcbs=[{"low":5.0,"high":100000.0,"step":0.1,"trange":1,"log":1},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
+                  {"low":5.0,"high":100000.0,"step":2.0,"trange":1,"log":0,"regime":2},
+                  # 3rd time regime for monitors to allow flexible binning of detector to reduce file size
+                  # and decrease file write time
+                  {"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0,"regime":3},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0,"regime":3}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
@@ -104,15 +97,10 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_histogram(self,lrange=0):
         print "setup larmor normal"
-        gen.change(nperiods=1)
         gen.change_sync('isis')
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
@@ -130,15 +118,13 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_transmission(self,lrange=0):
         print "setup larmor transmission"
-        gen.change(nperiods=1)
         gen.change_sync('isis')
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector_monitors_only.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_monitors_only.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring_monitors_only.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
+            "C:\Instrument\Settings\Tables\spectra_monitors_only.dat",
+            "C:\Instrument\Settings\Tables\wiring_monitors_only.dat",
+            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
+             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
         # Running at 5Hz and centering the dip from the T0 at 50ms by setting phase to 48.4ms does not stop the fast flash 
@@ -156,14 +142,9 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_monotest(self):
         print "setup larmor monotest"
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
         gen.cset(T0Phase=0)
         gen.set_pv("IN:LARMOR:MK3CHOPR_01:CH2:DIR:SP","CW")
         gen.cset(TargetDiskPhase=8200)
@@ -175,75 +156,50 @@ class Larmor(ScanningInstrument):
         #setup to allow m1 to count as normal but to shift the rest of the detectors
         # in order to allow counting over the frame
         print "setup larmor tshift"
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring_tshift.dat")
-        gen.change_tcb(low=tlowdet,high=thighdet,step=100.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_tcb(low=tlowmon,high=thighmon,step=20.0,trange=1,log=0,regime=3)
-        gen.change_finish()
+        self._generic_scan(
+            wiring="C:\Instrument\Settings\Tables\wiring_tshift.dat",
+            tcbs=[{"low":tlowdet,"high":thighdet,"step":100.0,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
+                  {"low":tlowmon,"high":thighmon,"step":20.0,"trange":1,"log":0,"regime":3}])
 
     @dae_setter
     def setup_dae_diffraction(self):
         print "setup larmor normal"
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=0.01,trange=1,log=1)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            tcbs=[{"low":5.0,"high":100000.0,"step":0.01,"trange":1,"log":1},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_polarised(self):
         print "setup larmor polarised"
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_bsalignment(self):
-        gen.change(nperiods=1)
         print "setup larmor beamstop alignment"
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_1To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=1000.0,high=100000.0,step=99000.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            tcbs=[{"low":1000.0,"high":100000.0,"step":99000.0,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_monitorsonly(self):
-        gen.change(nperiods=1)
         print "setup larmor monitors only"
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_phase1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=20.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            spectra="C:\Instrument\Settings\Tables\spectra_phase1.dat",
+            tcbs=[{"low":5.0,"high":100000.0,"step":20.0,"trange":1,"log":0},
+                  {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_resonantimaging(self):
-        gen.change(nperiods=1)
         print "setup larmor monitors only"
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector_monitors_only.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_monitors_only.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring_monitors_only.dat")
-        gen.change_tcb(low=5.0,high=1500.0,step=0.256,trange=1,log=0)
-        gen.change_tcb(low=1500.0,high=100000.0,step=100.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
+            "C:\Instrument\Settings\Tables\spectra_monitors_only.dat",
+            "C:\Instrument\Settings\Tables\wiring_monitors_only.dat",
+            [{"low":5.0,"high":1500.0,"step":0.256,"trange":1,"log":0},
+             {"low":1500.0,"high":100000.0,"step":100.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_resonantimaging_choppers(self):
@@ -254,15 +210,13 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_4periods(self):
-        gen.change(nperiods=1)
         print "setup larmor for 4 Period mode"
-        gen.change_start()
-        gen.change_tables(detector="C:\Instrument\Settings\Tables\detector.dat")
-        gen.change_tables(spectra="C:\Instrument\Settings\Tables\spectra_4To1.dat")
-        gen.change_tables(wiring="C:\Instrument\Settings\Tables\wiring.dat")
-        gen.change_tcb(low=5.0,high=100000.0,step=100.0,trange=1,log=0)
-        gen.change_tcb(low=0.0,high=0.0,step=0.0,trange=2,log=0)
-        gen.change_finish()
+        self._generic_scan(
+            "C:\Instrument\Settings\Tables\detector.dat",
+            "C:\Instrument\Settings\Tables\spectra_4To1.dat",
+            "C:\Instrument\Settings\Tables\wiring.dat",
+            [{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
+             {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     def set_aperature(self, size):
         if size.upper=="MEDIUM":
