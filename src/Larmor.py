@@ -1,6 +1,7 @@
 from Instrument import ScanningInstrument
 from Util import dae_setter
 from genie import gen
+from logging import info
 
 class Larmor(ScanningInstrument):
     _poslist = ['AB','BB','CB','DB','EB','FB','GB','HB','IB','JB','KB','LB','MB','NB','OB','PB','QB','RB','SB','TB'
@@ -73,7 +74,7 @@ class Larmor(ScanningInstrument):
     def setup_dae_event_fastsave(self,step=100.0,lrange=0):
         # Event mode with reduced detector histogram binning to decrease filesize
         # This currently breaks mantid nexus read
-        print "setup larmor event fastsave"
+        info("setup larmor event fastsave")
         Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_event_fastsave.dat",
             # change to log binning to reduce number of detector bins by a factor of 10 to decrease write time
@@ -88,7 +89,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_histogram(self,lrange=0):
-        print "setup larmor normal"
+        info("setup larmor normal")
         gen.change_sync('isis')
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
@@ -97,7 +98,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_transmission(self,lrange=0):
-        print "setup larmor transmission"
+        info("setup larmor transmission")
         gen.change_sync('isis')
         Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
@@ -110,7 +111,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_monotest(self):
         """Setup with a mono test?"""
-        print "setup larmor monotest"
+        info("setup larmor monotest")
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
@@ -126,7 +127,7 @@ class Larmor(ScanningInstrument):
         in order to allow counting over the frame.
 
         """
-        print "setup larmor tshift"
+        info("setup larmor tshift")
         Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_tshift.dat",
             tcbs=[{"low":tlowdet,"high":thighdet,"step":100.0,"trange":1,"log":0},
@@ -136,28 +137,28 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_diffraction(self):
         """Set the wiring tables for a diffraction measurement"""
-        print "setup larmor normal"
+        info("setup larmor normal")
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":0.01,"trange":1,"log":1},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_polarised(self):
-        print "setup larmor polarised"
+        info("setup larmor polarised")
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_bsalignment(self):
-        print "setup larmor beamstop alignment"
+        info("setup larmor beamstop alignment")
         Larmor._generic_scan(
             tcbs=[{"low":1000.0,"high":100000.0,"step":99000.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_monitorsonly(self):
-        print "setup larmor monitors only"
+        info("setup larmor monitors only")
         Larmor._generic_scan(
             spectra="C:\Instrument\Settings\Tables\spectra_phase1.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":20.0,"trange":1,"log":0},
@@ -166,7 +167,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_resonantimaging(self):
         """Set the wiring table for resonant imaging"""
-        print "setup larmor monitors only"
+        info("setup larmor monitors only")
         Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
             "C:\Instrument\Settings\Tables\spectra_monitors_only.dat",
@@ -177,7 +178,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_resonantimaging_choppers(self):
         """Set the wiring thable for resonant imaging choppers"""
-        print "Setting Chopper phases"
+        info("Setting Chopper phases")
         gen.cset(T0Phase=49200)
         gen.cset(TargetDiskPhase=0)
         gen.cset(InstrumentDiskPhase=0)
@@ -185,7 +186,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_4periods(self):
         """Setup the instrument with four periods."""
-        print "setup larmor for 4 Period mode"
+        info("setup larmor for 4 Period mode")
         Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector.dat",
             "C:\Instrument\Settings\Tables\spectra_4To1.dat",
@@ -252,7 +253,7 @@ class Larmor(ScanningInstrument):
     @staticmethod
     def homecoarsejaws():
         """Rehome coarse jaws."""
-        print "Homing Coarse Jaws"
+        info("Homing Coarse Jaws")
         gen.cset(cjhgap=40,cjvgap=40)
         gen.waitfor_move()
         # home north and west
@@ -272,7 +273,7 @@ class Larmor(ScanningInstrument):
     @staticmethod
     def homea1():
         """Rehome aperature 1."""
-        print "Homing a1"
+        info("Homing a1")
         gen.cset(a1hgap=40,a1vgap=40)
         gen.waitfor_move()
         # home north and west
@@ -292,7 +293,7 @@ class Larmor(ScanningInstrument):
     @staticmethod
     def homes1():
         """Rehome slit1."""
-        print "Homing s1"
+        info("Homing s1")
         gen.cset(s1hgap=40,s1vgap=40)
         gen.waitfor_move()
         # home north and west
@@ -312,7 +313,7 @@ class Larmor(ScanningInstrument):
     @staticmethod
     def homes2():
         """Rehome slit2.  This is currentl a no-op."""
-        print "Homing s2"
+        info("Homing s2")
 
     @staticmethod
     def detectoronoff(onoff=0,delay=1):
@@ -329,16 +330,16 @@ class Larmor(ScanningInstrument):
         # wait for 3 minutes for ramp up 60s to ranmp down
         if(delay==1):
             if(onoff==1):
-                print "Waiting For Detector To Power Up (180s)"
+                info("Waiting For Detector To Power Up (180s)")
                 sleep(180)
             else:
-                print "Waiting For Detector To Power Down (60s)"
+                info("Waiting For Detector To Power Down (60s)")
                 sleep(60)
                 
 
     @staticmethod
     def movebench(angle=0.0,delaydet=1):
-        print "Turning Detector Off"
+        info("Turning Detector Off")
         detectoronoff(onoff=0,delay=delaydet)
         a1=0
         a1+=gen.get_pv("IN:LARMOR:CAEN:hv0:0:8:status")
@@ -346,30 +347,30 @@ class Larmor(ScanningInstrument):
         a1+=gen.get_pv("IN:LARMOR:CAEN:hv0:0:10:status")
         a1+=gen.get_pv("IN:LARMOR:CAEN:hv0:0:11:status")
         if(a1>0):
-            print "The detector is not turned off"
-            print "Not attempting Move"
+            info("The detector is not turned off")
+            info("Not attempting Move")
             return
         else:
-            print "The detector is off"
+            info("The detector is off")
            
         if(angle >= 0.0):
             gen.cset(benchlift=1)
-            print "Lifting Bench (20s)"
+            info("Lifting Bench (20s)")
             sleep(20)
             a1=gen.get_pv("IN:LARMOR:BENCH:STATUS")
 
             if(a1==1):
-                print "Rotating Bench"
+                info("Rotating Bench")
                 gen.cset(bench_rot=angle)
                 gen.waitfor_move()
-                print "Lowering Bench (20s)"
+                info("Lowering Bench (20s)")
                 gen.cset(benchlift=0)
                 sleep(20)
             else:
-                print "Bench failed to lift"
-                print "Move not attempted"
+                info("Bench failed to lift")
+                info("Move not attempted")
         #turn the detector back on
-        print "Turning Detector Back on"
+        info("Turning Detector Back on")
         detectoronoff(onoff=1,delay=delaydet)
 
     @staticmethod
@@ -380,28 +381,28 @@ class Larmor(ScanningInstrument):
         a1+=gen.get_pv("IN:LARMOR:CAEN:hv0:0:10:status")
         a1+=gen.get_pv("IN:LARMOR:CAEN:hv0:0:11:status")
         if(a1>0):
-            print "The detector is not turned off"
-            print "Not attempting Move"
+            info("The detector is not turned off")
+            info("Not attempting Move")
             return
         else:
-            print "The detector is off"
+            info("The detector is off")
            
         if(angle >= -0.5):
             gen.cset(benchlift=1)
-            print "Lifting Bench (20s)"
+            info("Lifting Bench (20s)")
             sleep(20)
             a1=gen.get_pv("IN:LARMOR:BENCH:STATUS")
 
             if(a1==1):
-                print "Rotating Bench"
+                info("Rotating Bench")
                 gen.cset(bench_rot=angle)
                 gen.waitfor_move()
-                print "Lowering Bench (20s)"
+                info("Lowering Bench (20s)")
                 gen.cset(benchlift=0)
                 sleep(20)
             else:
-                print "Bench failed to lift"
-                print "Move not attempted"
+                info("Bench failed to lift")
+                info("Move not attempted")
 
     @staticmethod
     def setup_pi_rotation():
