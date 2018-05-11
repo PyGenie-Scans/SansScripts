@@ -1,10 +1,6 @@
 from Instrument import ScanningInstrument
 from Util import dae_setter
-try:
-    import genie_python.genie as gen
-except ImportError:
-    import mock
-    gen = mock.Mock()
+from genie import gen
 
 class Larmor(ScanningInstrument):
     _poslist = ['AB','BB','CB','DB','EB','FB','GB','HB','IB','JB','KB','LB','MB','NB','OB','PB','QB','RB','SB','TB'
