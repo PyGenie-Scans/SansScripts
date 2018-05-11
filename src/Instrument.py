@@ -172,7 +172,7 @@ class ScanningInstrument(object):
 
     def measure_changer(self, title, pos=None, thickness=1.0,
                         trans=False, **kwargs):
-        """Measure SANS or TRANS at a given sample changer position If no
+        """Measure SANS or TRANS at a given sample changer position. If no
         position is given the sample stack will not move.  Accepts any
         of the waitfor keyword arguments to specify the length of the
         measurement.
@@ -208,9 +208,9 @@ class ScanningInstrument(object):
                 finezpos=None, thickness=1.0, trans=False, **kwargs):
         """Measure SANS or TRANS at a given sample stack position
 
-        If no position is given the sample stack will not move Make
-        sure we only have 1 period just in case. If more are needed
-        write another function.
+        If no position is given the sample stack will not move. The
+        run time for the measurement can be given with the same
+        keyword arguments used in waitfor.
 
         Parameters
         ==========
@@ -229,6 +229,7 @@ class ScanningInstrument(object):
         trans : bool
           whether to perform a trans measurement.  By default, a Sans
           measurement is performed.
+
         """
         self._needs_setup()
         move = {}
