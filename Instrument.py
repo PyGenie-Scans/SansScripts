@@ -226,7 +226,26 @@ class ScanningInstrument(object):
 
         If no position is given the sample stack will not move
         Make sure we only have 1 period just in case. If more are needed write 
-        another function."""
+        another function.
+        
+        Parameters
+        ==========
+        xpos
+          X position of sample
+        ypos
+          y position of sample
+        coarsezpos
+          z position of sample on coarse motor
+        finezpos
+          z position of sample on fine motor
+        title
+          Measurement title
+        thickness
+          sample thickness in mm
+        sanstrans
+          whether to perform a sans or a trans measurement
+
+        """
         move = {}
         if xpos is not None:
             gen.cset(SampleX=xpos)
