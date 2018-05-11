@@ -169,6 +169,23 @@ class ScanningInstrument(object):
             return False
         return True
 
+    def _measure(self, title, thickness, sanstrans, **kwargs):
+        if sanstrans.upper() == 'TRANS':
+            self.configure_TRANS()
+        elif sanstrans.upper() == 'SANS':
+            self.configure_SANS()
+        else:
+            warning("Unknown measurement mode {}".format(sanstrans))
+        gen.waitfor_move()
+        gen.change_sample_par("Thick", thickness)
+        print("Using the following Sample Parameters")
+        self.printsamplepars()
+        gen.change(title=title+self.title_footer)
+        gen.begin()
+        gen.waitfor(**kwargs)
+        gen.end()
+        
+
     def MeasureChanger(self, pos="", title="", thickness=1.0, sanstrans='', **kwargs):
         """Measure SANS or TRANS at a given sample changer position If no
         position is given the sample stack will not move.  Accepts any
@@ -201,28 +218,15 @@ class ScanningInstrument(object):
             if pos != "NONE" and self.check_move_pos(pos=pos):
                 print("Moving to position "+pos+" "+ctime())
                 gen.cset(SamplePos=pos)
-        # if we've defined the mode in this function sort things out otherwise do nothing
-        if sanstrans.upper() == 'TRANS':
-            self.configure_TRANS()
-        elif sanstrans.upper() == 'SANS':
-            self.configure_SANS()
-        else:
-            warning("Unknown measurement mode {}".format(sanstrans))
-        gen.change_sample_par("Thick", thickness)
-        info("Using the following Sample Parameters")
-        self.printsamplepars()
-        # Add the _SANS or _TRANS title ending
-        gen.change(title=title+self.title_footer)
-        gen.begin()
-        gen.waitfor(**kwargs)
-        gen.end()
+        self._measure(title, thickness, sanstrans, **kwargs)
 
     def Measure(self, xpos=None, ypos=None, coarsezpos=None, finezpos=None,
                 title="", thickness=1.0, sanstrans='SANS', **kwargs):
         """Measure SANS or TRANS at a given sample stack position
 
         If no position is given the sample stack will not move
-        Make sure we only have 1 period just in case. If more are needed write another function."""
+        Make sure we only have 1 period just in case. If more are needed write 
+        another function."""
         move = {}
         if xpos is not None:
             gen.cset(SampleX=xpos)
@@ -240,18 +244,7 @@ class ScanningInstrument(object):
             positions = [str(k)+": "+str(move[k]) for k in move]
             print("Moving to position "+", ".join(positions))
             gen.waitfor_move()
-        if sanstrans.upper() == 'TRANS':
-            self.configure_TRANS()
-        elif sanstrans.upper() == 'SANS':
-            self.configure_SANS()
-        gen.waitfor_move()
-        gen.change_sample_par("Thick", thickness)
-        print("Using the following Sample Parameters")
-        self.printsamplepars()
-        gen.change(title=title+self.title_footer)
-        gen.begin()
-        gen.waitfor(**kwargs)
-        gen.end()
+        self._measure(title, thickness, sanstrans, **kwargs)
 
     @staticmethod
     def printsamplepars():
