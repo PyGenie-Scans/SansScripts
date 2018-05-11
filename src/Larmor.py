@@ -25,6 +25,7 @@ class Larmor(ScanningInstrument):
             gen.change_tcb(**tcb)
         gen.change_finish()
 
+    @staticmethod
     def _set_choppers(lrange):
         # now set the chopper phasing to the defaults
         # T0 phase checked for November 2015 cycle 
