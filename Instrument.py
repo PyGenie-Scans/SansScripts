@@ -54,6 +54,7 @@ class ScanningInstrument(object):
 
     @abstractmethod
     def setup_dae_event_fastsave(self):
+        """Event mode with reduced detector histogram binning to decrease filesize."""
         pass
 
     @abstractmethod
