@@ -228,23 +228,19 @@ class Larmor(ScanningInstrument):
         gen.cset(pol_trans=100,pol_arc=-0.069)
 
     @staticmethod
-    def BSInOut(InOut="IN"):
+    def BSInOut(In=True):
         """Move the Beam Stop in and out of the beam.
 
         Parameters
         ==========
-        InOut = "IN" : str
+        In : bool
           Whether to move the beam stop in or out
         """
         #move beamstop in or out. The default is to move in
-        if(InOut.upper()=="OUT"):
-            cset(BSY=200.0,BSZ=0.0)
-        else:
+        if In:
             cset(BSY=88.5,BSZ=353.0)
-
-    #def Analyserin():
-        # Set the analyser so that the wavelength cut off is at approx 1.6 Ang
-        #cset(An_Trans=0,An_Deg=-1.0)
+        else:
+            cset(BSY=200.0,BSZ=0.0)
 
     @staticmethod
     def homecoarsejaws():
