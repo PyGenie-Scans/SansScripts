@@ -272,11 +272,14 @@ class ScanningInstrument(object):
         for par in ["Geometry", "Width", "Height", "Thickness"]:
             info("{}={}".format(par, pars[par.upper()]))
 
+
 SCANNING = None
+
 
 def is_instrument(title):
     """Check if we are running on the instrument with the given name"""
     return title.upper() in gethostname().upper()
+
 
 if is_instrument("Larmor"):
     from .Larmor import Larmor
@@ -295,7 +298,6 @@ def _local_wrapper(method):
     @wraps(getattr(SCANNING, method))
     def inner(*args, **kwargs):
         return getattr(SCANNING, method)(*args, **kwargs)
-    #inner.__doc__ = getattr(SCANNING, m).__doc__
     if not inner.__doc__ and hasattr(ScanningInstrument, method):
         inner.__doc__ = getattr(ScanningInstrument, method).__doc__
     return inner
