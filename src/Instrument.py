@@ -1,10 +1,9 @@
 """The baseline for loading a scanning instrument
 
-This module automatically detects the instrument it is being run on
-and automatically loads the correct submodule.  The primary useage
-method for this entire project is:
-
->   from SansScriping.Instrument import *
+Each instrument will have its own module that declares a class
+inheriting from ScanningInstrument.  The abstract base class is used
+to ensure that the derived classes define the necessary methods to run
+any generic scripts.
 
 """
 
@@ -73,20 +72,6 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def setup_dae_monotest(self):
-        pass
-
-    @abstractmethod
-    def setup_dae_tshift(self):
-        """Set the wiring tables for a time shifted measurement"""
-        pass
-
-    @abstractmethod
-    def setup_dae_diffraction(self):
-        """Set the wiring tables for a diffraction measurement"""
-        pass
-
-    @abstractmethod
     def setup_dae_polarised(self):
         """Set the wiring tables for a polarisation measurement"""
         pass
@@ -101,29 +86,12 @@ class ScanningInstrument(object):
         """Set the wiring tables to record only the monitors"""
         pass
 
-    @abstractmethod
-    def setup_dae_resonantimaging(self):
-        """Set the wiring thable for resonant imaging"""
-        pass
-
-    @abstractmethod
-    def setup_dae_resonantimaging_choppers(self):
-        """Set the wiring thable for resonant imaging choppers"""
-        pass
-
-    @abstractmethod
-    def setup_dae_4periods(self):
-        """Setup the instrument with four periods."""
-        pass
-
-    @abstractmethod
     def _configure_sans_custom(self, size, mode):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam)"""
         pass
 
-    @abstractmethod
     def _configure_trans_custom(self, size):
         """The specific actions required by the instrument
         to run a transmission measurement measurement (e.g.

@@ -109,6 +109,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_monotest(self):
+        """Setup with a mono test?"""
         print "setup larmor monotest"
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
@@ -121,8 +122,10 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_tshift(self,tlowdet=5.0,thighdet=100000.0,tlowmon=5.0,thighmon=100000.0):
-        #setup to allow m1 to count as normal but to shift the rest of the detectors
-        # in order to allow counting over the frame
+        """Allow m1 to count as normal but to shift the rest of the detectors
+        in order to allow counting over the frame.
+
+        """
         print "setup larmor tshift"
         Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_tshift.dat",
@@ -132,6 +135,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_diffraction(self):
+        """Set the wiring tables for a diffraction measurement"""
         print "setup larmor normal"
         Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":0.01,"trange":1,"log":1},
@@ -161,6 +165,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_resonantimaging(self):
+        """Set the wiring table for resonant imaging"""
         print "setup larmor monitors only"
         Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
@@ -171,6 +176,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_resonantimaging_choppers(self):
+        """Set the wiring thable for resonant imaging choppers"""
         print "Setting Chopper phases"
         gen.cset(T0Phase=49200)
         gen.cset(TargetDiskPhase=0)
@@ -178,6 +184,7 @@ class Larmor(ScanningInstrument):
 
     @dae_setter
     def setup_dae_4periods(self):
+        """Setup the instrument with four periods."""
         print "setup larmor for 4 Period mode"
         Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector.dat",
