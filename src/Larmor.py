@@ -43,26 +43,26 @@ class Larmor(ScanningInstrument):
     
     @dae_setter
     def setup_dae_scanning(self):
-        self._generic_scan(
+        Larmor._generic_scan(
             spectra="C:\Instrument\Settings\Tables\spectra_scanning_80.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nr(self):
-        self._generic_scan(
+        Larmor._generic_scan(
             spectra="C:\Instrument\Settings\Tables\spectra_nrscanning.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_nrscanning(self):
-        self._generic_scan(
+        Larmor._generic_scan(
             spectra="U:\Users\Masks\spectra_scanning_auto.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0}])
 
     @dae_setter
     def setup_dae_event(self,step=100.0,lrange=0):
         # Normal event mode with full detector binning
-        self._generic_scan(
+        Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_event.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":step,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
@@ -74,7 +74,7 @@ class Larmor(ScanningInstrument):
         # Event mode with reduced detector histogram binning to decrease filesize
         # This currently breaks mantid nexus read
         print "setup larmor event fastsave"
-        self._generic_scan(
+        Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_event_fastsave.dat",
             # change to log binning to reduce number of detector bins by a factor of 10 to decrease write time
             tcbs=[{"low":5.0,"high":100000.0,"step":0.1,"trange":1,"log":1},
@@ -90,7 +90,7 @@ class Larmor(ScanningInstrument):
     def setup_dae_histogram(self,lrange=0):
         print "setup larmor normal"
         gen.change_sync('isis')
-        self._generic_scan(
+        Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
         self._set_choppers(lrange)
@@ -99,7 +99,7 @@ class Larmor(ScanningInstrument):
     def setup_dae_transmission(self,lrange=0):
         print "setup larmor transmission"
         gen.change_sync('isis')
-        self._generic_scan(
+        Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
             "C:\Instrument\Settings\Tables\spectra_monitors_only.dat",
             "C:\Instrument\Settings\Tables\wiring_monitors_only.dat",
@@ -110,7 +110,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_monotest(self):
         print "setup larmor monotest"
-        self._generic_scan(
+        Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
         gen.cset(T0Phase=0)
@@ -124,7 +124,7 @@ class Larmor(ScanningInstrument):
         #setup to allow m1 to count as normal but to shift the rest of the detectors
         # in order to allow counting over the frame
         print "setup larmor tshift"
-        self._generic_scan(
+        Larmor._generic_scan(
             wiring="C:\Instrument\Settings\Tables\wiring_tshift.dat",
             tcbs=[{"low":tlowdet,"high":thighdet,"step":100.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0},
@@ -133,28 +133,28 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_diffraction(self):
         print "setup larmor normal"
-        self._generic_scan(
+        Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":0.01,"trange":1,"log":1},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_polarised(self):
         print "setup larmor polarised"
-        self._generic_scan(
+        Larmor._generic_scan(
             tcbs=[{"low":5.0,"high":100000.0,"step":100.0,"trange":1},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_bsalignment(self):
         print "setup larmor beamstop alignment"
-        self._generic_scan(
+        Larmor._generic_scan(
             tcbs=[{"low":1000.0,"high":100000.0,"step":99000.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
 
     @dae_setter
     def setup_dae_monitorsonly(self):
         print "setup larmor monitors only"
-        self._generic_scan(
+        Larmor._generic_scan(
             spectra="C:\Instrument\Settings\Tables\spectra_phase1.dat",
             tcbs=[{"low":5.0,"high":100000.0,"step":20.0,"trange":1,"log":0},
                   {"low":0.0,"high":0.0,"step":0.0,"trange":2,"log":0}])
@@ -162,7 +162,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_resonantimaging(self):
         print "setup larmor monitors only"
-        self._generic_scan(
+        Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector_monitors_only.dat",
             "C:\Instrument\Settings\Tables\spectra_monitors_only.dat",
             "C:\Instrument\Settings\Tables\wiring_monitors_only.dat",
@@ -179,7 +179,7 @@ class Larmor(ScanningInstrument):
     @dae_setter
     def setup_dae_4periods(self):
         print "setup larmor for 4 Period mode"
-        self._generic_scan(
+        Larmor._generic_scan(
             "C:\Instrument\Settings\Tables\detector.dat",
             "C:\Instrument\Settings\Tables\spectra_4To1.dat",
             "C:\Instrument\Settings\Tables\wiring.dat",
@@ -208,24 +208,34 @@ class Larmor(ScanningInstrument):
     ######## Instrument Specific Scripts ########
     @staticmethod
     def FOMin():
+        """Put the frame overload mirror into the beam."""
         #gen.cset(pol_trans=0,pol_arc=-1.6)
         # Convert to angle instead of mm
         gen.cset(pol_trans=0,pol_arc=-0.084)
 
     @staticmethod
     def ShortPolariserin():
+        """Put the short polariser for long wavelength into the beam."""
         #gen.cset(pol_trans=-100,pol_arc=-1.3)
         # Convert to angle instead of mm
         gen.cset(pol_trans=-100,pol_arc=-0.069)
 
     @staticmethod
     def LongPolariserin():
+        """Put the long polariser for short wavelengths into the beam."""
         #gen.cset(pol_trans=100,pol_arc=-1.3)
         # Convert to angle instead of mm
         gen.cset(pol_trans=100,pol_arc=-0.069)
 
     @staticmethod
     def BSInOut(InOut="IN"):
+        """Move the Beam Stop in and out of the beam.
+
+        Parameters
+        ==========
+        InOut = "IN" : str
+          Whether to move the beam stop in or out
+        """
         #move beamstop in or out. The default is to move in
         if(InOut.upper()=="OUT"):
             cset(BSY=200.0,BSZ=0.0)
@@ -238,6 +248,7 @@ class Larmor(ScanningInstrument):
 
     @staticmethod
     def homecoarsejaws():
+        """Rehome coarse jaws."""
         print "Homing Coarse Jaws"
         gen.cset(cjhgap=40,cjvgap=40)
         gen.waitfor_move()
@@ -257,6 +268,7 @@ class Larmor(ScanningInstrument):
 
     @staticmethod
     def homea1():
+        """Rehome aperature 1."""
         print "Homing a1"
         gen.cset(a1hgap=40,a1vgap=40)
         gen.waitfor_move()
@@ -276,6 +288,7 @@ class Larmor(ScanningInstrument):
 
     @staticmethod
     def homes1():
+        """Rehome slit1."""
         print "Homing s1"
         gen.cset(s1hgap=40,s1vgap=40)
         gen.waitfor_move()
@@ -295,6 +308,7 @@ class Larmor(ScanningInstrument):
 
     @staticmethod
     def homes2():
+        """Rehome slit2.  This is currentl a no-op."""
         print "Homing s2"
 
     @staticmethod
