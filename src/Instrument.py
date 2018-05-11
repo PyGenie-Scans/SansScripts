@@ -188,13 +188,11 @@ class ScanningInstrument(object):
             return False
         return True
 
-    def _measure(self, title, thickness, sanstrans, **kwargs):
-        if sanstrans.upper() == 'TRANS':
+    def _measure(self, title, thickness, trans, **kwargs):
+        if trans:
             self.configure_trans()
-        elif sanstrans.upper() == 'SANS':
-            self.configure_sans()
         else:
-            warning("Unknown measurement mode {}".format(sanstrans))
+            self.configure_sans()
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
         info("Using the following Sample Parameters")
@@ -204,8 +202,8 @@ class ScanningInstrument(object):
         gen.waitfor(**kwargs)
         gen.end()
 
-    def measure_changer(self, pos="", title="", thickness=1.0, sanstrans='',
-                        **kwargs):
+    def measure_changer(self, title, pos=None, thickness=1.0,
+                        trans=False, **kwargs):
         """Measure SANS or TRANS at a given sample changer position If no
         position is given the sample stack will not move.  Accepts any
         of the waitfor keyword arguments to specify the length of the
@@ -213,14 +211,14 @@ class ScanningInstrument(object):
 
         Parameters
         ==========
-        pos = ""
-          Sample changer position.  If blank, then the position isn't moved.
-        title = ""
+        title : str
           title of the measurement
-        thickness = 1.0
+        pos : str
+          Sample changer position.  If blank, then the position isn't moved.
+        thickness : float
           The thickness of the sample in mm
-        sanstrans = ''
-          Whether to perform a 'SANS' measurement or a 'TRANS' measurement
+        trans : bool
+          Whether to perform a transmission measurement.  Sans is the default.
 
         Returns
         =======
@@ -233,13 +231,13 @@ class ScanningInstrument(object):
         self._needs_setup()
         if pos:
             pos = pos.upper()
-            if pos != "NONE" and self.check_move_pos(pos=pos):
+            if self.check_move_pos(pos=pos):
                 info("Moving to position "+pos+" "+ctime())
                 gen.cset(SamplePos=pos)
-        self._measure(title, thickness, sanstrans, **kwargs)
+        self._measure(title, thickness, trans, **kwargs)
 
-    def measure(self, xpos=None, ypos=None, coarsezpos=None, finezpos=None,
-                title="", thickness=1.0, sanstrans='SANS', **kwargs):
+    def measure(self, title, xpos=None, ypos=None, coarsezpos=None,
+                finezpos=None, thickness=1.0, trans=False, **kwargs):
         """Measure SANS or TRANS at a given sample stack position
 
         If no position is given the sample stack will not move Make
@@ -248,21 +246,21 @@ class ScanningInstrument(object):
 
         Parameters
         ==========
-        xpos
+        xpos : float
           X position of sample
-        ypos
+        ypos : float
           y position of sample
-        coarsezpos
+        coarsezpos : float
           z position of sample on coarse motor
-        finezpos
+        finezpos : float
           z position of sample on fine motor
-        title
+        title : str
           Measurement title
-        thickness
+        thickness : float
           sample thickness in mm
-        sanstrans
-          whether to perform a sans or a trans measurement
-
+        trans : bool
+          whether to perform a trans measurement.  By default, a Sans
+          measurement is performed.
         """
         self._needs_setup()
         move = {}
@@ -282,7 +280,7 @@ class ScanningInstrument(object):
             positions = [str(k)+": "+str(move[k]) for k in move]
             info("Moving to position "+", ".join(positions))
             gen.waitfor_move()
-        self._measure(title, thickness, sanstrans, **kwargs)
+        self._measure(title, thickness, trans, **kwargs)
 
     @staticmethod
     def printsamplepars():
