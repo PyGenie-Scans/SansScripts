@@ -67,6 +67,11 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
+    def setup_dae_histogram(self):
+        """Set the wiring tables for histogram mode"""
+        pass
+
+    @abstractmethod
     def setup_dae_event_fastsave(self):
         """Event mode with reduced detector histogram binning to decrease
         filesize."""
