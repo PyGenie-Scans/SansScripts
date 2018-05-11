@@ -16,7 +16,11 @@ from time import ctime
 from functools import wraps
 
 from six import add_metaclass
-import genie_python.genie as gen
+try:
+    import genie_python.genie as gen
+except ImportError:
+    import mock
+    gen = mock.Mock()
 
 
 def needs_setup(f):
