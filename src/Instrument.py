@@ -9,21 +9,11 @@ method for this entire project is:
 """
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from functools import wraps
 from logging import info, warning
 from time import ctime
 
 from six import add_metaclass
 from genie import gen
-
-
-def needs_setup(f):
-    @wraps(f)
-    def with_setup(*args, **kwargs):
-        if gen.get_runstate() != "SETUP":
-            raise RuntimeError("Cannot start a measuremnt in a measurement")
-        return f(*args, **kwargs)
-    return with_setup
 
 
 @add_metaclass(ABCMeta)
@@ -38,6 +28,11 @@ class ScanningInstrument(object):
         """The list of named positions that the instrument can run through in
         the sample changer"""
         return []
+
+    @staticmethod
+    def _needs_setup():
+        if gen.get_runstate() != "SETUP":
+            raise RuntimeError("Cannot start a measuremnt in a measurement")
 
     @abstractmethod
     def setup_dae_scanning(self):
@@ -202,7 +197,6 @@ class ScanningInstrument(object):
         gen.waitfor(**kwargs)
         gen.end()
 
-    @needs_setup
     def measure_changer(self, pos="", title="", thickness=1.0, sanstrans='',
                         **kwargs):
         """Measure SANS or TRANS at a given sample changer position If no
@@ -229,6 +223,7 @@ class ScanningInstrument(object):
         # Check if a changer move is valid and if so move there if not
         # do nothing Make sure we only have 1 period just in case. If
         # more are needed write another function
+        self._needs_setup()
         if pos:
             pos = pos.upper()
             if pos != "NONE" and self.check_move_pos(pos=pos):
@@ -236,7 +231,6 @@ class ScanningInstrument(object):
                 gen.cset(SamplePos=pos)
         self._measure(title, thickness, sanstrans, **kwargs)
 
-    @needs_setup
     def measure(self, xpos=None, ypos=None, coarsezpos=None, finezpos=None,
                 title="", thickness=1.0, sanstrans='SANS', **kwargs):
         """Measure SANS or TRANS at a given sample stack position
@@ -263,6 +257,7 @@ class ScanningInstrument(object):
           whether to perform a sans or a trans measurement
 
         """
+        self._needs_setup()
         move = {}
         if xpos is not None:
             gen.cset(SampleX=xpos)
