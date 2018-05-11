@@ -78,14 +78,17 @@ class ScanningInstrument(object):
 
     @abstractmethod
     def setup_dae_tshift(self):
+        """Set the wiring tables for a time shifted measurement"""
         pass
 
     @abstractmethod
     def setup_dae_diffraction(self):
+        """Set the wiring tables for a diffraction measurement"""
         pass
 
     @abstractmethod
     def setup_dae_polarised(self):
+        """Set the wiring tables for a polarisation measurement"""
         pass
 
     @abstractmethod
@@ -95,18 +98,22 @@ class ScanningInstrument(object):
 
     @abstractmethod
     def setup_dae_monitorsonly(self):
+        """Set the wiring tables to record only the monitors"""
         pass
 
     @abstractmethod
     def setup_dae_resonantimaging(self):
+        """Set the wiring thable for resonant imaging"""
         pass
 
     @abstractmethod
     def setup_dae_resonantimaging_choppers(self):
+        """Set the wiring thable for resonant imaging choppers"""
         pass
 
     @abstractmethod
     def setup_dae_4periods(self):
+        """Setup the instrument with four periods."""
         pass
 
     @abstractmethod
