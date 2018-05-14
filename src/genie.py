@@ -1,29 +1,36 @@
-import logging
+import mock
+mock_gen = mock.Mock()
+mock_gen._state = "SETUP"
+
+
+def begin():
+    mock_gen._state = "RUNNING"
+
+
+def end():
+    mock_gen._state = "SETUP"
+
+
+mock_gen.begin.side_effect = begin
+mock_gen.end.side_effect = end
+mock_gen.get_runstate.side_effect = lambda: mock_gen._state
+
+mock_gen._sample_pars = {
+    "GEOMETRY": "Flat Plate",
+    "WIDTH": 10,
+    "HEIGHT": 10,
+    "THICKNESS": 1}
+mock_gen.get_sample_pars.side_effect = lambda: mock_gen._sample_pars
+
+
+def change_sample_pars(key, value):
+    if key.upper() == "THICK":
+        mock_gen._sample_pars["THICKNESS"] = value
+
+
+mock_gen.change_sample_par.side_effect = change_sample_pars
+
 try:
     import genie_python.genie as gen
 except ImportError:
-    import mock
-    gen = mock.Mock()
-    gen._state = "SETUP"
-
-    def begin():
-        gen._state = "RUNNING"
-
-    def end():
-        gen._state = "SETUP"
-
-    gen.begin.side_effect = begin
-    gen.end.side_effect = end
-    gen.get_runstate.side_effect = lambda: gen._state
-
-    gen._sample_pars = {
-        "GEOMETRY": "Flat Plate",
-        "WIDTH": 10,
-        "HEIGHT": 10,
-        "THICKNESS": 1}
-    gen.get_sample_pars.side_effect = lambda: gen._sample_pars
-
-    def change_sample_pars(key, value):
-        if key.upper() == "THICK":
-            gen._sample_pars["THICKNESS"] = value
-    gen.change_sample_par.side_effect = change_sample_pars
+    gen = mock_gen
