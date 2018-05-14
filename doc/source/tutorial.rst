@@ -177,3 +177,17 @@ used before.
 
 Primary commands
 ================
+
+    >>> @user_script
+    ... def trial():
+    ...     measure_changer("Test1", "BT", trans=True, uamps=5)
+    ...     measure_changer("Test2", "ZT", trans=True, uamps=5)
+    ...     measure_changer("Test1", "BT", trans=False, uamps=15)
+    ...     measure_changer("Test2", "ZT", trans=False, uamps=15)
+    >>> trial() #doctest:+ELLIPSIS
+    Validating Script trial
+    The script should finish in 1.0 hours
+    ...
+    Thickness=1.0
+
+Finish code block

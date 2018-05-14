@@ -57,3 +57,49 @@ def dae_setter(f):
         f(self, *args, **kwargs)
         self._dae_mode = request
     return wrapper
+
+
+SCALES = {"uamps": 90, "frames": 0.1, "seconds": 1,
+          "minutes": 60, "hours": 3600}
+
+
+def wait_time(call):
+    name, args, kwargs = call
+    if name != "waitfor":
+        return 0
+    key = kwargs.keys()[0]
+    return SCALES[key] * kwargs[key]
+
+
+def pretty_print_time(s):
+    from datetime import timedelta, datetime
+    hours = s/3600.0
+    delta = timedelta(0, s)
+    skeleton = "The script should finish in {} hours\nat {}"
+    return skeleton.format(hours, delta+datetime.now())
+
+
+
+def user_script(f):
+    """Perform some sanity checking on a user script before it is run"""
+    @wraps(f)
+    def inner(*args, **kwargs):
+        from genie import mock_gen
+        from mock import Mock
+        code = f.__name__ + "("
+        code += ", ".join(args)
+        for k in kwargs:
+            code += ", " + k + "=" + kwargs[k]
+        code += ")"
+        mock_gen.reset_mock()
+        logging.info("Validating Script {}".format(f.__name__))
+        logging.getLogger().disabled = True
+        try:
+            eval(code, {"gen": mock_gen, "logging": Mock()}, {f.__name__: f})
+        finally:
+            logging.getLogger().disabled = False
+        calls = mock_gen.mock_calls
+        time = sum([wait_time(call) for call in calls])
+        logging.info(pretty_print_time(time))
+        f(*args, **kwargs)
+    return inner

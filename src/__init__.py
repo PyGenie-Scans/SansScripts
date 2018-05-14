@@ -1,6 +1,7 @@
 from socket import gethostname
 from functools import wraps
 from .Instrument import ScanningInstrument
+from Util import user_script
 
 SCANNING = None
 
