@@ -1,3 +1,4 @@
+import logging
 try:
     import genie_python.genie as gen
 except ImportError:
@@ -15,8 +16,14 @@ except ImportError:
     gen.end.side_effect = end
     gen.get_runstate.side_effect = lambda: gen._state
 
-    gen.get_sample_pars.return_value = {
+    gen._sample_pars = {
         "GEOMETRY": "Flat Plate",
         "WIDTH": 10,
         "HEIGHT": 10,
         "THICKNESS": 1}
+    gen.get_sample_pars.side_effect = lambda: gen._sample_pars
+
+    def change_sample_pars(key, value):
+        if key.upper() == "THICK":
+            gen._sample_pars["THICKNESS"] = value
+    gen.change_sample_par.side_effect = change_sample_pars

@@ -50,7 +50,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1
+Thickness=1.0
 
 This command returns no result, but should cause a large number of
 actions to be run through genie-python.  We can verify those actions
@@ -116,7 +116,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1
+Thickness=2.0
 >>> print(gen.mock_calls)
 [call.get_runstate(),
  call.waitfor_move(),
@@ -143,7 +143,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1
+Thickness=1.0
 >>> print(gen.mock_calls)
 [call.get_runstate(),
  call.change_sync('isis'),
