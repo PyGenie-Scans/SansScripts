@@ -138,7 +138,6 @@ take a transmission measurement.
 >>> gen.reset_mock()
 >>> measure_changer("Test" "CT", trans=True, uamps=3)
 Setup Larmor for transmission
-setup larmor transmission
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
