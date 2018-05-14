@@ -37,7 +37,7 @@ Examples
 
 First, we'll do a simple measurement on the sample changer
 
->>> measure_changer("Test" "BT", uamps=3)
+>>> measure_changer("Test" "BT", uamps=15)
 
 This command returns no result, but should cause a large number of
 actions to be run through genie-python.  We can verify those actions
@@ -66,7 +66,7 @@ genie-python isn't found.
  call.get_sample_pars(),
  call.change(title='TestBT_SANS'),
  call.begin(),
- call.waitfor(uamps=3),
+ call.waitfor(uamps=15),
  call.end()]
 
 That's quite a few commands, so it's worth running through them.
@@ -98,21 +98,24 @@ After setting the title, the script finally takes a measurement.
 We can then repeat the measurement on a different sample position.
 
 >>> gen.reset_mock()
->>> measure_changer("Test" "CT", uamps=3)
+>>> measure_changer("Test" "CT", uamps=15, thickness=2.0)
 >>> print(gen.mock_calls)
 [call.get_runstate(),
  call.waitfor_move(),
  call.cset(m4trans=200.0),
  call.waitfor_move(),
  call.waitfor_move(),
- call.change_sample_par('Thick', 1.0),
+ call.change_sample_par('Thick', 2.0),
  call.get_sample_pars(),
  call.change(title='TestCT_SANS'),
  call.begin(),
- call.waitfor(uamps=3),
+ call.waitfor(uamps=15),
  call.end()]
 
-Notice that far fewer commands are being run now.  This is because we've already set the instrument in event mode and mode, so those bits are not re-run until the wiring tables change.  To see that, we'll take a transmission measurement.
+Notice that far fewer commands are being run now.  This is because
+we've already set the instrument in event mode and mode, so those bits
+are not re-run until the wiring tables change.  To see that, we'll
+take a transmission measurement.
 
 >>> gen.reset_mock()
 >>> measure_changer("Test" "CT", trans=True, uamps=3)
@@ -142,4 +145,7 @@ Notice that far fewer commands are being run now.  This is because we've already
  call.waitfor(uamps=3),
  call.end()]
 
-You can see that a different set of monitor only wiring tables are loaded, plus the M4 monitor is now moved back into the beam.  Finally, "TRANS" is appened onto the run name, instead of the "SANS" that was used before.
+You can see that a different set of monitor only wiring tables are
+loaded, plus the M4 monitor is now moved back into the beam.  Finally,
+"TRANS" is appened onto the run name, instead of the "SANS" that was
+used before.
