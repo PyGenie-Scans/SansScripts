@@ -10,6 +10,7 @@ Welcome to SansScripting's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   tutorial
    reference
 
 Indices and tables
