@@ -32,12 +32,25 @@ similarly portable.
 Examples
 ========
 
+
+>>> import logging
+>>> import sys
 >>> from src import *
 >>> from src.genie import gen
+>>> ch = logging.StreamHandler(sys.stdout)
+>>> ch.setLevel(logging.DEBUG)
+>>> logging.getLogger().setLevel(logging.DEBUG)
+>>> logging.getLogger().addHandler(ch)
 
 First, we'll do a simple measurement on the sample changer
 
 >>> measure_changer("Test" "BT", uamps=15)
+Setup Larmor for event
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1
 
 This command returns no result, but should cause a large number of
 actions to be run through genie-python.  We can verify those actions
@@ -99,6 +112,11 @@ We can then repeat the measurement on a different sample position.
 
 >>> gen.reset_mock()
 >>> measure_changer("Test" "CT", uamps=15, thickness=2.0)
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1
 >>> print(gen.mock_calls)
 [call.get_runstate(),
  call.waitfor_move(),
@@ -119,6 +137,13 @@ take a transmission measurement.
 
 >>> gen.reset_mock()
 >>> measure_changer("Test" "CT", trans=True, uamps=3)
+Setup Larmor for transmission
+setup larmor transmission
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1
 >>> print(gen.mock_calls)
 [call.get_runstate(),
  call.change_sync('isis'),
@@ -149,3 +174,7 @@ You can see that a different set of monitor only wiring tables are
 loaded, plus the M4 monitor is now moved back into the beam.  Finally,
 "TRANS" is appened onto the run name, instead of the "SANS" that was
 used before.
+
+
+Primary commands
+================
