@@ -92,7 +92,6 @@ def user_script(f):
             code += ", " + k + "=" + kwargs[k]
         code += ")"
         mock_gen.reset_mock()
-        logging.info("Validating Script {}".format(f.__name__))
         logging.getLogger().disabled = True
         try:
             eval(code, {"gen": mock_gen, "logging": Mock()}, {f.__name__: f})

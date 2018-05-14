@@ -202,6 +202,8 @@ class ScanningInstrument(object):
             if self.check_move_pos(pos=pos):
                 info("Moving to position "+pos+" "+ctime())
                 gen.cset(SamplePos=pos)
+            else:
+                raise RuntimeError("Position {} does not exist.".format(pos))
         self._measure(title, thickness, trans, **kwargs)
 
     def measure(self, title, xpos=None, ypos=None, coarsezpos=None,

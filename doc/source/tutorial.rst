@@ -2,7 +2,7 @@ Tutorial
 ********
 
 .. highlight:: python
-   :linenothreshold: 5
+   :linenothreshold: 10
 
 Design Goals
 ============
@@ -175,19 +175,58 @@ loaded, plus the M4 monitor is now moved back into the beam.  Finally,
 used before.
 
 
-Primary commands
-================
+Automated script checking
+=========================
+
+    This module includes a decorated `user_script` that can be added
+    to the front of any user script.  This will allow the scripting
+    system to scan the script for common problems before it is run,
+    ensuring that problems are noticed immediately and not at one in
+    the morning.  All that's required of the user is putting
+    `@user_script` on the line before any functions that they define.
 
     >>> @user_script
     ... def trial():
-    ...     measure_changer("Test1", "BT", trans=True, uamps=5)
-    ...     measure_changer("Test2", "ZT", trans=True, uamps=5)
-    ...     measure_changer("Test1", "BT", trans=False, uamps=15)
-    ...     measure_changer("Test2", "ZT", trans=False, uamps=15)
+    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
+    ...     measure_changer("Test2", "ZT", trans=True, uamps=10)
+    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
+    ...     measure_chnager("Test2", "ZT", trans=False, uamps=30)
     >>> trial() #doctest:+ELLIPSIS
-    Validating Script trial
-    The script should finish in 1.0 hours
+    Traceback (most recent call last):
+	...
+    RuntimeError: Position ZT does not exist.
+
+    What's particularly important about this script setup is that the
+    position error was caught immediately, not fifteen minutes into
+    the measurement, when the users may have already headed to dinner.
+    Changing position "ZT" to position "BT" then gives:
+
+    >>> @user_script
+    ... def trial():
+    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
+    ...     measure_changer("Test2", "TT", trans=True, uamps=10)
+    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
+    ...     measure_chnager("Test2", "TT", trans=False, uamps=30)
+    >>> trial() #doctest:+ELLIPSIS
+    Traceback (most recent call last):
+	...
+    NameError: global name 'measure_chnager' is not defined
+
+    Again, an easy typo to make at midnight that normally would not be
+    found until one thirty in the morning.
+
+    >>> @user_script
+    ... def trial():
+    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
+    ...     measure_changer("Test2", "CT", trans=True, uamps=10)
+    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
+    ...     measure_changer("Test2", "CT", trans=False, uamps=30)
+    >>> trial() #doctest:+ELLIPSIS
+    The script should finish in 2.0 hours
     ...
     Thickness=1.0
 
-Finish code block
+    Once the script has been validated, which should happen nearly
+    instantly, the program will print an estimate of the time needed
+    for the script and the approximate time of completion (not shown).
+    It will then run the script for real.
