@@ -28,12 +28,14 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         return self.lrange
 
     def set_lrange(self, l):
+        self._dae_mode = ""
         self.lrange = l
 
     def get_tof_step(self):
         return self.step
 
     def set_tof_step(self, step):
+        self._dae_mode = ""
         self.step = step
 
 
