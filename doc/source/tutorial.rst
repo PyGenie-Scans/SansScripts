@@ -132,6 +132,29 @@ positions, they can be set independently in their own functions.
 Measure can then move to that position as though it were a standard
 sample changer position.
 
+>>> setup_dae_bsalignment()
+Setup Larmor for bsalignment
+>>> measure("Beam stop", frames=300, dae_fixed=True)
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+Measuring Beam stop_SANS for 300 frames
+>>> measure("Beam stop", frames=300)
+Setup Larmor for event
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+Measuring Beam stop_SANS for 300 frames
+
+By default, when taking a sans measurement, the `measure` function
+puts the instrument in event mode.  Similarly, trans measurements are
+always in transmission mode.  Setting the dae_fixed property to `True`
+ignores the default mode and maintains whatever mode the instrument is
+currently in.
 
 Automated script checking
 =========================

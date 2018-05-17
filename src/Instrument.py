@@ -167,7 +167,7 @@ class ScanningInstrument(object):
         """
         return False
 
-    def configure_sans(self, size="", mode='event'):
+    def configure_sans(self, size="", dae_fixed=False):
         """Setup to the instrument for a SANS measurement
 
         Parameters
@@ -182,14 +182,12 @@ class ScanningInstrument(object):
         """
         # setup to run in histogram or event mode
         self.title_footer = "_SANS"
-        if mode.upper() == 'HISTOGRAM':
-            self.setup_dae_histogram()
-        else:
+        if not dae_fixed:
             self.setup_dae_event()
         self.set_aperature(size)
-        self._configure_sans_custom(size, mode)
+        self._configure_sans_custom(size, dae_fixed)
 
-    def configure_trans(self, size=""):
+    def configure_trans(self, size="", dae_fixed=False):
         """Setup the instrument for a transmission measurement
 
         Parameters
@@ -199,10 +197,11 @@ class ScanningInstrument(object):
           A blank string (the default value) results in
           the aperature not being changed"""
         self.title_footer = "_TRANS"
-        self.setup_dae_transmission()
+        if not dae_fixed:
+            self.setup_dae_transmission()
         gen.waitfor_move()
         self.set_aperature(size)
-        self._configure_trans_custom(self)
+        self._configure_trans_custom(self, dae_fixed=dae_fixed)
 
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False"""
@@ -211,11 +210,11 @@ class ScanningInstrument(object):
             return False
         return True
 
-    def _measure(self, title, thickness, trans, **kwargs):
+    def _measure(self, title, thickness, trans, dae_fixed, **kwargs):
         if trans:
-            self.configure_trans()
+            self.configure_trans(dae_fixed=dae_fixed)
         else:
-            self.configure_sans()
+            self.configure_sans(dae_fixed=dae_fixed)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
         info("Using the following Sample Parameters")
@@ -226,7 +225,7 @@ class ScanningInstrument(object):
         gen.end()
 
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                **kwargs):
+                dae_fixed=False, **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -290,7 +289,8 @@ class ScanningInstrument(object):
             moved = True
         if moved:
             gen.waitfor_move()
-        self._measure(title, thickness, trans, **sanitised_timings(kwargs))
+        self._measure(title, thickness, trans, dae_fixed=dae_fixed,
+                      **sanitised_timings(kwargs))
 
     @staticmethod
     def printsamplepars():

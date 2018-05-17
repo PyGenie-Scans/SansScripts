@@ -270,12 +270,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             pass
         gen.waitfor_move()
 
-    def _configure_sans_custom(self, size="", mode='event'):
+    def _configure_sans_custom(self, size="", dae_fixed=None):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
         gen.waitfor_move()
 
-    def _configure_trans_custom(self, size=""):
+    def _configure_trans_custom(self, size="", dae_fixed=None):
         # move the transmission monitor out
         gen.cset(m4trans=0.0)
         gen.waitfor_move()
