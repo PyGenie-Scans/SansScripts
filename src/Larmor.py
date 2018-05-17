@@ -448,19 +448,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     @staticmethod
     def setup_pi_rotation():
         """Initialise the pi flipper."""
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "*IDN?")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "ERR?")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "SVO 1 1")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "RON 1 1")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "VEL 1 180")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "ACC 1 90")
-        sleep(1)
-        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", "DEC 1 90")
+        script = ["*IDN?", "ERR?", "SVO 1 1", "RON 1 1",
+                  "VEL 1 180", "ACC 1 90", "DEC 1 90"]
+        gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", script[0])
+        for line in script[1:]:
+            sleep(1)
+            gen.set_pv("IN: LARMOR: SDTEST_01: P2: COMM", line)
 
     @staticmethod
     def home_pi_rotation():
