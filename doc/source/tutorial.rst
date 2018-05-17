@@ -29,9 +29,12 @@ underlying blocks are beamline independent, the final script should be
 similarly portable.
 
 
-Examples
-========
+Boilerplate setup
+=================
 
+The commands below are for creating a simple testing system in the
+tutorial.  This merely guarantees that the tutorial is always in sync
+with the actual behaviour of the software.
 
 >>> import logging
 >>> import sys
@@ -42,8 +45,18 @@ Examples
 >>> logging.getLogger().setLevel(logging.DEBUG)
 >>> logging.getLogger().addHandler(ch)
 
+Basic examples
+==============
+
+The simplest possible measurement that
+
 First, we'll do a simple measurement on the sample changer
 
+
+Under the hood
+==============
+
+>>> gen.reset_mock()
 >>> measure("Test", "BT", uamps=15)
 Moving to sample changer position BT
 Setup Larmor for event
@@ -180,8 +193,8 @@ used before.
 Automated script checking
 =========================
 
-    This module includes a decorated `user_script` that can be added
-    to the front of any user script.  This will allow the scripting
+    This module includes a decorator `user_script` that can be added
+    to the front of any user function.  This will allow the scripting
     system to scan the script for common problems before it is run,
     ensuring that problems are noticed immediately and not at one in
     the morning.  All that's required of the user is putting
@@ -189,40 +202,40 @@ Automated script checking
 
     >>> @user_script
     ... def trial():
-    ...     measure("Test1", "BT", trans=True, uamps=10)
-    ...     measure("Test2", "ZT", trans=True, uamps=10)
-    ...     measure("Test1", "BT", trams=False, uamps=30)
-    ...     measure("Test2", "ZT", trans=False, uamps=30)
+    ...     measure("Test1", "BT", uamps=30)
+    ...     measure("Test2", "VT", uamps=30)
+    ...     measure("Test1", "BT", trans=True, uanps=10)
+    ...     measure("Test2", "VT", trans=True, uamps=10)
     >>> trial()
     Traceback (most recent call last):
     ...
-    RuntimeError: Position ZT does not exist
+    RuntimeError: Position VT does not exist
 
-    What's particularly important about this script setup is that the
-    position error was caught immediately, not fifteen minutes into
-    the measurement, when the users may have already headed to dinner.
-    Changing position "ZT" to position "BT" then gives:
+    What may not be immediately obvious from reading is that this
+    error message occurs instantly, not forty five minutes
+    into the run after the first measurement has already been
+    performed.  Fixing the "VT" positions to "CT" then gives:
 
     >>> @user_script
     ... def trial():
-    ...     measure("Test1", "BT", trans=True, uamps=10)
+    ...     measure("Test1", "BT", uamps=30)
+    ...     measure("Test2", "TT", uamps=30)
+    ...     measure("Test1", "BT", trans=True, uanps=10)
     ...     measure("Test2", "TT", trans=True, uamps=10)
-    ...     measure("Test1", "BT", trams=False, uamps=30)
-    ...     measure("Test2", "TT", trans=False, uamps=30)
     >>> trial()
     Traceback (most recent call last):
 	...
-    RuntimeError: Unknown Block trams
+    RuntimeError: Unknown Block uanps
 
     Again, an easy typo to make at midnight that normally would not be
-    found until one thirty in the morning.
+    found until two in the morning.
 
     >>> @user_script
     ... def trial():
+    ...     measure("Test1", "BT", uamps=30)
+    ...     measure("Test2", "TT", uamps=30)
     ...     measure("Test1", "BT", trans=True, uamps=10)
-    ...     measure("Test2", "CT", trans=True, uamps=10)
-    ...     measure("Test1", "BT", trans=False, uamps=30)
-    ...     measure("Test2", "CT", trans=False, uamps=30)
+    ...     measure("Test2", "TT", trans=True, uamps=10)
     >>> trial() #doctest:+ELLIPSIS
     The script should finish in 2.0 hours
     ...
