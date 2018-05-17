@@ -29,7 +29,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                 '8WT', '9WT', '10WT', '11WT', '12WT', '13WT', '14WT']
 
     step = 100.0
-    lrange = 0
+    lrange = "0.9-13.25"
 
     def get_lrange(self):
         """Return the current wavelength range"""
@@ -64,15 +64,19 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         # Running at 5Hz and centering the dip from the T0 at 50ms by
         # setting phase to 48.4ms does not stop the fast flash
         # Setting the T0 phase to 0 (50ms) does
-        if lrange == 0:
+        if lrange == "0.9-13.25":
             # This is for 0.9-13.25
             gen.cset(T0Phase=0)
             gen.cset(TargetDiskPhase=2750)
             gen.cset(InstrumentDiskPhase=2450)
-        else:
+        elif lrange == "0.65-12.95":
             # This is for 0.65-12.95
             gen.cset(TargetDiskPhase=1900)
             gen.cset(InstrumentDiskPhase=1600)
+        else:
+            raise RuntimeError(
+                "The only known lranges for the chopper "
+                "are '0.9-13.25' and '0.65-12.95'")
 
     @dae_setter
     def setup_dae_scanning(self):
