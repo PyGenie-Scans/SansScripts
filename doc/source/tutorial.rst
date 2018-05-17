@@ -2,7 +2,7 @@ Tutorial
 ********
 
 .. highlight:: python
-   :linenothreshold: 10
+   :linenothreshold: 20
 
 Design Goals
 ============
@@ -311,19 +311,25 @@ genie-python isn't found.
 
 That's quite a few commands, so it's worth running through them.
 
-  2-15
+  2
+    Ensure that the instrument is ready to start a measurement
+  3-6
+    Check that the detector is on
+  7
+    Move the sample into position
+  8-20
     Put the instrument in event mode
-  16-18
+  21-23
     Move the M4 transmission monitor out of the beam
-  19
-    Set the sample thickness
-  20
-    Print and log the sample parameters
-  21
-    Set the sample title
-  22
-    Start the measurement.
-  23
-    Wait the requested time
   24
+    Set the sample thickness
+  25
+    Print and log the sample parameters
+  26
+    Set the sample title
+  27
+    Start the measurement.
+  28
+    Wait the requested time
+  29
     Stop the measurement.
