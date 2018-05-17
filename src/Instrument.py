@@ -9,19 +9,20 @@ any generic scripts.
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 from logging import info, warning
-from time import ctime
-
 from six import add_metaclass
-from genie import gen
+from .genie import gen
 
 TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
-def sanitised_timings(d):
+
+def sanitised_timings(kwargs):
+    """Include only the keyword arguments for run timings."""
     result = {}
     for k in TIMINGS:
-        if k in d:
-            result[k] = d[k]
+        if k in kwargs:
+            result[k] = kwargs[k]
     return result
+
 
 @add_metaclass(ABCMeta)
 class ScanningInstrument(object):
@@ -220,7 +221,7 @@ class ScanningInstrument(object):
         self._needs_setup()
         moved = False
         if pos:
-            if type(pos) is str:
+            if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):
                     info("Moving to sample changer position {}".format(pos))
                     gen.cset(SamplePos=pos)

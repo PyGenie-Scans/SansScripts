@@ -1,20 +1,33 @@
+"""A module to import genie_python even when genie is not available
+
+Impoting `gen` from this module will import genie_python in the
+instance where it does exist and will create a mock virtual instrument
+when it does not.  You can directly import this mock instrument by
+importing `mock_gen`.
+
+"""
 import mock
 mock_gen = mock.Mock()
-mock_gen._state = "SETUP"
+mock_gen.mock_state = "SETUP"
 
 
 def begin():
-    mock_gen._state = "RUNNING"
+    """Fake starting a measurement"""
+    mock_gen.mock_state = "RUNNING"
 
 
 def end():
-    mock_gen._state = "SETUP"
+    """Fake stopping a measurement"""
+    mock_gen.mock_state = "SETUP"
+
 
 MOTORS = {"CoarseZ": 0, "Translation": 0, "SampleX": 0,
           "SamplePos": "", "T0Phase": 0, "TargetDiskPhase": 0,
           "InstrumentDiskPhase": 0, "m4trans": 0}
 
+
 def cset_sideffect(axis=None, value=None, **kwargs):
+    """Fake setting a motor"""
     if axis:
         kwargs[axis] = value
     for k in kwargs:
@@ -22,28 +35,30 @@ def cset_sideffect(axis=None, value=None, **kwargs):
             raise RuntimeError("Unknown Block {}".format(k))
         MOTORS[k] = kwargs[k]
 
+
 mock_gen.begin.side_effect = begin
 mock_gen.end.side_effect = end
-mock_gen.get_runstate.side_effect = lambda: mock_gen._state
+mock_gen.get_runstate.side_effect = lambda: mock_gen.mock_state
 mock_gen.cset.side_effect = cset_sideffect
 mock_gen.cget.side_effect = lambda axis: MOTORS[axis]
 
-mock_gen._sample_pars = {
+mock_gen.mock_sample_pars = {
     "GEOMETRY": "Flat Plate",
     "WIDTH": 10,
     "HEIGHT": 10,
     "THICKNESS": 1}
-mock_gen.get_sample_pars.side_effect = lambda: mock_gen._sample_pars
+mock_gen.get_sample_pars.side_effect = lambda: mock_gen.mock_sample_pars
 
 
 def change_sample_pars(key, value):
+    """Fake change the sample parameters."""
     if key.upper() == "THICK":
-        mock_gen._sample_pars["THICKNESS"] = value
+        mock_gen.mock_sample_pars["THICKNESS"] = value
 
 
 mock_gen.change_sample_par.side_effect = change_sample_pars
 
 try:
-    import genie_python.genie as gen
+    import genie_python.genie as gen  # pylint: disable=unused-import
 except ImportError:
     gen = mock_gen

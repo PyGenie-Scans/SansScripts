@@ -1,9 +1,11 @@
+"""Useful utilities for scriping"""
 from functools import wraps
 import logging
 from logging import info
 
 
 class CustomFormatter(logging.Formatter):
+    """A logging formatter for the instruments"""
     def format(self, rec):
         return rec.levelname
 
@@ -11,9 +13,6 @@ class CustomFormatter(logging.Formatter):
 # create logger
 logger = logging.getLogger('simple_example')
 
-# create console handler and set level to debug
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
 # create console handler and set level to debug
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -26,7 +25,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def dae_setter(f):
+def dae_setter(inner):
     """Declare that a method sets the DAE wiring table
 
     This decorator was designed to work on subclasses of the
@@ -47,15 +46,16 @@ def dae_setter(f):
     of the wiring table.
 
     """
-    @wraps(f)
+    @wraps(inner)
     def wrapper(self, *args, **kwargs):
-        request = f.__name__[10:]
-        if request == self._dae_mode:
+        """Memoize the dae mode"""
+        request = inner.__name__[10:]
+        if request == self._dae_mode:  # pylint: disable=protected-access
             return
         info("Setup {} for {}".format(type(self).__name__,
                                       request.replace("_", " ")))
-        f(self, *args, **kwargs)
-        self._dae_mode = request
+        inner(self, *args, **kwargs)
+        self._dae_mode = request  # pylint: disable=protected-access
     return wrapper
 
 
@@ -64,29 +64,31 @@ SCALES = {"uamps": 90, "frames": 0.1, "seconds": 1,
 
 
 def wait_time(call):
-    name, args, kwargs = call
+    """Calculate the time spent waiting by a mock wait call."""
+    name, _, kwargs = call
     if name != "waitfor":
         return 0
     key = kwargs.keys()[0]
     return SCALES[key] * kwargs[key]
 
 
-def pretty_print_time(s):
+def pretty_print_time(seconds):
+    """Given a number of seconds, generate a human readable time string."""
     from datetime import timedelta, datetime
-    hours = s/3600.0
-    delta = timedelta(0, s)
+    hours = seconds/3600.0
+    delta = timedelta(0, seconds)
     skeleton = "The script should finish in {} hours\nat {}"
     return skeleton.format(hours, delta+datetime.now())
 
 
-
-def user_script(f):
+def user_script(script):
     """Perform some sanity checking on a user script before it is run"""
-    @wraps(f)
+    @wraps(script)
     def inner(*args, **kwargs):
-        from genie import mock_gen
+        """Mock run a script before running it for real."""
         from mock import Mock
-        code = f.__name__ + "("
+        from .genie import mock_gen
+        code = script.__name__ + "("
         code += ", ".join(args)
         for k in kwargs:
             code += ", " + k + "=" + kwargs[k]
@@ -94,11 +96,13 @@ def user_script(f):
         mock_gen.reset_mock()
         logging.getLogger().disabled = True
         try:
-            eval(code, {"gen": mock_gen, "logging": Mock()}, {f.__name__: f})
+            eval(code,  # pylint: disable=eval-used
+                 {"gen": mock_gen, "logging": Mock()},
+                 {script.__name__: script})
         finally:
             logging.getLogger().disabled = False
         calls = mock_gen.mock_calls
         time = sum([wait_time(call) for call in calls])
         logging.info(pretty_print_time(time))
-        f(*args, **kwargs)
+        script(*args, **kwargs)
     return inner
