@@ -275,6 +275,7 @@ class ScanningInstrument(object):
                     raise RuntimeError(
                         "Position {} does not exist".format(pos))
             elif callable(pos):
+                info("Moving to position {}".format(pos.__name__))
                 pos()
             else:
                 raise TypeError("Cannot understand position {}".format(pos))
