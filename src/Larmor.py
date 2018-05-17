@@ -384,6 +384,14 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         info("Homing s2")
 
     @staticmethod
+    def detector_is_on():
+        """Is the detector currently on?"""
+        voltage_status = sum([
+            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
+            for x in [8, 9, 10, 11]])
+        return voltage_status > 0
+
+    @staticmethod
     def detectoronoff(onoff=0, delay=1):
         """Toggle the high voltage on the detector"""
         if onoff == 1:
@@ -407,34 +415,10 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
 
     @staticmethod
     def movebench(angle=0.0, delaydet=1):
-        """Move the downstream arm"""
+        """Safely move the downstream arm"""
         info("Turning Detector Off")
         Larmor.detectoronoff(onoff=0, delay=delaydet)
-        voltage_status = sum([
-            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
-            for x in [8, 9, 10, 11]])
-        if voltage_status > 0:
-            info("The detector is not turned off")
-            info("Not attempting Move")
-            return
-        else:
-            info("The detector is off")
-
-        if angle >= 0.0:
-            gen.cset(benchlift=1)
-            info("Lifting Bench (20s)")
-            sleep(20)
-
-            if gen.get_pv("IN: LARMOR: BENCH: STATUS") == 1:
-                info("Rotating Bench")
-                gen.cset(bench_rot=angle)
-                gen.waitfor_move()
-                info("Lowering Bench (20s)")
-                gen.cset(benchlift=0)
-                sleep(20)
-            else:
-                info("Bench failed to lift")
-                info("Move not attempted")
+        Larmor.rotatebench(angle)
         # turn the detector back on
         info("Turning Detector Back on")
         Larmor.detectoronoff(onoff=1, delay=delaydet)
@@ -442,10 +426,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     @staticmethod
     def rotatebench(angle=0.0):
         """Move the downstream arm"""
-        voltage_status = sum([
-            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
-            for x in [8, 9, 10, 11]])
-        if voltage_status > 0:
+        if Larmor.detector_is_on() > 0:
             info("The detector is not turned off")
             info("Not attempting Move")
             return
