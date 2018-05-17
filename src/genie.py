@@ -71,6 +71,7 @@ def get_pv(pv):
         else:
             return 0
 
+
 mock_gen.get_pv.side_effect = get_pv
 mock_gen.set_pv.side_effect = set_pv
 mock_gen.mock_detector_on = "On"
