@@ -372,36 +372,34 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         return voltage_status > 0
 
     @staticmethod
-    def detectoronoff(onoff=0, delay=1):
-        """Toggle the high voltage on the detector"""
-        if onoff == 1:
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "On")
-        else:
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
-            gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
-        # wait for 3 minutes for ramp up 60s to ranmp down
-        if delay == 1:
-            if onoff == 1:
-                info("Waiting For Detector To Power Up (180s)")
-                sleep(180)
-            else:
-                info("Waiting For Detector To Power Down (60s)")
-                sleep(60)
+    def detector_turn_on(delay=True):
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "On")
+        if delay:
+            info("Waiting For Detector To Power Up (180s)")
+            sleep(180)
 
     @staticmethod
-    def movebench(angle=0.0, delaydet=1):
+    def detector_turn_off(delay=True):
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
+        if delay:
+            info("Waiting For Detector To Power Up (60)")
+            sleep(60)
+
+    @staticmethod
+    def movebench(angle=0.0, delaydet=True):
         """Safely move the downstream arm"""
         info("Turning Detector Off")
-        Larmor.detectoronoff(onoff=0, delay=delaydet)
+        Larmor.detector_turn_off(delay=delaydet)
         Larmor.rotatebench(angle)
         # turn the detector back on
         info("Turning Detector Back on")
-        Larmor.detectoronoff(onoff=1, delay=delaydet)
+        Larmor.detector_turn_on(delay=delaydet)
 
     @staticmethod
     def rotatebench(angle=0.0):
