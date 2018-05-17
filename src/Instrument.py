@@ -31,6 +31,23 @@ class ScanningInstrument(object):
     _dae_mode = None
     title_footer = ""
 
+    @staticmethod
+    def _generic_scan(detector, spectra, wiring, tcbs):
+        """A utility class for setting up dae states
+
+        On its own, it's not particularly useful, but
+        letting subclasses provide default parameters
+        simplifies creating new dae states.
+        """
+        gen.change(nperiods=1)
+        gen.change_start()
+        gen.change_tables(detector=detector)
+        gen.change_tables(spectra=spectra)
+        gen.change_tables(wiring=wiring)
+        for tcb in tcbs:
+            gen.change_tcb(**tcb)
+        gen.change_finish()
+
     @abstractproperty
     def _poslist(self):
         """The list of named positions that the instrument can run through in
@@ -40,7 +57,7 @@ class ScanningInstrument(object):
     @staticmethod
     def _needs_setup():
         if gen.get_runstate() != "SETUP":
-            raise RuntimeError("Cannot start a measuremnt in a measurement")
+            raise RuntimeError("Cannot start a measurement in a measurement")
 
     @abstractmethod
     def setup_dae_scanning(self):
@@ -118,7 +135,6 @@ class ScanningInstrument(object):
           A blank string (the default value) results in
           the aperature not being changed.
           """
-
         pass
 
     def configure_sans(self, size="", mode='event'):

@@ -32,19 +32,22 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     lrange = 0
 
     def get_lrange(self):
+        """Return the current wavelength range"""
         return self.lrange
 
-    def set_lrange(self, l):
+    def set_lrange(self, lrange):
+        """Set the current wavelength range"""
         self._dae_mode = ""
-        self.lrange = l
+        self.lrange = lrange
 
     def get_tof_step(self):
+        """Get the current TOF step for the tcb"""
         return self.step
 
     def set_tof_step(self, step):
+        """Set the current TOF step for the tcb"""
         self._dae_mode = ""
         self.step = step
-
 
     @staticmethod
     def _generic_scan(  # pylint: disable=dangerous-default-value
@@ -52,14 +55,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             spectra=r"C:\Instrument\Settings\Tables\spectra_1To1.dat",
             wiring=r"C:\Instrument\Settings\Tables\wiring.dat",
             tcbs=[]):
-        gen.change(nperiods=1)
-        gen.change_start()
-        gen.change_tables(detector=detector)
-        gen.change_tables(spectra=spectra)
-        gen.change_tables(wiring=wiring)
-        for tcb in tcbs:
-            gen.change_tcb(**tcb)
-        gen.change_finish()
+        ScanningInstrument._generic_scan(detector, spectra, wiring, tcbs)
 
     @staticmethod
     def _set_choppers(lrange):
@@ -130,8 +126,8 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                   # 3rd time regime for monitors to allow flexible
                   # binning of detector to reduce file size and
                   # decrease file write time
-                  {"low": 5.0, "high": 100000.0, "step": self.step, "trange": 1,
-                   "log": 0, "regime": 3},
+                  {"low": 5.0, "high": 100000.0, "step": self.step,
+                   "trange": 1, "log": 0, "regime": 3},
                   {"low": 0.0, "high": 0.0, "step": 0.0, "trange": 2,
                    "log": 0, "regime": 3}])
         self._set_choppers(self.lrange)
