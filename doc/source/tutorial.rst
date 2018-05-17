@@ -244,6 +244,13 @@ Height=10
 Thickness=1.0
 Measuring Sample_SANS for 100 frames
 
+We can also turn on the detector manually.
+
+>>> detector_turn_off()
+Waiting For Detector To Power Down (60s)
+>>> detector_turn_on()
+Waiting For Detector To Power Up (180s)
+
 
 DAE Modes
 =========
