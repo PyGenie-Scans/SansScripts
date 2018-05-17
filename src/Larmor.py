@@ -1,9 +1,16 @@
 """This is the instrument implementation for the Larmor beamline."""
 from logging import info
-from time import sleep
 from .Instrument import ScanningInstrument
 from .Util import dae_setter
 from .genie import gen
+
+
+def sleep(seconds):
+    """Override the sleep function to use genie.
+
+    We need this override to ensure that simularted runs are forced to
+    wait for real sleeps."""
+    return gen.waitfor(seconds=seconds)
 
 
 class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
