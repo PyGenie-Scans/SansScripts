@@ -137,6 +137,36 @@ class ScanningInstrument(object):
           """
         pass
 
+    @staticmethod
+    @abstractmethod
+    def detector_is_on():
+        """Is the detector currently powered?"""
+        return False
+
+    @staticmethod
+    @abstractmethod
+    def detector_turn_on(delay=True):
+        """Power on the detector
+
+        Parameters
+        ==========
+        delay : bool
+          Wait for the detector to warm up before continuing
+        """
+        return False
+
+    @staticmethod
+    @abstractmethod
+    def detector_turn_off(delay=True):
+        """Remove detector power
+
+        Parameters
+        ==========
+        delay : bool
+          Wait for the detector to cool down before continuing
+        """
+        return False
+
     def configure_sans(self, size="", mode='event'):
         """Setup to the instrument for a SANS measurement
 

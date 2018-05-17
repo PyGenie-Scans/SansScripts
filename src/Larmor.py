@@ -281,6 +281,34 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.cset(m4trans=0.0)
         gen.waitfor_move()
 
+    @staticmethod
+    def detector_is_on():
+        """Is the detector currently on?"""
+        voltage_status = sum([
+            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
+            for x in [8, 9, 10, 11]])
+        return voltage_status > 0
+
+    @staticmethod
+    def detector_turn_on(delay=True):
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "On")
+        if delay:
+            info("Waiting For Detector To Power Up (180s)")
+            sleep(180)
+
+    @staticmethod
+    def detector_turn_off(delay=True):
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
+        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
+        if delay:
+            info("Waiting For Detector To Power Up (60)")
+            sleep(60)
+
     # Instrument Specific Scripts
     @staticmethod
     def FOMin():  # pylint: disable=invalid-name
@@ -362,34 +390,6 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     def homes2():
         """Rehome slit2.  This is currentl a no-op."""
         info("Homing s2")
-
-    @staticmethod
-    def detector_is_on():
-        """Is the detector currently on?"""
-        voltage_status = sum([
-            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
-            for x in [8, 9, 10, 11]])
-        return voltage_status > 0
-
-    @staticmethod
-    def detector_turn_on(delay=True):
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "On")
-        if delay:
-            info("Waiting For Detector To Power Up (180s)")
-            sleep(180)
-
-    @staticmethod
-    def detector_turn_off(delay=True):
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
-        if delay:
-            info("Waiting For Detector To Power Up (60)")
-            sleep(60)
 
     @staticmethod
     def movebench(angle=0.0, delaydet=True):
