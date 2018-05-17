@@ -10,10 +10,23 @@ def begin():
 def end():
     mock_gen._state = "SETUP"
 
+MOTORS = {"CoarseZ": 0, "Translation": 0, "SampleX": 0,
+          "SamplePos": "", "T0Phase": 0, "TargetDiskPhase": 0,
+          "InstrumentDiskPhase": 0, "m4trans": 0}
+
+def cset_sideffect(axis=None, value=None, **kwargs):
+    if axis:
+        kwargs[axis] = value
+    for k in kwargs:
+        if k not in MOTORS:
+            raise RuntimeError("Unknown Block {}".format(k))
+        MOTORS[k] = kwargs[k]
 
 mock_gen.begin.side_effect = begin
 mock_gen.end.side_effect = end
 mock_gen.get_runstate.side_effect = lambda: mock_gen._state
+mock_gen.cset.side_effect = cset_sideffect
+mock_gen.cget.side_effect = lambda axis: MOTORS[axis]
 
 mock_gen._sample_pars = {
     "GEOMETRY": "Flat Plate",

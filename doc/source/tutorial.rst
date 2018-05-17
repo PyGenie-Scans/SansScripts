@@ -44,7 +44,8 @@ Examples
 
 First, we'll do a simple measurement on the sample changer
 
->>> measure_changer("Test" "BT", uamps=15)
+>>> measure("Test", "BT", uamps=15)
+Moving to sample changer position BT
 Setup Larmor for event
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -59,6 +60,7 @@ genie-python isn't found.
 
 >>> print(gen.mock_calls)
 [call.get_runstate(),
+ call.cset(SamplePos='BT'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),
@@ -77,7 +79,7 @@ genie-python isn't found.
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
  call.get_sample_pars(),
- call.change(title='TestBT_SANS'),
+ call.change(title='Test_SANS'),
  call.begin(),
  call.waitfor(uamps=15),
  call.end()]
@@ -111,7 +113,7 @@ After setting the title, the script finally takes a measurement.
 We can then repeat the measurement on a different sample position.
 
 >>> gen.reset_mock()
->>> measure_changer("Test" "CT", uamps=15, thickness=2.0)
+>>> measure("Test" "CT", uamps=15, thickness=2.0)
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -136,7 +138,7 @@ are not re-run until the wiring tables change.  To see that, we'll
 take a transmission measurement.
 
 >>> gen.reset_mock()
->>> measure_changer("Test" "CT", trans=True, uamps=3)
+>>> measure("Test" "CT", trans=True, uamps=3)
 Setup Larmor for transmission
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -187,14 +189,14 @@ Automated script checking
 
     >>> @user_script
     ... def trial():
-    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
-    ...     measure_changer("Test2", "ZT", trans=True, uamps=10)
-    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
-    ...     measure_chnager("Test2", "ZT", trans=False, uamps=30)
-    >>> trial() #doctest:+ELLIPSIS
+    ...     measure("Test1", "BT", trans=True, uamps=10)
+    ...     measure("Test2", "ZT", trans=True, uamps=10)
+    ...     measure("Test1", "BT", trams=False, uamps=30)
+    ...     measure("Test2", "ZT", trans=False, uamps=30)
+    >>> trial()
     Traceback (most recent call last):
-	...
-    RuntimeError: Position ZT does not exist.
+    ...
+    RuntimeError: Position ZT does not exist
 
     What's particularly important about this script setup is that the
     position error was caught immediately, not fifteen minutes into
@@ -203,24 +205,24 @@ Automated script checking
 
     >>> @user_script
     ... def trial():
-    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
-    ...     measure_changer("Test2", "TT", trans=True, uamps=10)
-    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
-    ...     measure_chnager("Test2", "TT", trans=False, uamps=30)
+    ...     measure("Test1", "BT", trans=True, uamps=10)
+    ...     measure("Test2", "TT", trans=True, uamps=10)
+    ...     measure("Test1", "BT", trams=False, uamps=30)
+    ...     measure("Test2", "TT", trans=False, uamps=30)
     >>> trial() #doctest:+ELLIPSIS
     Traceback (most recent call last):
 	...
-    NameError: global name 'measure_chnager' is not defined
+    RuntimeError: Unknown Block trams
 
     Again, an easy typo to make at midnight that normally would not be
     found until one thirty in the morning.
 
     >>> @user_script
     ... def trial():
-    ...     measure_changer("Test1", "BT", trans=True, uamps=10)
-    ...     measure_changer("Test2", "CT", trans=True, uamps=10)
-    ...     measure_changer("Test1", "BT", trans=False, uamps=30)
-    ...     measure_changer("Test2", "CT", trans=False, uamps=30)
+    ...     measure("Test1", "BT", trans=True, uamps=10)
+    ...     measure("Test2", "CT", trans=True, uamps=10)
+    ...     measure("Test1", "BT", trans=False, uamps=30)
+    ...     measure("Test2", "CT", trans=False, uamps=30)
     >>> trial() #doctest:+ELLIPSIS
     The script should finish in 2.0 hours
     ...

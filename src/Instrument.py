@@ -14,6 +14,14 @@ from time import ctime
 from six import add_metaclass
 from genie import gen
 
+TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
+
+def sanitised_timings(d):
+    result = {}
+    for k in TIMINGS:
+        if k in d:
+            result[k] = d[k]
+    return result
 
 @add_metaclass(ABCMeta)
 class ScanningInstrument(object):
@@ -170,88 +178,68 @@ class ScanningInstrument(object):
         gen.waitfor(**kwargs)
         gen.end()
 
-    def measure_changer(self, title, pos=None, thickness=1.0,
-                        trans=False, **kwargs):
-        """Measure SANS or TRANS at a given sample changer position. If no
-        position is given the sample stack will not move.  Accepts any
-        of the waitfor keyword arguments to specify the length of the
-        measurement.
+    def measure(self, title, pos=None, thickness=1.0, trans=False,
+                **kwargs):
+        """Take a sample measurement.
 
         Parameters
         ==========
         title : str
-          title of the measurement
-        pos : str
-          Sample changer position.  If blank, then the position isn't moved.
+          The title for the measurement.  This is the only required parameter.
+        pos
+          The sample position.  This can be a string with the name of
+          a sample position or it can be a function which moves the
+          detector into the desired position.  If left undefined, the
+          instrument will take the measurement in its current
+          position.
         thickness : float
-          The thickness of the sample in mm
+          The thickness of the sample in millimeters.  The default is 1mm.
         trans : bool
-          Whether to perform a transmission measurement.  Sans is the default.
+          Whether to perform a transmission run instead of a sans run.
 
-        Returns
-        =======
-        None
+        Additionally, this function takes two other kinds of keyword
+        arguments.  If given a block name, it will move that block to
+        the given position.  If given a time duration, then that will
+        be the duration of the run.
 
+        Examples
+        ========
+        measure("H2O", uamps=10)
+
+          Perform a SANS measurment in the current position on a 1mm
+          thick water sample until the proton beam has released 10
+          microamp hours of current (approx 15 minutes).
+
+        measure("D2O", "LT", thickness=2.0, trans=True, CoarseZ=38, frames=300)
+
+          Move to sample changer position LT, then adjust the CoarseZ
+          motor to 38mm.  Finally, take a transmission measurement on
+          a 2 mm thick deuterium sample for 300 proton pulses (approx
+          5 minutes).
         """
-        # Check if a changer move is valid and if so move there if not
-        # do nothing Make sure we only have 1 period just in case. If
-        # more are needed write another function
         self._needs_setup()
+        moved = False
         if pos:
-            pos = pos.upper()
-            if self.check_move_pos(pos=pos):
-                info("Moving to position "+pos+" "+ctime())
-                gen.cset(SamplePos=pos)
+            if type(pos) is str:
+                if self.check_move_pos(pos=pos):
+                    info("Moving to sample changer position {}".format(pos))
+                    gen.cset(SamplePos=pos)
+                else:
+                    raise RuntimeError(
+                        "Position {} does not exist".format(pos))
+            elif callable(pos):
+                pos()
             else:
-                raise RuntimeError("Position {} does not exist.".format(pos))
-        self._measure(title, thickness, trans, **kwargs)
-
-    def measure(self, title, xpos=None, ypos=None, coarsezpos=None,
-                finezpos=None, thickness=1.0, trans=False, **kwargs):
-        """Measure SANS or TRANS at a given sample stack position
-
-        If no position is given the sample stack will not move. The
-        run time for the measurement can be given with the same
-        keyword arguments used in waitfor.
-
-        Parameters
-        ==========
-        xpos : float
-          X position of sample
-        ypos : float
-          y position of sample
-        coarsezpos : float
-          z position of sample on coarse motor
-        finezpos : float
-          z position of sample on fine motor
-        title : str
-          Measurement title
-        thickness : float
-          sample thickness in mm
-        trans : bool
-          whether to perform a trans measurement.  By default, a Sans
-          measurement is performed.
-
-        """
-        self._needs_setup()
-        move = {}
-        if xpos is not None:
-            gen.cset(SampleX=xpos)
-            move["x"] = xpos
-        if ypos is not None:
-            gen.cset(Translation=ypos)
-            move["y"] = ypos
-        if coarsezpos is not None:
-            gen.cset(CoarseZ=coarsezpos)
-            move["CoarseZ"] = coarsezpos
-        if finezpos is not None:
-            gen.cset(FineZ=finezpos)
-            move["FineZ"] = finezpos
-        if move:
-            positions = [str(k)+": "+str(move[k]) for k in move]
-            info("Moving to position "+", ".join(positions))
+                raise TypeError("Cannot understand position {}".format(pos))
+        for arg in kwargs:
+            if arg in TIMINGS:
+                continue
+            info("Moving {} to {}".format(arg, kwargs[arg]))
+            gen.cset(arg, kwargs[arg])
+            moved = True
+        if moved:
             gen.waitfor_move()
-        self._measure(title, thickness, trans, **kwargs)
+        self._measure(title, thickness, trans, **sanitised_timings(kwargs))
 
     @staticmethod
     def printsamplepars():
