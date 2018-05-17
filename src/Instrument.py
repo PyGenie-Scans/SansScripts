@@ -221,6 +221,10 @@ class ScanningInstrument(object):
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
         gen.begin()
+        info("Measuring {title:} for {time:} {units:}".format(
+            title=title+self.title_footer,
+            units=list(kwargs.keys())[0],
+            time=kwargs[list(kwargs.keys())[0]]))
         gen.waitfor(**kwargs)
         gen.end()
 
