@@ -60,6 +60,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Sample Name_SANS for 600 frames
 
 The `measure` command is the primary entry point for all types of SANS
 measurement.  We can pass it a sample changer position if we wish to
@@ -72,6 +73,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Sample Name_SANS for 5 uamps
 
 A couple of things changed with this new command.  First, I've
 measured for 5 µamps instead of the 600 frames we did before.  The
@@ -92,6 +94,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=2.0
+Measuring Sample Name_TRANS for 5 uamps
 
 Here we are directly setting the moving the CoarseZ motor on the
 sample stack to our desired position, instead of just picking a
@@ -109,6 +112,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Sample Name_SANS for 5 uamps
 
 We can combine a sample changer position with motor movements.  This
 is useful for custom mounting that may not perfectly align with the
@@ -126,6 +130,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Sample Name_SANS for 10 uamps
 
 Finally, if the experiment requires a large number of custom
 positions, they can be set independently in their own functions.
@@ -205,7 +210,7 @@ Automated script checking
     >>> trial() #doctest:+ELLIPSIS
     The script should finish in 2.0 hours
     ...
-    Thickness=1.0
+    Measuring Test2_TRANS for 10 uamps
 
     Once the script has been validated, which should happen nearly
     instantly, the program will print an estimate of the time needed
@@ -237,6 +242,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Sample_SANS for 100 frames
 
 
 DAE Modes
@@ -259,6 +265,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
+Measuring Test_SANS for 15 uamps
 
 This command returns no result, but should cause a large number of
 actions to be run through genie-python.  We can verify those actions
@@ -313,84 +320,3 @@ That's quite a few commands, so it's worth running through them.
     Wait the requested time
   24
     Stop the measurement.
-
-The
-first thirteen lines put the instrument into event mode for taking a
-sans measurement and set the chopper to the correct value.  The next
-three lines move the M4 transmission monitor out of the beam.  The
-sample's thickness is then set and the sample parameters logged.
-After setting the title, the script finally takes a measurement.
-
-We can then repeat the measurement on a different sample position.
-
->>> gen.reset_mock()
->>> measure("Test" "CT", uamps=15, thickness=2.0)
-Using the following Sample Parameters
-Geometry=Flat Plate
-Width=10
-Height=10
-Thickness=2.0
->>> print(gen.mock_calls)
-[call.get_runstate(),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
- call.waitfor_move(),
- call.cset(m4trans=200.0),
- call.waitfor_move(),
- call.waitfor_move(),
- call.change_sample_par('Thick', 2.0),
- call.get_sample_pars(),
- call.change(title='TestCT_SANS'),
- call.begin(),
- call.waitfor(uamps=15),
- call.end()]
-
-Notice that far fewer commands are being run now.  This is because
-we've already set the instrument in event mode and mode, so those bits
-are not re-run until the wiring tables change.  To see that, we'll
-take a transmission measurement.
-
->>> gen.reset_mock()
->>> measure("Test" "CT", trans=True, uamps=3)
-Setup Larmor for transmission
-Using the following Sample Parameters
-Geometry=Flat Plate
-Width=10
-Height=10
-Thickness=1.0
->>> print(gen.mock_calls)
-[call.get_runstate(),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
- call.change_sync('isis'),
- call.change(nperiods=1),
- call.change_start(),
- call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector_monitors_only.dat'),
- call.change_tables(spectra='C:\\Instrument\\Settings\\Tables\\spectra_monitors_only.dat'),
- call.change_tables(wiring='C:\\Instrument\\Settings\\Tables\\wiring_monitors_only.dat'),
- call.change_tcb(high=100000.0, log=0, low=5.0, step=100.0, trange=1),
- call.change_tcb(high=0.0, log=0, low=0.0, step=0.0, trange=2),
- call.change_finish(),
- call.cset(T0Phase=0),
- call.cset(TargetDiskPhase=2750),
- call.cset(InstrumentDiskPhase=2450),
- call.waitfor_move(),
- call.waitfor_move(),
- call.cset(m4trans=0.0),
- call.waitfor_move(),
- call.waitfor_move(),
- call.change_sample_par('Thick', 1.0),
- call.get_sample_pars(),
- call.change(title='TestCT_TRANS'),
- call.begin(),
- call.waitfor(uamps=3),
- call.end()]
-
-You can see that a different set of monitor only wiring tables are
-loaded, plus the M4 monitor is now moved back into the beam.  Finally,
-"TRANS" is appened onto the run name, instead of the "SANS" that was
-used before.
