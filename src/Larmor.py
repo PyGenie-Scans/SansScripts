@@ -21,6 +21,22 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                 '1WT', '2WT', '3WT', '4WT', '5WT', '6WT', '7WT',
                 '8WT', '9WT', '10WT', '11WT', '12WT', '13WT', '14WT']
 
+    step = 100.0
+    lrange = 0
+
+    def get_lrange(self):
+        return self.lrange
+
+    def set_lrange(self, l):
+        self.lrange = l
+
+    def get_tof_step(self):
+        return self.step
+
+    def set_tof_step(self, step):
+        self.step = step
+
+
     @staticmethod
     def _generic_scan(  # pylint: disable=dangerous-default-value
             detector=r"C:\Instrument\Settings\Tables\detector.dat",
@@ -75,22 +91,20 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "trange": 1, "log": 0}])
 
     @dae_setter
-    def setup_dae_event(self, step=100.0,  # pylint: disable=arguments-differ
-                        lrange=0):
+    def setup_dae_event(self):
         # Normal event mode with full detector binning
         Larmor._generic_scan(
             wiring=r"C:\Instrument\Settings\Tables\wiring_event.dat",
-            tcbs=[{"low": 5.0, "high": 100000.0, "step": step,
+            tcbs=[{"low": 5.0, "high": 100000.0, "step": self.step,
                    "trange": 1, "log": 0},
                   {"low": 0.0, "high": 0.0, "step": 0.0,
                    "trange": 2, "log": 0},
                   {"low": 5.0, "high": 100000.0, "step": 2.0, "trange": 1,
                    "log": 0, "regime": 2}])
-        self._set_choppers(lrange)
+        self._set_choppers(self.lrange)
 
     @dae_setter
-    def setup_dae_event_fastsave(self,  # pylint: disable=arguments-differ
-                                 step=100.0, lrange=0):
+    def setup_dae_event_fastsave(self):
         # Event mode with reduced detector histogram binning to
         # decrease filesize
         # This currently breaks mantid nexus read
@@ -107,26 +121,24 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                   # 3rd time regime for monitors to allow flexible
                   # binning of detector to reduce file size and
                   # decrease file write time
-                  {"low": 5.0, "high": 100000.0, "step": step, "trange": 1,
+                  {"low": 5.0, "high": 100000.0, "step": self.step, "trange": 1,
                    "log": 0, "regime": 3},
                   {"low": 0.0, "high": 0.0, "step": 0.0, "trange": 2,
                    "log": 0, "regime": 3}])
-        self._set_choppers(lrange)
+        self._set_choppers(self.lrange)
 
     @dae_setter
-    def setup_dae_histogram(self,  # pylint: disable=arguments-differ
-                            lrange=0):
+    def setup_dae_histogram(self):
         gen.change_sync('isis')
         Larmor._generic_scan(
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 100.0,
                    "trange": 1, "log": 0},
                   {"low": 0.0, "high": 0.0, "step": 0.0,
                    "trange": 2, "log": 0}])
-        self._set_choppers(lrange)
+        self._set_choppers(self.lrange)
 
     @dae_setter
-    def setup_dae_transmission(self,  # pylint: disable=arguments-differ
-                               lrange=0):
+    def setup_dae_transmission(self):
         gen.change_sync('isis')
         Larmor._generic_scan(
             r"C:\Instrument\Settings\Tables\detector_monitors_only.dat",
@@ -136,7 +148,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
               "trange": 1, "log": 0},
              {"low": 0.0, "high": 0.0, "step": 0.0,
               "trange": 2, "log": 0}])
-        self._set_choppers(lrange)
+        self._set_choppers(self.lrange)
 
     @staticmethod
     @dae_setter
