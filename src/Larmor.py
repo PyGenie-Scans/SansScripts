@@ -209,9 +209,8 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                   {"low": 0.0, "high": 0.0, "step": 0.0,
                    "trange": 2, "log": 0}])
 
-    @staticmethod
     @dae_setter
-    def setup_dae_bsalignment():
+    def setup_dae_bsalignment(self):
         Larmor._generic_scan(
             tcbs=[{"low": 1000.0, "high": 100000.0, "step": 99000.0,
                    "trange": 1, "log": 0},
@@ -306,7 +305,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
         if delay:
-            info("Waiting For Detector To Power Up (60)")
+            info("Waiting For Detector To Power Down (60s)")
             sleep(60)
 
     # Instrument Specific Scripts

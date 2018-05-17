@@ -265,6 +265,9 @@ class ScanningInstrument(object):
           5 minutes).
         """
         self._needs_setup()
+        if not self.detector_is_on() and not trans:
+            warning("The detector was off.  Turning on the detector")
+            self.detector_turn_on()
         moved = False
         if pos:
             if isinstance(pos, str):

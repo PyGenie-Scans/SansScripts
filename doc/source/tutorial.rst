@@ -189,6 +189,41 @@ Automated script checking
     for the script and the approximate time of completion (not shown).
     It will then run the script for real.
 
+Detector Status
+===============
+
+As an obvious sanity check, it is possible to check if the detector is on.
+
+>>> detector_is_on()
+True
+
+We can also power cycle the detector.
+
+>>> detector_turn_off()
+Waiting For Detector To Power Down (60s)
+
+If we try to start a measurement with the detector off, the detector
+will be turned back on.
+
+>>> measure("Sample", frames=100)
+The detector was off.  Turning on the detector
+Waiting For Detector To Power Up (180s)
+Setup Larmor for event
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+
+
+DAE Modes
+=========
+
+Setup dae modes
+
+>>> setup_dae_bsalignment()
+Setup Larmor for bsalignment
+
 Under the hood
 ==============
 
@@ -209,6 +244,10 @@ genie-python isn't found.
 
 >>> print(gen.mock_calls)
 [call.get_runstate(),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
  call.cset(SamplePos='BT'),
  call.change(nperiods=1),
  call.change_start(),
@@ -270,6 +309,10 @@ Height=10
 Thickness=2.0
 >>> print(gen.mock_calls)
 [call.get_runstate(),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
  call.waitfor_move(),
  call.cset(m4trans=200.0),
  call.waitfor_move(),
@@ -296,6 +339,10 @@ Height=10
 Thickness=1.0
 >>> print(gen.mock_calls)
 [call.get_runstate(),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
+ call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
  call.change_sync('isis'),
  call.change(nperiods=1),
  call.change_start(),

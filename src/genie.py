@@ -58,6 +58,23 @@ def change_sample_pars(key, value):
 
 mock_gen.change_sample_par.side_effect = change_sample_pars
 
+
+def set_pv(pv, value):
+    if "pwonoff" in pv:
+        mock_gen.mock_detector_on = value
+
+
+def get_pv(pv):
+    if "hv0" in pv:
+        if mock_gen.mock_detector_on == "On":
+            return 1
+        else:
+            return 0
+
+mock_gen.get_pv.side_effect = get_pv
+mock_gen.set_pv.side_effect = set_pv
+mock_gen.mock_detector_on = "On"
+
 try:
     import genie_python.genie as gen  # pylint: disable=unused-import
 except ImportError:
