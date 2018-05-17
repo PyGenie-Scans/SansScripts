@@ -9,7 +9,7 @@ The best way of using the module is with a single
 from socket import gethostname
 from functools import wraps
 from .Instrument import ScanningInstrument
-from .Util import user_script
+from .Util import user_script  # noqa: F401
 
 SCANNING = None
 

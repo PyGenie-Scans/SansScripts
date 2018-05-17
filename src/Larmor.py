@@ -6,7 +6,7 @@ from .Util import dae_setter
 from .genie import gen
 
 
-class Larmor(ScanningInstrument): # pylint: disable=too-many-public-methods
+class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     """This class handles the Larmor beamline"""
     _poslist = ['AB', 'BB', 'CB', 'DB', 'EB', 'FB', 'GB', 'HB', 'IB', 'JB',
                 'KB', 'LB', 'MB', 'NB', 'OB', 'PB', 'QB', 'RB', 'SB', 'TB',
@@ -22,7 +22,7 @@ class Larmor(ScanningInstrument): # pylint: disable=too-many-public-methods
                 '8WT', '9WT', '10WT', '11WT', '12WT', '13WT', '14WT']
 
     @staticmethod
-    def _generic_scan( # pylint: disable=dangerous-default-value
+    def _generic_scan(  # pylint: disable=dangerous-default-value
             detector=r"C:\Instrument\Settings\Tables\detector.dat",
             spectra=r"C:\Instrument\Settings\Tables\spectra_1To1.dat",
             wiring=r"C:\Instrument\Settings\Tables\wiring.dat",
@@ -222,7 +222,7 @@ class Larmor(ScanningInstrument): # pylint: disable=too-many-public-methods
 
     @staticmethod
     @dae_setter
-    def setup_dae_resonantimaging_choppers(): # pylint: disable=invalid-name
+    def setup_dae_resonantimaging_choppers():  # pylint: disable=invalid-name
         """Set the wiring thable for resonant imaging choppers"""
         info("Setting Chopper phases")
         gen.cset(T0Phase=49200)
@@ -260,30 +260,30 @@ class Larmor(ScanningInstrument): # pylint: disable=too-many-public-methods
         gen.cset(m4trans=0.0)
         gen.waitfor_move()
 
-    ######## Instrument Specific Scripts ########
+    # Instrument Specific Scripts
     @staticmethod
-    def FOMin(): # pylint: disable=invalid-name
+    def FOMin():  # pylint: disable=invalid-name
         """Put the frame overload mirror into the beam."""
         # gen.cset(pol_trans=0, pol_arc=-1.6)
         # Convert to angle instead of mm
         gen.cset(pol_trans=0, pol_arc=-0.084)
 
     @staticmethod
-    def ShortPolariserin(): # pylint: disable=invalid-name
+    def ShortPolariserin():  # pylint: disable=invalid-name
         """Put the short polariser for long wavelength into the beam."""
         # gen.cset(pol_trans=-100, pol_arc=-1.3)
         # Convert to angle instead of mm
         gen.cset(pol_trans=-100, pol_arc=-0.069)
 
     @staticmethod
-    def LongPolariserin(): # pylint: disable=invalid-name
+    def LongPolariserin():  # pylint: disable=invalid-name
         """Put the long polariser for short wavelengths into the beam."""
         # gen.cset(pol_trans=100, pol_arc=-1.3)
         # Convert to angle instead of mm
         gen.cset(pol_trans=100, pol_arc=-0.069)
 
     @staticmethod
-    def BSInOut(In=True): # pylint: disable=invalid-name
+    def BSInOut(In=True):  # pylint: disable=invalid-name
         """Move the Beam Stop in and out of the beam.
 
         Parameters
