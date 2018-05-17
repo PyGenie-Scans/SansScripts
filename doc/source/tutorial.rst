@@ -209,7 +209,7 @@ Automated script checking
     ...     measure("Test2", "TT", trans=True, uamps=10)
     ...     measure("Test1", "BT", trams=False, uamps=30)
     ...     measure("Test2", "TT", trans=False, uamps=30)
-    >>> trial() #doctest:+ELLIPSIS
+    >>> trial()
     Traceback (most recent call last):
 	...
     RuntimeError: Unknown Block trams

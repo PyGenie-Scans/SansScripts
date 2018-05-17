@@ -4,27 +4,6 @@ import logging
 from logging import info
 
 
-class CustomFormatter(logging.Formatter):
-    """A logging formatter for the instruments"""
-    def format(self, rec):
-        return rec.levelname
-
-
-# create logger
-logger = logging.getLogger('simple_example')
-
-# create console handler and set level to debug
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = CustomFormatter()
-
-# add formatter to ch
-ch.setFormatter(formatter)
-
-# add ch to logger
-logger.addHandler(ch)
-
-
 def dae_setter(inner):
     """Declare that a method sets the DAE wiring table
 
