@@ -16,7 +16,18 @@ TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
 
 def sanitised_timings(kwargs):
-    """Include only the keyword arguments for run timings."""
+    """Include only the keyword arguments for run timings.
+
+    Parameters
+    ----------
+    kwargs : dict
+      A dictionary of keyword arguments
+
+    Returns
+    -------
+    dict
+      Keyword arguments accepted by gen.waitfor
+    """
     result = {}
     for k in TIMINGS:
         if k in kwargs:
@@ -128,13 +139,13 @@ class ScanningInstrument(object):
     @abstractmethod
     def set_aperature(size):
         """Set the beam aperature to the desired size
+
         Parameters
         ----------
         size : str
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
-          the aperature not being changed.
-          """
+          the aperature not being changed."""
         pass
 
     @staticmethod
@@ -176,9 +187,9 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
           the aperature not being changed
-        mode : str
-          Whether to run the instrument in "event" or
-          "histogram" mode.  Event mode is the default.
+        dae_fixed : bool
+          If False, the DAE will be set to event mode.
+          Otherwise the DAE is left alone.
         """
         # setup to run in histogram or event mode
         self.title_footer = "_SANS"
@@ -195,7 +206,11 @@ class ScanningInstrument(object):
         size : str
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
-          the aperature not being changed"""
+          the aperature not being changed
+        dae_fixed : bool
+          If False, the DAE will be set to event mode.
+          Otherwise the DAE is left alone.
+        """
         self.title_footer = "_TRANS"
         if not dae_fixed:
             self.setup_dae_transmission()
@@ -204,7 +219,14 @@ class ScanningInstrument(object):
         self._configure_trans_custom(self, dae_fixed=dae_fixed)
 
     def check_move_pos(self, pos):
-        """Check whether the position is valid and return True or False"""
+        """Check whether the position is valid and return True or False
+
+        Parameters
+        ----------
+        pos : str
+          The sample changer position
+
+        """
         if pos.upper() not in self._poslist:
             warning("Error in script, position {} does not exist".format(pos))
             return False
@@ -246,26 +268,32 @@ class ScanningInstrument(object):
           The thickness of the sample in millimeters.  The default is 1mm.
         trans : bool
           Whether to perform a transmission run instead of a sans run.
-
-        Additionally, this function takes two other kinds of keyword
-        arguments.  If given a block name, it will move that block to
-        the given position.  If given a time duration, then that will
-        be the duration of the run.
+        dae_fixed : bool
+          If True, then :py:meth:`measure` will not change the DAE mode before
+          starting the measurement.  This is useful if you want to use
+          a different DAE mode than the default.
+        **kwargs
+          This function takes two kinds of keyword arguments.  If
+          given a block name, it will move that block to the given
+          position.  If given a time duration, then that will be the
+          duration of the run.
 
         Examples
         ========
-        measure("H2O", uamps=10)
 
-          Perform a SANS measurment in the current position on a 1mm
-          thick water sample until the proton beam has released 10
-          microamp hours of current (approx 15 minutes).
+        >>> measure("H2O", uamps=10)
 
-        measure("D2O", "LT", thickness=2.0, trans=True, CoarseZ=38, frames=300)
+        Perform a SANS measurment in the current position on a 1mm
+        thick water sample until the proton beam has released 10
+        microamp hours of current (approx 15 minutes).
 
-          Move to sample changer position LT, then adjust the CoarseZ
-          motor to 38mm.  Finally, take a transmission measurement on
-          a 2 mm thick deuterium sample for 300 proton pulses (approx
-          5 minutes).
+        >>> measure("D2O", "LT", thickness=2.0, trans=True, CoarseZ=38, frames=300)
+
+        Move to sample changer position LT, then adjust the CoarseZ
+        motor to 38mm.  Finally, take a transmission measurement on
+        a 2 mm thick deuterium sample for 300 proton pulses (approx
+        5 minutes).
+
         """
         self._needs_setup()
         if not self.detector_is_on() and not trans:

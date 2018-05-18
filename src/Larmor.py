@@ -335,7 +335,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         """Move the Beam Stop in and out of the beam.
 
         Parameters
-        = == == == ===
+        ----------
         In : bool
           Whether to move the beam stop in or out
         """

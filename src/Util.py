@@ -8,20 +8,21 @@ def dae_setter(inner):
     """Declare that a method sets the DAE wiring table
 
     This decorator was designed to work on subclasses of the
-    ScanningInstrument class.  The following functionality is added
-    into the class
+    :py:class:`src.Instrument.ScanningInstrument` class.  The following functionality
+    is added into the class
 
-    1) If the wiring tables are already in the correct state, the function
-    returns immediately without taking any other actions
-    2) If the wiring tables are in a different state, the change to the wiring
-    tables is printed to the prompt before performing the actual change
+    1. If the wiring tables are already in the correct state, the function
+       returns immediately without taking any other actions
+    2. If the wiring tables are in a different state, the change to the wiring
+       tables is printed to the prompt before performing the actual change
+
 
     #1 of the above is the most important, as it allows the wiring
     tables to be set on any function call without worrying about
     wasting time reloading an existing configuration
 
     Please note that this decorator assumes that the title of the
-    method begins with "setup_dae_", followed by the new of the state
+    method begins with "setup_dae", followed by the new of the state
     of the wiring table.
 
     """
@@ -43,7 +44,18 @@ SCALES = {"uamps": 90, "frames": 0.1, "seconds": 1,
 
 
 def wait_time(call):
-    """Calculate the time spent waiting by a mock wait call."""
+    """
+    Calculate the time spent waiting by a mock wait call.
+
+    Parameters
+    ----------
+    call : mock.Call
+      A mock call that might be a waitfor command
+    Returns
+    -------
+    float
+      The approximate time in seconds needed for this command.
+    """
     name, _, kwargs = call
     if name != "waitfor":
         return 0
@@ -52,7 +64,18 @@ def wait_time(call):
 
 
 def pretty_print_time(seconds):
-    """Given a number of seconds, generate a human readable time string."""
+    """
+    Given a number of seconds, generate a human readable time string.
+
+    Parameters
+    ----------
+    seconds : float
+      The time in seconds that the script will require.
+    Returns
+    -------
+    str
+      A string giving the time needed in hours and an approximate ETA.
+    """
     from datetime import timedelta, datetime
     hours = seconds/3600.0
     delta = timedelta(0, seconds)
@@ -61,7 +84,8 @@ def pretty_print_time(seconds):
 
 
 def user_script(script):
-    """Perform some sanity checking on a user script before it is run"""
+    """A decorator to perform some sanity checking on a user script before
+    it is run"""
     @wraps(script)
     def inner(*args, **kwargs):
         """Mock run a script before running it for real."""
