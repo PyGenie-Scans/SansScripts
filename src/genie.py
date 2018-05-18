@@ -59,17 +59,19 @@ def change_sample_pars(key, value):
 mock_gen.change_sample_par.side_effect = change_sample_pars
 
 
-def set_pv(pv, value):
-    if "pwonoff" in pv:
+def set_pv(pv_name, value):
+    """Fake setting a PV value"""
+    if "pwonoff" in pv_name:
         mock_gen.mock_detector_on = value
 
 
-def get_pv(pv):
-    if "hv0" in pv:
+def get_pv(pv_name):
+    """Fake getting a PV value"""
+    if "hv0" in pv_name:
         if mock_gen.mock_detector_on == "On":
             return 1
-        else:
-            return 0
+        return 0
+    return mock_gen.mock_get_pv(pv_name)
 
 
 mock_gen.get_pv.side_effect = get_pv

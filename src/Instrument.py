@@ -124,16 +124,44 @@ class ScanningInstrument(object):
         """Set the wiring tables to record only the monitors"""
         pass
 
-    def _configure_sans_custom(self, size, mode):
+    def _configure_sans_custom(self, size, dae_fixed):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
-        from the beam)"""
+        from the beam).
+
+        This is a no-op for the default instrument but can be
+        overwritten by other instruments to perform any actions they
+        need to put the instrument into SANS mode.
+
+        Parameters
+        ----------
+        size : str
+          The aperature size (e.g. "Small" or "Medium").  A blank
+          string results in the aperature not being changed.
+        dae_fixed : bool
+          If False, the DAE will be set to event mode.
+          Otherwise the DAE is left alone.
+        """
         pass
 
-    def _configure_trans_custom(self, size):
+    def _configure_trans_custom(self, size, dae_fixed):
         """The specific actions required by the instrument
-        to run a transmission measurement measurement (e.g.
-        put the monitor in the beam"""
+        to run a SANS measurement (e.g. remove the monitor
+        from the beam).
+
+        This is a no-op for the default instrument but can be
+        overwritten by other instruments to perform any actions they
+        need to put the instrument into SANS mode.
+
+        Parameters
+        ----------
+        size : str
+          The aperature size (e.g. "Small" or "Medium").  A blank
+          string results in the aperature not being changed.
+        dae_fixed : bool
+          If False, the DAE will be set to event mode.
+          Otherwise the DAE is left alone.
+        """
         pass
 
     @staticmethod
