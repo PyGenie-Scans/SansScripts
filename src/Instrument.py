@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """The baseline for loading a scanning instrument
 
 Each instrument will have its own module that declares a class
@@ -281,18 +282,18 @@ class ScanningInstrument(object):
         Examples
         ========
 
-        >>> measure("H2O", uamps=10)
+        >>> measure("H2O", frames=900)
 
-        Perform a SANS measurment in the current position on a 1mm
-        thick water sample until the proton beam has released 10
-        microamp hours of current (approx 15 minutes).
+        Perform a SANS measurment in the current position on a 1 mm
+        thick water sample until the proton beam has released 900
+        proton pulses (approx 15 minutes).
 
-        >>> measure("D2O", "LT", thickness=2.0, trans=True, CoarseZ=38, frames=300)
+        >>> measure("D2O", "LT", thickness=2.0, trans=True, Phi=3, uamps=10)
 
         Move to sample changer position LT, then adjust the CoarseZ
-        motor to 38mm.  Finally, take a transmission measurement on
-        a 2 mm thick deuterium sample for 300 proton pulses (approx
-        5 minutes).
+        motor to 38 mm.  Finally, take a transmission measurement on a
+        2 mm thick deuterium sample for 10 µA hours of proton
+        current. (approx 15 minutes).
 
         """
         self._needs_setup()

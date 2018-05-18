@@ -8,8 +8,8 @@ def dae_setter(inner):
     """Declare that a method sets the DAE wiring table
 
     This decorator was designed to work on subclasses of the
-    :py:class:`src.Instrument.ScanningInstrument` class.  The following functionality
-    is added into the class
+    :py:class:`src.Instrument.ScanningInstrument` class.  The
+    following functionality is added into the class
 
     1. If the wiring tables are already in the correct state, the function
        returns immediately without taking any other actions
