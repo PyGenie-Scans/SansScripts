@@ -23,7 +23,8 @@ def end():
 
 MOTORS = {"CoarseZ": 0, "Translation": 0, "SampleX": 0,
           "SamplePos": "", "T0Phase": 0, "TargetDiskPhase": 0,
-          "InstrumentDiskPhase": 0, "m4trans": 0}
+          "InstrumentDiskPhase": 0, "m4trans": 0,
+          "Julabo1_SP": 0}
 
 
 def cset_sideffect(axis=None, value=None, **kwargs):

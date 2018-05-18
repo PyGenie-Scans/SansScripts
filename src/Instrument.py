@@ -384,6 +384,39 @@ class ScanningInstrument(object):
         self._measure(title, thickness, trans, dae_fixed=dae_fixed,
                       **sanitised_timings(kwargs))
 
+    def measure_file(self, file_path):
+        """Perform a series of measurements based on a spreadsheet
+
+        Parameters
+        ----------
+        file_path : str
+          The location of the script file
+        """
+        from .Util import user_script
+
+        @user_script
+        def inner():
+            """Actually load and run the script"""
+            import csv
+            import ast
+            with open(file_path, "rb") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    for k in row.keys():
+                        if row[k].strip() == "":
+                            del row[k]
+                        elif row[k].upper() == "TRUE":
+                            row[k] = True
+                        elif row[k].upper() == "FALSE":
+                            row[k] = True
+                        else:
+                            try:
+                                row[k] = ast.literal_eval(row[k])
+                            except ValueError:
+                                continue
+                    self.measure(**row)
+        inner()
+
     @staticmethod
     def printsamplepars():
         """Display the basic sample parameters on the console."""

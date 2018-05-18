@@ -217,6 +217,58 @@ Automated script checking
     for the script and the approximate time of completion (not shown).
     It will then run the script for real.
 
+Large script handling
+=====================
+
+The :py:meth:`src.Instrument.ScanningInstrument.measure_file` function allows the user to define everything in an
+CSV file with excel and then run it through python.
+
+For the example below, test.csv looks like
+
+.. csv-table:: test.csv
+  :file: ../../tests/test.csv
+  :header-rows: 1
+
+>>> measure_file("tests/test.csv") #doctest:+ELLIPSIS
+The script should finish in 3.0 hours
+...
+Measuring Sample5_TRANS for 20 uamps
+
+The particular keyword argument to the `measure` function is given in
+the header on the first line of the file.  Each subsequent line
+represents a single run and the value of each cell in the line is the
+value of that keyword argument for the header.  If an argument is left
+blank, then the keyword's default value is used.  The boolean values
+True and False are case insensitive, but all other strings retain
+their case.
+
+.. csv-table:: bad_julabo.csv
+  :file: ../../tests/bad_julabo.csv
+  :header-rows: 1
+
+>>> measure_file("tests/bad_julabo.csv") #doctest:+ELLIPSIS
+Traceback (most recent call last):
+...
+RuntimeError: Unknown Block Julabo
+
+Each CSV file is run through the :py:func:`src.Util.user_script`
+function, so the script will be checked for errors before being run.
+In the example above, the user set the column header to "Julabo", but
+the actual block name is "Julabo1_SP".
+
+If we fix the script file
+
+.. csv-table:: good_julabo.csv
+  :file: ../../tests/good_julabo.csv
+  :header-rows: 1
+
+>>> measure_file("tests/good_julabo.csv") #doctest:+ELLIPSIS
+The script should finish in 0.5 hours
+...
+Measuring Sample2_TRANS for 10 uamps
+
+The scan then runs as normal.
+
 Detector Status
 ===============
 
