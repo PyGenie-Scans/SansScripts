@@ -6,15 +6,15 @@ source code.
 
 Instrument
 --------------
-.. automodule:: Instrument
+.. automodule:: src.Instrument
    :members:
 
 Util
 ---------
-.. automodule:: Util
+.. automodule:: src.Util
    :members:
 
 Larmor
 ----------------
-.. automodule:: Larmor
+.. automodule:: src.Larmor
    :members:
