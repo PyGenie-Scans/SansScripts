@@ -1,2 +1,5 @@
+
+[[http://sansscripting.readthedocs.io/en/latest/?badge=latest][http://readthedocs.org/projects/sansscripting/badge/?version=latest]]
+
 This is an attempt at a unified SANS control system for genie_python.
 The full documentation can be found at [[https://sansscripting.readthedocs.io/en/latest]].
