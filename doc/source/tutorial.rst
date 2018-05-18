@@ -311,11 +311,19 @@ Height=10
 Thickness=1.0
 Measuring Sample_SANS for 100 frames
 
-We can also turn on the detector manually.
+Performing transmission measurements does not require the detector
 
 >>> detector_on(False)
 Waiting For Detector To Power Down (60s)
 False
+>>> measure("Sample", trans=True, frames=100)
+Setup Larmor for transmission
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+Measuring Sample_TRANS for 100 frames
 >>> detector_on(True)
 Waiting For Detector To Power Up (180s)
 True

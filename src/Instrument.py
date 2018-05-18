@@ -292,26 +292,8 @@ class ScanningInstrument(object):
             return False
         return True
 
-    def _measure(self, title, thickness, trans, dae_fixed, **kwargs):
-        if trans:
-            self.configure_trans(dae_fixed=dae_fixed)
-        else:
-            self.configure_sans(dae_fixed=dae_fixed)
-        gen.waitfor_move()
-        gen.change_sample_par("Thick", thickness)
-        info("Using the following Sample Parameters")
-        self.printsamplepars()
-        gen.change(title=title+self.title_footer)
-        gen.begin()
-        info("Measuring {title:} for {time:} {units:}".format(
-            title=title+self.title_footer,
-            units=list(kwargs.keys())[0],
-            time=kwargs[list(kwargs.keys())[0]]))
-        gen.waitfor(**kwargs)
-        gen.end()
-
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                dae_fixed=False, **kwargs):
+                dae_fixed=False, aperature="", **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -329,9 +311,13 @@ class ScanningInstrument(object):
         trans : bool
           Whether to perform a transmission run instead of a sans run.
         dae_fixed : bool
-          If True, then :py:meth:`measure` will not change the DAE mode before
+          If True, then `measure` will not change the DAE mode before
           starting the measurement.  This is useful if you want to use
           a different DAE mode than the default.
+        aperature : str
+          The aperature size.  e.g. "Small" or "Medium" A blank string
+          (the default value) results in the aperature not being
+          changed.
         **kwargs
           This function takes two kinds of keyword arguments.  If
           given a block name, it will move that block to the given
@@ -381,8 +367,23 @@ class ScanningInstrument(object):
             moved = True
         if moved:
             gen.waitfor_move()
-        self._measure(title, thickness, trans, dae_fixed=dae_fixed,
-                      **sanitised_timings(kwargs))
+        if trans:
+            self.configure_trans(size=aperature, dae_fixed=dae_fixed)
+        else:
+            self.configure_sans(size=aperature, dae_fixed=dae_fixed)
+        times = sanitised_timings(kwargs)
+        gen.waitfor_move()
+        gen.change_sample_par("Thick", thickness)
+        info("Using the following Sample Parameters")
+        self.printsamplepars()
+        gen.change(title=title+self.title_footer)
+        gen.begin()
+        info("Measuring {title:} for {time:} {units:}".format(
+            title=title+self.title_footer,
+            units=list(times.keys())[0],
+            time=times[list(times.keys())[0]]))
+        gen.waitfor(**times)
+        gen.end()
 
     def measure_file(self, file_path):
         """Perform a series of measurements based on a spreadsheet
