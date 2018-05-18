@@ -388,10 +388,24 @@ class ScanningInstrument(object):
     def measure_file(self, file_path):
         """Perform a series of measurements based on a spreadsheet
 
+        The file should contain comma separated values.  Excel can
+        easily produce files of this sort.  The first line of the file
+        is the header with each field giving the name of a parameter
+        to the `measure` function.  As always, the ``title`` parameter
+        is mandatory.  Each subsequent line of the file represents a
+        single measurement with the fields indicating that values to
+        pass to their corresponding keywords.  If a cell is blank, the
+        keyword's default parameter it used.  Boolean values are
+        represented by `True` and `False` and are not case sensitive.
+
+        The script is run through the simulator to check for errors
+        before attempting a real run.
+
         Parameters
         ----------
         file_path : str
           The location of the script file
+
         """
         from .Util import user_script
 
