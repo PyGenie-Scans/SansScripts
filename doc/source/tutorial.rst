@@ -4,6 +4,9 @@ Tutorial
 .. highlight:: python
    :linenothreshold: 20
 
+.. py:currentmodule:: src.Instrument
+
+
 Design Goals
 ============
 
@@ -18,7 +21,8 @@ beamline, as long as the relevant physical hardware is in place.
 User simplicity
 ---------------
 
-The user should be able to perform measurements with a minimum of fuss or boilerplate
+The user should be able to perform measurements with a minimum of fuss
+or boilerplate.
 
 Composability
 -------------
@@ -28,6 +32,12 @@ system and create more complicated scripts from them.  Since the
 underlying blocks are beamline independent, the final script should be
 similarly portable.
 
+Stability
+---------
+
+Scripting problems should be detected as quickly as possible.  Bad
+scripts should fail immediately, not in the middle of the night when
+there's no one there to see it.
 
 Boilerplate setup
 =================
@@ -62,9 +72,9 @@ Height=10
 Thickness=1.0
 Measuring Sample Name_SANS for 600 frames
 
-The `measure` command is the primary entry point for all types of SANS
-measurement.  We can pass it a sample changer position if we wish to
-measure at a specific location.
+The :py:meth:`ScanningInstrument.measure` command is the primary entry
+point for all types of SANS measurement.  We can pass it a sample
+changer position if we wish to measure at a specific location.
 
 >>> measure("Sample Name", "AT", uamps=5)
 Moving to sample changer position AT
@@ -78,7 +88,7 @@ Measuring Sample Name_SANS for 5 uamps
 A couple of things changed with this new command.  First, I've
 measured for 5 µamps instead of the 600 frames we did before.  The
 measure command will take and of the time commands that genie_python's
-`waitfor` command will accept, though `uamps`, `frames`, and `seconds`
+:py:meth:`waitfor` command will accept, though :py:attr:`uamps`, :py:attr:`frames`, and :py:attr:`seconds`
 will almost always be the ones which are needed.  Secondly, we've
 passed sample position AT in as the position parameter and the
 instrument has dutifully moved into position AT before starting the
@@ -155,72 +165,74 @@ Height=10
 Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
-By default, when taking a sans measurement, the `measure` function
-puts the instrument in event mode.  Similarly, trans measurements are
-always in transmission mode.  Setting the dae_fixed property to `True`
-ignores the default mode and maintains whatever mode the instrument is
-currently in.
+By default, when taking a sans measurement, the
+:py:meth:`ScanningInstrument.measure` function puts the instrument in
+event mode.  Similarly, trans measurements are always in transmission
+mode.  Setting the dae_fixed property to ``True`` ignores the default
+mode and maintains whatever mode the instrument is currently in.
 
 Automated script checking
 =========================
 
-    This module includes a decorator `user_script` that can be added
-    to the front of any user function.  This will allow the scripting
-    system to scan the script for common problems before it is run,
-    ensuring that problems are noticed immediately and not at one in
-    the morning.  All that's required of the user is putting
-    `@user_script` on the line before any functions that they define.
+.. py:currentmodule:: src.Util
 
-    >>> @user_script
-    ... def trial():
-    ...     measure("Test1", "BT", uamps=30)
-    ...     measure("Test2", "VT", uamps=30)
-    ...     measure("Test1", "BT", trans=True, uanps=10)
-    ...     measure("Test2", "VT", trans=True, uamps=10)
-    >>> trial()
-    Traceback (most recent call last):
-    ...
-    RuntimeError: Position VT does not exist
+This module includes a decorator :py:meth:`user_script` that can be
+added to the front of any user function.  This will allow the
+scripting system to scan the script for common problems before it is
+run, ensuring that problems are noticed immediately and not at one in
+the morning.  All that's required of the user is putting
+``@user_script`` on the line before any functions that they define.
 
-    What may not be immediately obvious from reading is that this
-    error message occurs instantly, not forty five minutes
-    into the run after the first measurement has already been
-    performed.  Fixing the "VT" positions to "CT" then gives:
+>>> @user_script
+... def trial():
+...     measure("Test1", "BT", uamps=30)
+...     measure("Test2", "VT", uamps=30)
+...     measure("Test1", "BT", trans=True, uanps=10)
+...     measure("Test2", "VT", trans=True, uamps=10)
+>>> trial()
+Traceback (most recent call last):
+...
+RuntimeError: Position VT does not exist
 
-    >>> @user_script
-    ... def trial():
-    ...     measure("Test1", "BT", uamps=30)
-    ...     measure("Test2", "TT", uamps=30)
-    ...     measure("Test1", "BT", trans=True, uanps=10)
-    ...     measure("Test2", "TT", trans=True, uamps=10)
-    >>> trial()
-    Traceback (most recent call last):
-	...
-    RuntimeError: Unknown Block uanps
+What may not be immediately obvious from reading is that this error
+message occurs instantly, not forty five minutes into the run after
+the first measurement has already been performed.  Fixing the "VT"
+positions to "CT" then gives:
 
-    Again, an easy typo to make at midnight that normally would not be
-    found until two in the morning.
+>>> @user_script
+... def trial():
+...     measure("Test1", "BT", uamps=30)
+...     measure("Test2", "TT", uamps=30)
+...     measure("Test1", "BT", trans=True, uanps=10)
+...     measure("Test2", "TT", trans=True, uamps=10)
+>>> trial()
+Traceback (most recent call last):
+...
+RuntimeError: Unknown Block uanps
 
-    >>> @user_script
-    ... def trial():
-    ...     measure("Test1", "BT", uamps=30)
-    ...     measure("Test2", "TT", uamps=30)
-    ...     measure("Test1", "BT", trans=True, uamps=10)
-    ...     measure("Test2", "TT", trans=True, uamps=10)
-    >>> trial() #doctest:+ELLIPSIS
-    The script should finish in 2.0 hours
-    ...
-    Measuring Test2_TRANS for 10 uamps
+Again, an easy typo to make at midnight that normally would not be
+found until two in the morning.
 
-    Once the script has been validated, which should happen nearly
-    instantly, the program will print an estimate of the time needed
-    for the script and the approximate time of completion (not shown).
-    It will then run the script for real.
+>>> @user_script
+... def trial():
+...     measure("Test1", "BT", uamps=30)
+...     measure("Test2", "TT", uamps=30)
+...     measure("Test1", "BT", trans=True, uamps=10)
+...     measure("Test2", "TT", trans=True, uamps=10)
+>>> trial() #doctest:+ELLIPSIS
+The script should finish in 2.0 hours
+...
+Measuring Test2_TRANS for 10 uamps
+
+Once the script has been validated, which should happen nearly
+instantly, the program will print an estimate of the time needed for
+the script and the approximate time of completion (not shown).  It
+will then run the script for real.
 
 Large script handling
 =====================
 
-The :py:meth:`src.Instrument.ScanningInstrument.measure_file` function allows the user to define everything in an
+The :py:meth:`ScanningInstrument.measure_file` function allows the user to define everything in an
 CSV file with excel and then run it through python.
 
 For the example below, test.csv looks like
@@ -234,13 +246,13 @@ The script should finish in 3.0 hours
 ...
 Measuring Sample5_TRANS for 20 uamps
 
-The particular keyword argument to the `measure` function is given in
-the header on the first line of the file.  Each subsequent line
-represents a single run and the value of each cell in the line is the
-value of that keyword argument for the header.  If an argument is left
-blank, then the keyword's default value is used.  The boolean values
-True and False are case insensitive, but all other strings retain
-their case.
+The particular keyword argument to the
+:py:meth:`ScanningInstrument.measure` function is given in the header
+on the first line of the file.  Each subsequent line represents a
+single run and the value of each cell in the line is the value of that
+keyword argument for the header.  If an argument is left blank, then
+the keyword's default value is used.  The boolean values True and
+False are case insensitive, but all other strings retain their case.
 
 .. csv-table:: bad_julabo.csv
   :file: ../../tests/bad_julabo.csv
@@ -251,7 +263,9 @@ Traceback (most recent call last):
 ...
 RuntimeError: Unknown Block Julabo
 
-Each CSV file is run through the :py:func:`src.Util.user_script`
+.. py:currentmodule:: src.Util
+
+Each CSV file is run through the :py:func:`user_script`
 function, so the script will be checked for errors before being run.
 In the example above, the user set the column header to "Julabo", but
 the actual block name is "Julabo1_SP".
@@ -305,15 +319,6 @@ False
 >>> detector_on(True)
 Waiting For Detector To Power Up (180s)
 True
-
-
-DAE Modes
-=========
-
-Setup dae modes
-
->>> setup_dae_bsalignment()
-Setup Larmor for bsalignment
 
 Under the hood
 ==============
