@@ -385,7 +385,7 @@ class ScanningInstrument(object):
         gen.waitfor(**times)
         gen.end()
 
-    def measure_file(self, file_path):
+    def measure_file(self, file_path, forever=False):
         """Perform a series of measurements based on a spreadsheet
 
         The file should contain comma separated values.  Excel can
@@ -405,6 +405,11 @@ class ScanningInstrument(object):
         ----------
         file_path : str
           The location of the script file
+        forever : bool
+          If set to True, the instrument will repeatedly run the
+          script manually stopped.  This can be useful for an
+          overnight run where you want to keep measureing until the
+          users return.
 
         """
         from .Util import user_script
@@ -430,7 +435,11 @@ class ScanningInstrument(object):
                             except ValueError:
                                 continue
                     self.measure(**row)
-        inner()
+        if forever:
+            while True:
+                inner()
+        else:
+            inner()
 
     @staticmethod
     def printsamplepars():

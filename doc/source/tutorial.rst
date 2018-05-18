@@ -264,7 +264,14 @@ The script should finish in 0.5 hours
 ...
 Measuring Sample2_TRANS for 10 uamps
 
-The scan then runs as normal.
+>> measure_file("tests/good_julabo.csv", forever=True)
+
+The scan then runs as normal.  If the users are leaving and you want
+to ensure that the script keeps taking data until they return, the
+``forever`` flag causes the instrument to repeatedly cycle through the
+script until there is a manual intervention at the keyboard.  The
+output is not shown above because there is infinite output.
+
 
 Detector Status
 ===============
