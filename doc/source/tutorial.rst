@@ -6,50 +6,16 @@ Tutorial
 
 .. py:currentmodule:: src.Instrument
 
-
-Design Goals
-============
-
-We desire the following traits in the scripting system
-
-Universality
-------------
-
-A script written on one beamline should be able to run on *any*
-beamline, as long as the relevant physical hardware is in place.
-
-User simplicity
----------------
-
-The user should be able to perform measurements with a minimum of fuss
-or boilerplate.
-
-Composability
--------------
-
-The user should be able to combine the building blocks from this
-system and create more complicated scripts from them.  Since the
-underlying blocks are beamline independent, the final script should be
-similarly portable.
-
-Stability
----------
-
-Scripting problems should be detected as quickly as possible.  Bad
-scripts should fail immediately, not in the middle of the night when
-there's no one there to see it.
-
 Boilerplate setup
 =================
 
 The commands below are for creating a simple testing system in the
 tutorial.  This merely guarantees that the tutorial is always in sync
-with the actual behaviour of the software.
+with the actual behaviour of the software.  The tutorial proper begins
+in the next section.
 
 >>> import logging
 >>> import sys
->>> from src import *
->>> from src.genie import gen
 >>> ch = logging.StreamHandler(sys.stdout)
 >>> ch.setLevel(logging.DEBUG)
 >>> logging.getLogger().setLevel(logging.DEBUG)
@@ -58,11 +24,11 @@ with the actual behaviour of the software.
 Basic examples
 ==============
 
-The simplest possible measurement that
-
 First, we'll just do a simple measurement on the main detector for 600
 frames.
 
+>>> from src import *
+>>> from src.genie import gen
 >>> measure("Sample Name", frames=600)
 Setup Larmor for event
 Using the following Sample Parameters
@@ -76,8 +42,8 @@ The :py:meth:`ScanningInstrument.measure` command is the primary entry
 point for all types of SANS measurement.  We can pass it a sample
 changer position if we wish to measure at a specific location.
 
->>> measure("Sample Name", "AT", uamps=5)
-Moving to sample changer position AT
+>>> measure("Sample Name", "QT", aperature="Medium", uamps=5)
+Moving to sample changer position QT
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -85,16 +51,25 @@ Height=10
 Thickness=1.0
 Measuring Sample Name_SANS for 5 uamps
 
-A couple of things changed with this new command.  First, I've
-measured for 5 µamps instead of the 600 frames we did before.  The
-measure command will take and of the time commands that genie_python's
-:py:meth:`waitfor` command will accept, though :py:attr:`uamps`, :py:attr:`frames`, and :py:attr:`seconds`
-will almost always be the ones which are needed.  Secondly, we've
-passed sample position AT in as the position parameter and the
-instrument has dutifully moved into position AT before starting the
-measurement.  Finally, you'll notice that there is no message about
-putting the instrument in event mode.  Since we were already in event
-mode, the instrument didn't perform the redundant step.
+A couple of things changed with this new command.
+
+1. I've measured for 5 µamps instead of the 600 frames we did before.
+   The measure command will take and of the time commands that
+   genie_python's ``waitfor`` command will accept, though ``uamps``,
+   ``frames``, and ``seconds`` will almost always be the ones which
+   are needed.
+
+2. We've passed sample position QT in as the position parameter and
+   the instrument has dutifully moved into position QT before starting
+   the measurement.
+
+#. We specified the beam size.  The individual beamlines will have the
+   opportunity to decide their own aperature settings, but there
+   should hopefully reach a consensus on the names.
+
+#. You'll notice that there is no message about putting the instrument
+   in event mode.  Since we were already in event mode, the instrument
+   didn't perform the redundant step.
 
 >>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
 Moving CoarseZ to 25
@@ -109,12 +84,13 @@ Measuring Sample Name_TRANS for 5 uamps
 Here we are directly setting the moving the CoarseZ motor on the
 sample stack to our desired position, instead of just picking a
 position for the sample changer.  We have also recorded that this run
-is on a 2 mm sample, unlike our previous 1mm runs.  Finally, the
+is on a 2 mm sample, unlike our previous 1 mm runs.  Finally, the
 instrument has converted into transmission mode, setting the
-appropriate wiring tables and moving the m4 monitor into the beam.
+appropriate wiring tables and moving the M4 monitor into the beam.
 
->>> measure("Sample Name", "CT", SampleX=10, uamps=5)
+>>> measure("Sample Name", "CT", SampleX=10, Julabo1_SP=35, uamps=5)
 Moving to sample changer position CT
+Moving Julabo1_SP to 35
 Moving SampleX to 10
 Setup Larmor for event
 Using the following Sample Parameters
@@ -126,15 +102,16 @@ Measuring Sample Name_SANS for 5 uamps
 
 We can combine a sample changer position with motor movements.  This
 is useful for custom mounting that may not perfectly align with the
-sample changer positions.  Alternately, since *any* block can be set
-in the measure command, this can also be used to set temperatures and
-other sample environment parameters.
+sample changer positions.  Alternately, since any block can be set
+within the measure command, it is also possible to set temperatures
+and other beam-line parameters for a measurement.
 
 >>> def weird_place():
 ...   gen.cset(Translation=100)
 ...   gen.cset(CoarseZ=-75)
->>> measure("Sample Name", weird_place, uamps=10)
+>>> measure("Sample Name", weird_place, Julabo1_SP=37, uamps=10)
 Moving to position weird_place
+Moving Julabo1_SP to 37
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -145,7 +122,9 @@ Measuring Sample Name_SANS for 10 uamps
 Finally, if the experiment requires a large number of custom
 positions, they can be set independently in their own functions.
 Measure can then move to that position as though it were a standard
-sample changer position.
+sample changer position.  It's still possible to override or amend
+these custom positions with measurement specific values, as we have
+done above with the Julabo temperature again.
 
 >>> setup_dae_bsalignment()
 Setup Larmor for bsalignment
@@ -166,10 +145,11 @@ Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
 By default, when taking a sans measurement, the
-:py:meth:`ScanningInstrument.measure` function puts the instrument in
-event mode.  Similarly, trans measurements are always in transmission
-mode.  Setting the dae_fixed property to ``True`` ignores the default
-mode and maintains whatever mode the instrument is currently in.
+:py:meth:`ScanningInstrument.measure` function puts the instrument
+into event mode.  Similarly, trans measurements are always in
+transmission mode.  Setting the ``dae_fixed`` property to ``True`` ignores
+the default mode and maintains whatever mode the instrument is
+currently in.
 
 Automated script checking
 =========================
@@ -232,10 +212,11 @@ will then run the script for real.
 Large script handling
 =====================
 
-The :py:meth:`ScanningInstrument.measure_file` function allows the user to define everything in an
-CSV file with excel and then run it through python.
+.. py:currentmodule:: src.Instrument
 
-For the example below, test.csv looks like
+The :py:meth:`ScanningInstrument.measure_file` function allows the
+user to define everything in a CSV file with excel and then run it
+through python.
 
 .. csv-table:: test.csv
   :file: ../../tests/test.csv
@@ -249,10 +230,10 @@ Measuring Sample5_TRANS for 20 uamps
 The particular keyword argument to the
 :py:meth:`ScanningInstrument.measure` function is given in the header
 on the first line of the file.  Each subsequent line represents a
-single run and the value of each cell in the line is the value of that
-keyword argument for the header.  If an argument is left blank, then
-the keyword's default value is used.  The boolean values True and
-False are case insensitive, but all other strings retain their case.
+single run with the parameters given in the columns of that row.  If
+an argument is left blank, then the keyword's default value is used.
+The boolean values ``True`` and ``False`` are case insensitive, but all other
+strings retain their case.
 
 .. csv-table:: bad_julabo.csv
   :file: ../../tests/bad_julabo.csv
@@ -266,9 +247,11 @@ RuntimeError: Unknown Block Julabo
 .. py:currentmodule:: src.Util
 
 Each CSV file is run through the :py:func:`user_script`
-function, so the script will be checked for errors before being run.
+function defined `above`__, so the script will be checked for errors before being run.
 In the example above, the user set the column header to "Julabo", but
 the actual block name is "Julabo1_SP".
+
+__ `Automated script checking`_
 
 If we fix the script file
 
@@ -332,7 +315,7 @@ Under the hood
 ==============
 
 >>> gen.reset_mock()
->>> measure("Test", "BT", uamps=15)
+>>> measure("Test", "BT", aperature="Medium", uamps=15)
 Moving to sample changer position BT
 Setup Larmor for event
 Using the following Sample Parameters
@@ -366,9 +349,8 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
- call.waitfor_move(),
+ call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
- call.waitfor_move(),
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
  call.get_sample_pars(),
@@ -379,25 +361,16 @@ genie-python isn't found.
 
 That's quite a few commands, so it's worth running through them.
 
-  2
-    Ensure that the instrument is ready to start a measurement
-  3-6
-    Check that the detector is on
-  7
-    Move the sample into position
-  8-20
-    Put the instrument in event mode
-  21-23
-    Move the M4 transmission monitor out of the beam
-  24
-    Set the sample thickness
-  25
-    Print and log the sample parameters
-  26
-    Set the sample title
-  27
-    Start the measurement.
-  28
-    Wait the requested time
-  29
-    Stop the measurement.
+:2: Ensure that the instrument is ready to start a measurement
+:3-6: Check that the detector is on
+:7: Move the sample into position
+:8-19: Put the instrument in event mode
+:20: Set the upstream slits
+:21: Move the M4 transmission monitor out of the beam
+:22: Let motors finish moving.
+:23: Set the sample thickness
+:24: Print and log the sample parameters
+:25: Set the sample title
+:26: Start the measurement.
+:27: Wait the requested time
+:28: Stop the measurement.

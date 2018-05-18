@@ -13,6 +13,10 @@ Welcome to SansScripting's documentation!
    tutorial
    reference
 
+The source is available on github_
+
+.. _github: https://github.com/PyGenie-Scans/SansScripts
+
 Indices and tables
 ==================
 

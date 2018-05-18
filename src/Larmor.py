@@ -263,22 +263,16 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
 
     @staticmethod
     def set_aperature(size):
-        if size.upper == "MEDIUM":
+        if size.upper() == "MEDIUM":
             gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
-        else:
-            # Leave the slits alone
-            pass
-        gen.waitfor_move()
 
     def _configure_sans_custom(self, size="", dae_fixed=None):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
-        gen.waitfor_move()
 
     def _configure_trans_custom(self, size="", dae_fixed=None):
         # move the transmission monitor out
         gen.cset(m4trans=0.0)
-        gen.waitfor_move()
 
     @staticmethod
     def _detector_is_on():
