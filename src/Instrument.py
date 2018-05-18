@@ -177,15 +177,46 @@ class ScanningInstrument(object):
           the aperature not being changed."""
         pass
 
+    def detector_on(self, powered=None, delay=True):
+        """Query and set the detector's electrical state.
+
+        Parameters
+        ----------
+        on : bool or None
+          If None, then return the detector's current state.  If True,
+          turn the detector on.  If False, turn the detector off.
+        delay : bool
+          If changing the detector state, whether to wait for the
+          detector to finish warming up or powering down before
+          continuing the script.
+        Returns :
+        bool
+          If the detector is currently on
+
+        """
+        if powered is not None:
+            if powered is True:
+                self._detector_turn_on(delay=delay)
+            else:
+                self._detector_turn_off(delay=delay)
+        return self._detector_is_on()
+
     @staticmethod
     @abstractmethod
-    def detector_is_on():
-        """Is the detector currently powered?"""
+    def _detector_is_on():
+        """Determine the current state of the detector.
+
+        Returns
+        -------
+        bool
+          True if the detector is powered up.
+
+        """
         return False
 
     @staticmethod
     @abstractmethod
-    def detector_turn_on(delay=True):
+    def _detector_turn_on(delay=True):
         """Power on the detector
 
         Parameters
@@ -197,7 +228,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def detector_turn_off(delay=True):
+    def _detector_turn_off(delay=True):
         """Remove detector power
 
         Parameters
@@ -325,9 +356,9 @@ class ScanningInstrument(object):
 
         """
         self._needs_setup()
-        if not self.detector_is_on() and not trans:
+        if not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
-            self.detector_turn_on()
+            self.detector_on(True)
         moved = False
         if pos:
             if isinstance(pos, str):

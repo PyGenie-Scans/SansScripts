@@ -281,7 +281,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.waitfor_move()
 
     @staticmethod
-    def detector_is_on():
+    def _detector_is_on():
         """Is the detector currently on?"""
         voltage_status = sum([
             gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
@@ -289,7 +289,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         return voltage_status > 0
 
     @staticmethod
-    def detector_turn_on(delay=True):
+    def _detector_turn_on(delay=True):
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
@@ -299,7 +299,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             sleep(180)
 
     @staticmethod
-    def detector_turn_off(delay=True):
+    def _detector_turn_off(delay=True):
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
         gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
@@ -390,20 +390,18 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         """Rehome slit2.  This is currentl a no-op."""
         info("Homing s2")
 
-    @staticmethod
-    def movebench(angle=0.0, delaydet=True):
+    def movebench(self, angle=0.0, delaydet=True):
         """Safely move the downstream arm"""
         info("Turning Detector Off")
-        Larmor.detector_turn_off(delay=delaydet)
-        Larmor.rotatebench(angle)
+        self.detector_on(False, delay=delaydet)
+        self.rotatebench(angle)
         # turn the detector back on
         info("Turning Detector Back on")
-        Larmor.detector_turn_on(delay=delaydet)
+        self.detector_on(True, delay=delaydet)
 
-    @staticmethod
-    def rotatebench(angle=0.0):
+    def rotatebench(self, angle=0.0):
         """Move the downstream arm"""
-        if Larmor.detector_is_on() > 0:
+        if self.detector_on():
             info("The detector is not turned off")
             info("Not attempting Move")
             return

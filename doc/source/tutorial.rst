@@ -222,13 +222,14 @@ Detector Status
 
 As an obvious sanity check, it is possible to check if the detector is on.
 
->>> detector_is_on()
+>>> detector_on()
 True
 
 We can also power cycle the detector.
 
->>> detector_turn_off()
+>>> detector_on(False)
 Waiting For Detector To Power Down (60s)
+False
 
 If we try to start a measurement with the detector off, the detector
 will be turned back on.
@@ -246,10 +247,12 @@ Measuring Sample_SANS for 100 frames
 
 We can also turn on the detector manually.
 
->>> detector_turn_off()
+>>> detector_on(False)
 Waiting For Detector To Power Down (60s)
->>> detector_turn_on()
+False
+>>> detector_on(True)
 Waiting For Detector To Power Up (180s)
+True
 
 
 DAE Modes
