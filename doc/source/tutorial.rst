@@ -318,6 +318,29 @@ Measuring Sample_TRANS for 100 frames
 Waiting For Detector To Power Up (180s)
 True
 
+Custom Running Modes
+====================
+
+More complicated running modes can be defined.
+
+>>> setup_dae_sesans()
+Setup Larmor for event
+Setup Larmor for sesans
+>>> measure("SESANS Test", u=1000, d=1000, frames=6000, dae_fixed=True)
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+Measuring SESANS Test_SANS for 6000 frames
+Flipper On
+Flipper Off
+Flipper On
+Flipper Off
+Flipper On
+Flipper Off
+
+
 Under the hood
 ==============
 

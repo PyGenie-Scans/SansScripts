@@ -13,27 +13,7 @@ from logging import info, warning
 from six import add_metaclass
 from .genie import gen
 
-TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
-
-def sanitised_timings(kwargs):
-    """Include only the keyword arguments for run timings.
-
-    Parameters
-    ----------
-    kwargs : dict
-      A dictionary of keyword arguments
-
-    Returns
-    -------
-    dict
-      Keyword arguments accepted by gen.waitfor
-    """
-    result = {}
-    for k in TIMINGS:
-        if k in kwargs:
-            result[k] = kwargs[k]
-    return result
 
 
 @add_metaclass(ABCMeta)
@@ -42,6 +22,30 @@ class ScanningInstrument(object):
 
     _dae_mode = None
     title_footer = ""
+    _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
+
+    @property
+    def TIMINGS(self):
+        return self._TIMINGS
+
+    def sanitised_timings(self, kwargs):
+        """Include only the keyword arguments for run timings.
+
+        Parameters
+        ----------
+        kwargs : dict
+        A dictionary of keyword arguments
+
+        Returns
+        -------
+        dict
+        Keyword arguments accepted by gen.waitfor
+        """
+        result = {}
+        for k in self.TIMINGS:
+            if k in kwargs:
+                result[k] = kwargs[k]
+        return result
 
     @staticmethod
     def _generic_scan(detector, spectra, wiring, tcbs):
@@ -163,6 +167,27 @@ class ScanningInstrument(object):
           Otherwise the DAE is left alone.
         """
         pass
+
+    def begin(self, *args, **kwargs):
+        """Start a measurement."""
+        if hasattr(self, "_begin_"+self._dae_mode):
+            getattr(self, "_begin_"+self._dae_mode)(*args, **kwargs)
+        else:
+            gen.begin(*args, **kwargs)
+
+    def end(self):
+        """End a measurement."""
+        if hasattr(self, "_end_"+self._dae_mode):
+            getattr(self, "_end_"+self._dae_mode)()
+        else:
+            gen.end()
+
+    def waitfor(self, **kwargs):
+        """Await the user's desired statistics."""
+        if hasattr(self, "_waitfor_"+self._dae_mode):
+            getattr(self, "_waitfor_"+self._dae_mode)(**kwargs)
+        else:
+            gen.waitfor(**kwargs)
 
     @staticmethod
     @abstractmethod
@@ -360,7 +385,7 @@ class ScanningInstrument(object):
             else:
                 raise TypeError("Cannot understand position {}".format(pos))
         for arg in kwargs:
-            if arg in TIMINGS:
+            if arg in self.TIMINGS:
                 continue
             info("Moving {} to {}".format(arg, kwargs[arg]))
             gen.cset(arg, kwargs[arg])
@@ -371,19 +396,20 @@ class ScanningInstrument(object):
             self.configure_trans(size=aperature, dae_fixed=dae_fixed)
         else:
             self.configure_sans(size=aperature, dae_fixed=dae_fixed)
-        times = sanitised_timings(kwargs)
+        times = self.sanitised_timings(kwargs)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
         info("Using the following Sample Parameters")
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
-        gen.begin()
+
+        self.begin()
         info("Measuring {title:} for {time:} {units:}".format(
             title=title+self.title_footer,
             units=list(times.keys())[0],
             time=times[list(times.keys())[0]]))
-        gen.waitfor(**times)
-        gen.end()
+        self.waitfor(**times)
+        self.end()
 
     def measure_file(self, file_path, forever=False):
         """Perform a series of measurements based on a spreadsheet
