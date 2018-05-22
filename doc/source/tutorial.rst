@@ -126,16 +126,29 @@ sample changer position.  It's still possible to override or amend
 these custom positions with measurement specific values, as we have
 done above with the Julabo temperature again.
 
->>> setup_dae_bsalignment()
+>>> set_default_sans(setup_dae_bsalignment)
 Setup Larmor for bsalignment
->>> measure("Beam stop", frames=300, dae_fixed=True)
+>>> measure("Beam stop", frames=300)
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
->>> measure("Beam stop", frames=300)
+
+The default DAE mode for all SANS measurements is evnet mode.  This
+can be overridden with the :py:meth:`Instrument.set_default_sans`
+function, which will assign a new default SANS method.  This new event
+mode will be used for all future SANS measurements.  For brevity, the
+:py:meth:`Instrument.set_default_sans` will also take a string
+argument.  The line above can also be run as
+
+>>> set_default_sans("bsalignment")
+
+Notice that nothing was printed by the line above, since we were
+already in beam stop alignment mode.
+
+>>> measure("Beam stop", dae="event", frames=300)
 Setup Larmor for event
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -144,12 +157,10 @@ Height=10
 Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
-By default, when taking a sans measurement, the
-:py:meth:`ScanningInstrument.measure` function puts the instrument
-into event mode.  Similarly, trans measurements are always in
-transmission mode.  Setting the ``dae_fixed`` property to ``True`` ignores
-the default mode and maintains whatever mode the instrument is
-currently in.
+The :py:meth:`ScanningInstrument.measure` function also has a ``dae``
+keyword parameter that is automatically passed to either
+`setup_default_sans` or `setup_default_trans`, depending on the
+measurement mode.
 
 Automated script checking
 =========================
@@ -323,10 +334,10 @@ Custom Running Modes
 
 More complicated running modes can be defined.
 
->>> setup_dae_sesans()
+>>> set_default_sans(setup_dae_sesans)
 Setup Larmor for event
 Setup Larmor for sesans
->>> measure("SESANS Test", u=1000, d=1000, frames=6000, dae_fixed=True)
+>>> measure("SESANS Test", u=1000, d=1000, frames=6000)
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -345,9 +356,9 @@ Under the hood
 ==============
 
 >>> gen.reset_mock()
->>> measure("Test", "BT", aperature="Medium", uamps=15)
-Moving to sample changer position BT
+>>> measure("Test", "BT", dae="event", aperature="Medium", uamps=15)
 Setup Larmor for event
+Moving to sample changer position BT
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -366,7 +377,6 @@ genie-python isn't found.
  call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
  call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
  call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
- call.cset(SamplePos='BT'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),
@@ -379,6 +389,7 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
+ call.cset(SamplePos='BT'),
  call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
  call.waitfor_move(),
@@ -393,8 +404,8 @@ That's quite a few commands, so it's worth running through them.
 
 :2: Ensure that the instrument is ready to start a measurement
 :3-6: Check that the detector is on
-:7: Move the sample into position
-:8-19: Put the instrument in event mode
+:7-18: Put the instrument in event mode
+:19: Move the sample into position
 :20: Set the upstream slits
 :21: Move the M4 transmission monitor out of the beam
 :22: Let motors finish moving.

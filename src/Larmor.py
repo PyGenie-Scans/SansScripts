@@ -305,11 +305,11 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         if size.upper() == "MEDIUM":
             gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
 
-    def _configure_sans_custom(self, size="", dae_fixed=None):
+    def _configure_sans_custom(self, size=""):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
 
-    def _configure_trans_custom(self, size="", dae_fixed=None):
+    def _configure_trans_custom(self, size=""):
         # move the transmission monitor out
         gen.cset(m4trans=0.0)
 

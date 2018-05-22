@@ -24,6 +24,24 @@ class ScanningInstrument(object):
     title_footer = ""
     _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
+    def __init__(self):
+        self.setup_sans = self.setup_dae_event
+        self.setup_trans = self.setup_dae_transmission
+
+    def set_default_sans(self, mode):
+        if isinstance(mode, str):
+            return self.set_default_sans(
+                getattr(self, "setup_dae_"+mode))
+        self.setup_sans = mode
+        mode()
+
+    def set_default_trans(self, mode):
+        if isinstance(mode, str):
+            return self.set_default_trans(
+                getattr(self, "setup_dae_"+mode))
+        self.setup_trans = mode
+        mode()
+
     @property
     def TIMINGS(self):
         return self._TIMINGS
@@ -128,7 +146,7 @@ class ScanningInstrument(object):
         """Set the wiring tables to record only the monitors"""
         pass
 
-    def _configure_sans_custom(self, size, dae_fixed):
+    def _configure_sans_custom(self, size):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -142,13 +160,10 @@ class ScanningInstrument(object):
         size : str
           The aperature size (e.g. "Small" or "Medium").  A blank
           string results in the aperature not being changed.
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         pass
 
-    def _configure_trans_custom(self, size, dae_fixed):
+    def _configure_trans_custom(self, size):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -162,9 +177,6 @@ class ScanningInstrument(object):
         size : str
           The aperature size (e.g. "Small" or "Medium").  A blank
           string results in the aperature not being changed.
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         pass
 
@@ -263,7 +275,7 @@ class ScanningInstrument(object):
         """
         return False
 
-    def configure_sans(self, size="", dae_fixed=False):
+    def configure_sans(self, size=""):
         """Setup to the instrument for a SANS measurement
 
         Parameters
@@ -272,18 +284,14 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
           the aperature not being changed
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         # setup to run in histogram or event mode
         self.title_footer = "_SANS"
-        if not dae_fixed:
-            self.setup_dae_event()
+        self.setup_sans()
         self.set_aperature(size)
-        self._configure_sans_custom(size, dae_fixed)
+        self._configure_sans_custom(size)
 
-    def configure_trans(self, size="", dae_fixed=False):
+    def configure_trans(self, size=""):
         """Setup the instrument for a transmission measurement
 
         Parameters
@@ -292,16 +300,12 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
           the aperature not being changed
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         self.title_footer = "_TRANS"
-        if not dae_fixed:
-            self.setup_dae_transmission()
+        self.setup_trans()
         gen.waitfor_move()
         self.set_aperature(size)
-        self._configure_trans_custom(self, dae_fixed=dae_fixed)
+        self._configure_trans_custom(size)
 
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False
@@ -318,7 +322,7 @@ class ScanningInstrument(object):
         return True
 
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                dae_fixed=False, aperature="", **kwargs):
+                dae=None, aperature="", **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -335,10 +339,19 @@ class ScanningInstrument(object):
           The thickness of the sample in millimeters.  The default is 1mm.
         trans : bool
           Whether to perform a transmission run instead of a sans run.
-        dae_fixed : bool
-          If True, then `measure` will not change the DAE mode before
-          starting the measurement.  This is useful if you want to use
-          a different DAE mode than the default.
+        dae : str or func
+          This option allows setting the default dae mode.  It takes a
+          string that contains the name of the DAE mode to be used as
+          the new default.  For example,
+          >>> measure("Test", frames=10, dae="event")
+          Is equivalent to
+          >>> set_default_sans(setup_dae_event)
+          >>> measure("Test", frames=10)
+          If dae is a function, then the function is set to the default
+          >>> measure("Test", frames=10, dae=foo)
+          Is equivalent to
+          >>> set_default_sans(foo)
+          >>> measure("Test", frames=10)
         aperature : str
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
@@ -371,6 +384,11 @@ class ScanningInstrument(object):
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
         moved = False
+        if dae:
+            if trans:
+                self.set_default_trans(dae)
+            else:
+                self.set_default_sans(dae)
         if pos:
             if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):
@@ -393,9 +411,9 @@ class ScanningInstrument(object):
         if moved:
             gen.waitfor_move()
         if trans:
-            self.configure_trans(size=aperature, dae_fixed=dae_fixed)
+            self.configure_trans(size=aperature)
         else:
-            self.configure_sans(size=aperature, dae_fixed=dae_fixed)
+            self.configure_sans(size=aperature)
         times = self.sanitised_timings(kwargs)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
