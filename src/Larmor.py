@@ -31,6 +31,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     step = 100.0
     lrange = "0.9-13.25"
 
+    @property
+    def TIMINGS(self):
+        if self._dae_mode == "sesans":
+            return self._TIMINGS + ["u", "d"]
+        return self._TIMINGS
+
     def get_lrange(self):
         """Return the current wavelength range"""
         return self.lrange
@@ -261,16 +267,59 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
               "trange": 1, "log": 0},
              {"low": 0.0, "high": 0.0, "step": 0.0, "trange": 2, "log": 0}])
 
+    @dae_setter
+    def setup_dae_sesans(self):
+        """Setup the instrument for SESANS measurements."""
+        self.setup_dae_event()
+
+    @staticmethod
+    def _begin_sesans():
+        """Initialise a SESANS run"""
+        gen.change(nperiods=2)
+        gen.begin(paused=1)
+
+    @staticmethod
+    def _waitfor_sesans(u=1000, d=1000,
+                        **kwargs):  # pylint: disable=invalid-name
+        """Perform a SESANS run"""
+        if "uamps" in kwargs:
+            get_total = gen.get_uamps
+            key = "uamps"
+        else:
+            get_total = gen.get_frames
+            key = "frames"
+        gfrm = gen.get_frames()
+        gtotal = get_total()
+
+        while gtotal < kwargs[key]:
+            gen.change(period=1)
+            info("Flipper On")
+            gen.flipper1(1)
+            gfrm = gen.get_frames()
+            gen.resume()
+            gen.waitfor(frames=gfrm+u)
+            gen.pause()
+
+            gen.change(period=2)
+            info("Flipper Off")
+            gen.flipper1(1)
+            gfrm = gen.get_frames()
+            gen.resume()
+            gen.waitfor(frames=gfrm+d)
+            gen.pause()
+
+            gtotal = get_total()
+
     @staticmethod
     def set_aperature(size):
         if size.upper() == "MEDIUM":
             gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
 
-    def _configure_sans_custom(self, size="", dae_fixed=None):
+    def _configure_sans_custom(self, size=""):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
 
-    def _configure_trans_custom(self, size="", dae_fixed=None):
+    def _configure_trans_custom(self, size=""):
         # move the transmission monitor out
         gen.cset(m4trans=0.0)
 

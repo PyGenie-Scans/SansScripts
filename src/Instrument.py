@@ -13,35 +13,67 @@ from logging import info, warning
 from six import add_metaclass
 from .genie import gen
 
-TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
-
-def sanitised_timings(kwargs):
-    """Include only the keyword arguments for run timings.
-
-    Parameters
-    ----------
-    kwargs : dict
-      A dictionary of keyword arguments
-
-    Returns
-    -------
-    dict
-      Keyword arguments accepted by gen.waitfor
-    """
-    result = {}
-    for k in TIMINGS:
-        if k in kwargs:
-            result[k] = kwargs[k]
-    return result
-
-
-@add_metaclass(ABCMeta)
+@add_metaclass(ABCMeta)  # pylint: disable=too-many-public-methods
 class ScanningInstrument(object):
     """The base class for scanning measurement instruments."""
 
     _dae_mode = None
     title_footer = ""
+    _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
+
+    def __init__(self):
+        self.setup_sans = self.setup_dae_event
+        self.setup_trans = self.setup_dae_transmission
+
+    def set_default_dae(self, mode=None, trans=False):
+        """Set the default DAE mode for SANS or TRANS measuremnts.
+
+        Parameters
+        ----------
+        mode : str or function
+          If the mode is a function, call that function to set the DAE
+          mode.  If the mode is a string, call the function whose name
+          is "setup_dae_" followed by that string.
+        trans : bool
+          If true, set the default transmission instead of the default
+          SANS mode.
+
+        """
+        if mode is None:
+            pass
+        elif isinstance(mode, str):
+            self.set_default_dae(
+                getattr(self, "setup_dae_"+mode))
+        else:
+            if trans:
+                self.setup_trans = mode
+            else:
+                self.setup_sans = mode
+
+    @property
+    def TIMINGS(self):  # pylint: disable=invalid-name
+        """The list of valid waitfor keywords."""
+        return self._TIMINGS
+
+    def sanitised_timings(self, kwargs):
+        """Include only the keyword arguments for run timings.
+
+        Parameters
+        ----------
+        kwargs : dict
+        A dictionary of keyword arguments
+
+        Returns
+        -------
+        dict
+        Keyword arguments accepted by gen.waitfor
+        """
+        result = {}
+        for k in self.TIMINGS:
+            if k in kwargs:
+                result[k] = kwargs[k]
+        return result
 
     @staticmethod
     def _generic_scan(detector, spectra, wiring, tcbs):
@@ -124,7 +156,7 @@ class ScanningInstrument(object):
         """Set the wiring tables to record only the monitors"""
         pass
 
-    def _configure_sans_custom(self, size, dae_fixed):
+    def _configure_sans_custom(self, size):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -138,13 +170,10 @@ class ScanningInstrument(object):
         size : str
           The aperature size (e.g. "Small" or "Medium").  A blank
           string results in the aperature not being changed.
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         pass
 
-    def _configure_trans_custom(self, size, dae_fixed):
+    def _configure_trans_custom(self, size):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -158,11 +187,29 @@ class ScanningInstrument(object):
         size : str
           The aperature size (e.g. "Small" or "Medium").  A blank
           string results in the aperature not being changed.
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         pass
+
+    def begin(self, *args, **kwargs):
+        """Start a measurement."""
+        if hasattr(self, "_begin_"+self._dae_mode):
+            getattr(self, "_begin_"+self._dae_mode)(*args, **kwargs)
+        else:
+            gen.begin(*args, **kwargs)
+
+    def end(self):
+        """End a measurement."""
+        if hasattr(self, "_end_"+self._dae_mode):
+            getattr(self, "_end_"+self._dae_mode)()
+        else:
+            gen.end()
+
+    def waitfor(self, **kwargs):
+        """Await the user's desired statistics."""
+        if hasattr(self, "_waitfor_"+self._dae_mode):
+            getattr(self, "_waitfor_"+self._dae_mode)(**kwargs)
+        else:
+            gen.waitfor(**kwargs)
 
     @staticmethod
     @abstractmethod
@@ -238,7 +285,7 @@ class ScanningInstrument(object):
         """
         return False
 
-    def configure_sans(self, size="", dae_fixed=False):
+    def configure_sans(self, size=""):
         """Setup to the instrument for a SANS measurement
 
         Parameters
@@ -247,18 +294,14 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
           the aperature not being changed
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         # setup to run in histogram or event mode
         self.title_footer = "_SANS"
-        if not dae_fixed:
-            self.setup_dae_event()
+        self.setup_sans()
         self.set_aperature(size)
-        self._configure_sans_custom(size, dae_fixed)
+        self._configure_sans_custom(size)
 
-    def configure_trans(self, size="", dae_fixed=False):
+    def configure_trans(self, size=""):
         """Setup the instrument for a transmission measurement
 
         Parameters
@@ -267,16 +310,12 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium"
           A blank string (the default value) results in
           the aperature not being changed
-        dae_fixed : bool
-          If False, the DAE will be set to event mode.
-          Otherwise the DAE is left alone.
         """
         self.title_footer = "_TRANS"
-        if not dae_fixed:
-            self.setup_dae_transmission()
+        self.setup_trans()
         gen.waitfor_move()
         self.set_aperature(size)
-        self._configure_trans_custom(self, dae_fixed=dae_fixed)
+        self._configure_trans_custom(size)
 
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False
@@ -293,7 +332,7 @@ class ScanningInstrument(object):
         return True
 
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                dae_fixed=False, aperature="", **kwargs):
+                dae=None, aperature="", **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -310,10 +349,19 @@ class ScanningInstrument(object):
           The thickness of the sample in millimeters.  The default is 1mm.
         trans : bool
           Whether to perform a transmission run instead of a sans run.
-        dae_fixed : bool
-          If True, then `measure` will not change the DAE mode before
-          starting the measurement.  This is useful if you want to use
-          a different DAE mode than the default.
+        dae : str or func
+          This option allows setting the default dae mode.  It takes a
+          string that contains the name of the DAE mode to be used as
+          the new default.  For example,
+          >>> measure("Test", frames=10, dae="event")
+          Is equivalent to
+          >>> set_default_dae(setup_dae_event)
+          >>> measure("Test", frames=10)
+          If dae is a function, then the function is set to the default
+          >>> measure("Test", frames=10, dae=foo)
+          Is equivalent to
+          >>> set_default_dae(foo)
+          >>> measure("Test", frames=10)
         aperature : str
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
@@ -345,7 +393,11 @@ class ScanningInstrument(object):
         if not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
-        moved = False
+        self.set_default_dae(dae, trans)
+        if trans:
+            self.configure_trans(size=aperature)
+        else:
+            self.configure_sans(size=aperature)
         if pos:
             if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):
@@ -360,30 +412,24 @@ class ScanningInstrument(object):
             else:
                 raise TypeError("Cannot understand position {}".format(pos))
         for arg in kwargs:
-            if arg in TIMINGS:
+            if arg in self.TIMINGS:
                 continue
             info("Moving {} to {}".format(arg, kwargs[arg]))
             gen.cset(arg, kwargs[arg])
-            moved = True
-        if moved:
-            gen.waitfor_move()
-        if trans:
-            self.configure_trans(size=aperature, dae_fixed=dae_fixed)
-        else:
-            self.configure_sans(size=aperature, dae_fixed=dae_fixed)
-        times = sanitised_timings(kwargs)
+        times = self.sanitised_timings(kwargs)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
         info("Using the following Sample Parameters")
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
-        gen.begin()
+
+        self.begin()
         info("Measuring {title:} for {time:} {units:}".format(
             title=title+self.title_footer,
             units=list(times.keys())[0],
             time=times[list(times.keys())[0]]))
-        gen.waitfor(**times)
-        gen.end()
+        self.waitfor(**times)
+        self.end()
 
     def measure_file(self, file_path, forever=False):
         """Perform a series of measurements based on a spreadsheet

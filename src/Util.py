@@ -32,9 +32,9 @@ def dae_setter(inner):
         request = inner.__name__[10:]
         if request == self._dae_mode:  # pylint: disable=protected-access
             return
+        inner(self, *args, **kwargs)
         info("Setup {} for {}".format(type(self).__name__,
                                       request.replace("_", " ")))
-        inner(self, *args, **kwargs)
         self._dae_mode = request  # pylint: disable=protected-access
     return wrapper
 

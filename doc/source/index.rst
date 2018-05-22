@@ -12,6 +12,7 @@ Welcome to SansScripting's documentation!
 
    tutorial
    reference
+   proposed
 
 The source is available on github_
 
