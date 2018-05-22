@@ -72,8 +72,8 @@ A couple of things changed with this new command.
    didn't perform the redundant step.
 
 >>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
-Moving CoarseZ to 25
 Setup Larmor for transmission
+Moving CoarseZ to 25
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -89,10 +89,10 @@ instrument has converted into transmission mode, setting the
 appropriate wiring tables and moving the M4 monitor into the beam.
 
 >>> measure("Sample Name", "CT", SampleX=10, Julabo1_SP=35, uamps=5)
+Setup Larmor for event
 Moving to sample changer position CT
 Moving Julabo1_SP to 35
 Moving SampleX to 10
-Setup Larmor for event
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -126,9 +126,9 @@ sample changer position.  It's still possible to override or amend
 these custom positions with measurement specific values, as we have
 done above with the Julabo temperature again.
 
->>> set_default_sans(setup_dae_bsalignment)
-Setup Larmor for bsalignment
+>>> set_default_dae(setup_dae_bsalignment)
 >>> measure("Beam stop", frames=300)
+Setup Larmor for bsalignment
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -137,13 +137,14 @@ Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The default DAE mode for all SANS measurements is evnet mode.  This
-can be overridden with the :py:meth:`Instrument.set_default_sans`
-function, which will assign a new default SANS method.  This new event
-mode will be used for all future SANS measurements.  For brevity, the
-:py:meth:`Instrument.set_default_sans` will also take a string
+can be overridden with the
+:py:meth:`ScanningInstrument.set_default_dae` function, which will
+assign a new default SANS method.  This new event mode will be used
+for all future SANS measurements.  For brevity, the
+:py:meth:`ScanningInstrument.set_default_dae` will also take a string
 argument.  The line above can also be run as
 
->>> set_default_sans("bsalignment")
+>>> set_default_dae("bsalignment")
 
 Notice that nothing was printed by the line above, since we were
 already in beam stop alignment mode.
@@ -158,9 +159,8 @@ Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The :py:meth:`ScanningInstrument.measure` function also has a ``dae``
-keyword parameter that is automatically passed to either
-`setup_default_sans` or `setup_default_trans`, depending on the
-measurement mode.
+keyword parameter that is automatically passed to
+:py:meth:`setup_default_dae`.
 
 Automated script checking
 =========================
@@ -332,12 +332,16 @@ True
 Custom Running Modes
 ====================
 
-More complicated running modes can be defined.
+Some mode may be much more complicated than a simple sans measurement.
+For example, a SESANS measurement needs to setup the DAE for two
+periods, manage the flipper state, and switch between those periods.
+From the user's perspective, this is all handled in the same manner as
+a normal measurement.
 
->>> set_default_sans(setup_dae_sesans)
+>>> set_default_dae(setup_dae_sesans)
+>>> measure("SESANS Test", u=1000, d=1000, frames=6000)
 Setup Larmor for event
 Setup Larmor for sesans
->>> measure("SESANS Test", u=1000, d=1000, frames=6000)
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -350,6 +354,12 @@ Flipper On
 Flipper Off
 Flipper On
 Flipper Off
+
+.. py:currentmodule:: src.Larmor
+
+In this example, the instrument scientist has written two functions
+:py:meth:`Larmor._begin_sesans` and :py:meth:`Larmor_waitfor_sesans`
+which handle the SESANS specific nature of the measurement.
 
 
 Under the hood
@@ -389,9 +399,9 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
- call.cset(SamplePos='BT'),
  call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
+ call.cset(SamplePos='BT'),
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
  call.get_sample_pars(),
@@ -405,9 +415,9 @@ That's quite a few commands, so it's worth running through them.
 :2: Ensure that the instrument is ready to start a measurement
 :3-6: Check that the detector is on
 :7-18: Put the instrument in event mode
-:19: Move the sample into position
-:20: Set the upstream slits
-:21: Move the M4 transmission monitor out of the beam
+:19: Set the upstream slits
+:20: Move the M4 transmission monitor out of the beam
+:21: Move the sample into position
 :22: Let motors finish moving.
 :23: Set the sample thickness
 :24: Print and log the sample parameters

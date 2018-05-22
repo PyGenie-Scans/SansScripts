@@ -273,10 +273,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         self.setup_dae_event()
 
     def _begin_sesans(self):
+        """Initialise a SESANS run"""
         gen.change(nperiods=2)
         gen.begin(paused=1)
 
     def _waitfor_sesans(self, **kwargs):
+        """Perform a SESANS run"""
         gfrm = gen.get_frames()
         u = kwargs["u"]
         d = kwargs["d"]

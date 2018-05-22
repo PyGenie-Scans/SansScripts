@@ -14,8 +14,6 @@ from six import add_metaclass
 from .genie import gen
 
 
-
-
 @add_metaclass(ABCMeta)
 class ScanningInstrument(object):
     """The base class for scanning measurement instruments."""
@@ -28,19 +26,27 @@ class ScanningInstrument(object):
         self.setup_sans = self.setup_dae_event
         self.setup_trans = self.setup_dae_transmission
 
-    def set_default_sans(self, mode):
-        if isinstance(mode, str):
-            return self.set_default_sans(
-                getattr(self, "setup_dae_"+mode))
-        self.setup_sans = mode
-        mode()
+    def set_default_dae(self, mode, trans=False):
+        """Set the default DAE mode for SANS or TRANS measuremnts.
 
-    def set_default_trans(self, mode):
+        Parameters
+        ----------
+        mode : str or function
+          If the mode is a function, call that function to set the DAE
+          mode.  If the mode is a string, call the function whose name
+          is "setup_dae_" followed by that string.
+        trans : bool
+          If true, set the default transmission instead of the default
+          SANS mode.
+
+        """
         if isinstance(mode, str):
-            return self.set_default_trans(
+            return self.set_default_dae(
                 getattr(self, "setup_dae_"+mode))
-        self.setup_trans = mode
-        mode()
+        if trans:
+            self.setup_trans = mode
+        else:
+            self.setup_sans = mode
 
     @property
     def TIMINGS(self):
@@ -345,12 +351,12 @@ class ScanningInstrument(object):
           the new default.  For example,
           >>> measure("Test", frames=10, dae="event")
           Is equivalent to
-          >>> set_default_sans(setup_dae_event)
+          >>> set_default_dae(setup_dae_event)
           >>> measure("Test", frames=10)
           If dae is a function, then the function is set to the default
           >>> measure("Test", frames=10, dae=foo)
           Is equivalent to
-          >>> set_default_sans(foo)
+          >>> set_default_dae(foo)
           >>> measure("Test", frames=10)
         aperature : str
           The aperature size.  e.g. "Small" or "Medium" A blank string
@@ -385,10 +391,11 @@ class ScanningInstrument(object):
             self.detector_on(True)
         moved = False
         if dae:
-            if trans:
-                self.set_default_trans(dae)
-            else:
-                self.set_default_sans(dae)
+            self.set_default_dae(dae, trans)
+        if trans:
+            self.configure_trans(size=aperature)
+        else:
+            self.configure_sans(size=aperature)
         if pos:
             if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):
@@ -410,10 +417,6 @@ class ScanningInstrument(object):
             moved = True
         if moved:
             gen.waitfor_move()
-        if trans:
-            self.configure_trans(size=aperature)
-        else:
-            self.configure_sans(size=aperature)
         times = self.sanitised_timings(kwargs)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)
