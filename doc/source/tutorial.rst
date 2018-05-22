@@ -361,13 +361,15 @@ In this example, the instrument scientist has written two functions
 :py:meth:`Larmor._begin_sesans` and :py:meth:`Larmor_waitfor_sesans`
 which handle the SESANS specific nature of the measurement.
 
->>> measure("SESANS Test", u=1500, d=1500, frames=6000)
+>>> measure("SESANS Test", u=1500, d=1500, uamps=10)
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
 Thickness=1.0
-Measuring SESANS Test_SANS for 6000 frames
+Measuring SESANS Test_SANS for 10 uamps
+Flipper On
+Flipper Off
 Flipper On
 Flipper Off
 Flipper On

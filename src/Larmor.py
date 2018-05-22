@@ -282,9 +282,16 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     def _waitfor_sesans(u=1000, d=1000,
                         **kwargs):  # pylint: disable=invalid-name
         """Perform a SESANS run"""
+        if "uamps" in kwargs:
+            get_total = gen.get_uamps
+            key = "uamps"
+        else:
+            get_total = gen.get_frames
+            key = "frames"
         gfrm = gen.get_frames()
+        gtotal = get_total()
 
-        while gfrm < kwargs["frames"]:
+        while gtotal < kwargs[key]:
             gen.change(period=1)
             info("Flipper On")
             gen.flipper1(1)
@@ -301,7 +308,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             gen.waitfor(frames=gfrm+d)
             gen.pause()
 
-            gfrm = gen.get_frames()
+            gtotal = get_total()
 
     @staticmethod
     def set_aperature(size):
