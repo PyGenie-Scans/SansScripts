@@ -14,7 +14,7 @@ from six import add_metaclass
 from .genie import gen
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(ABCMeta)  # pylint: disable=too-many-public-methods
 class ScanningInstrument(object):
     """The base class for scanning measurement instruments."""
 
@@ -41,15 +41,17 @@ class ScanningInstrument(object):
 
         """
         if isinstance(mode, str):
-            return self.set_default_dae(
+            self.set_default_dae(
                 getattr(self, "setup_dae_"+mode))
-        if trans:
-            self.setup_trans = mode
         else:
-            self.setup_sans = mode
+            if trans:
+                self.setup_trans = mode
+            else:
+                self.setup_sans = mode
 
     @property
-    def TIMINGS(self):
+    def TIMINGS(self):  # pylint: disable=invalid-name
+        """The list of valid waitfor keywords."""
         return self._TIMINGS
 
     def sanitised_timings(self, kwargs):
@@ -389,7 +391,6 @@ class ScanningInstrument(object):
         if not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
-        moved = False
         if dae:
             self.set_default_dae(dae, trans)
         if trans:
@@ -414,9 +415,6 @@ class ScanningInstrument(object):
                 continue
             info("Moving {} to {}".format(arg, kwargs[arg]))
             gen.cset(arg, kwargs[arg])
-            moved = True
-        if moved:
-            gen.waitfor_move()
         times = self.sanitised_timings(kwargs)
         gen.waitfor_move()
         gen.change_sample_par("Thick", thickness)

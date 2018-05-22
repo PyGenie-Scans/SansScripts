@@ -272,16 +272,18 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         """Setup the instrument for SESANS measurements."""
         self.setup_dae_event()
 
-    def _begin_sesans(self):
+    @staticmethod
+    def _begin_sesans():
         """Initialise a SESANS run"""
         gen.change(nperiods=2)
         gen.begin(paused=1)
 
-    def _waitfor_sesans(self, **kwargs):
+    @staticmethod
+    def _waitfor_sesans(**kwargs):
         """Perform a SESANS run"""
         gfrm = gen.get_frames()
-        u = kwargs["u"]
-        d = kwargs["d"]
+        up_frames = kwargs["u"]
+        down_frames = kwargs["d"]
 
         while gfrm < kwargs["frames"]:
             gen.change(period=1)
@@ -289,16 +291,16 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             gen.flipper1(1)
             gfrm = gen.get_frames()
             gen.resume()
-            gen.waitfor(frames=gfrm+u)
-            gen.pause
+            gen.waitfor(frames=gfrm+up_frames)
+            gen.pause()
 
             gen.change(period=2)
             info("Flipper Off")
             gen.flipper1(1)
             gfrm = gen.get_frames()
             gen.resume()
-            gen.waitfor(frames=gfrm+d)
-            gen.pause
+            gen.waitfor(frames=gfrm+down_frames)
+            gen.pause()
 
             gfrm = gen.get_frames()
 

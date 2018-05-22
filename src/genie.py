@@ -11,7 +11,7 @@ mock_gen = mock.Mock()
 mock_gen.mock_state = "SETUP"
 
 
-def begin(*args, **kwargs):
+def begin(*_, **_kwargs):
     """Fake starting a measurement"""
     mock_gen.mock_state = "RUNNING"
     mock_gen.mock_frames = 0
@@ -53,7 +53,9 @@ mock_gen.mock_sample_pars = {
 mock_gen.get_sample_pars.side_effect = lambda: mock_gen.mock_sample_pars
 mock_gen.get_frames = lambda: mock_gen.mock_frames
 
+
 def waitfor(**kwargs):
+    """Update frames in response to waiting."""
     if "frames" in kwargs:
         mock_gen.mock_frames = max(mock_gen.mock_frames, kwargs["frames"])
     elif "uamps" in kwargs:
