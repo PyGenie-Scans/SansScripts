@@ -279,11 +279,10 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.begin(paused=1)
 
     @staticmethod
-    def _waitfor_sesans(**kwargs):
+    def _waitfor_sesans(u=1000, d=1000,
+                        **kwargs):  # pylint: disable=invalid-name
         """Perform a SESANS run"""
         gfrm = gen.get_frames()
-        up_frames = kwargs["u"]
-        down_frames = kwargs["d"]
 
         while gfrm < kwargs["frames"]:
             gen.change(period=1)
@@ -291,7 +290,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             gen.flipper1(1)
             gfrm = gen.get_frames()
             gen.resume()
-            gen.waitfor(frames=gfrm+up_frames)
+            gen.waitfor(frames=gfrm+u)
             gen.pause()
 
             gen.change(period=2)
@@ -299,7 +298,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             gen.flipper1(1)
             gfrm = gen.get_frames()
             gen.resume()
-            gen.waitfor(frames=gfrm+down_frames)
+            gen.waitfor(frames=gfrm+d)
             gen.pause()
 
             gfrm = gen.get_frames()

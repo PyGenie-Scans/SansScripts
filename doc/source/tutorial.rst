@@ -339,7 +339,7 @@ From the user's perspective, this is all handled in the same manner as
 a normal measurement.
 
 >>> set_default_dae(setup_dae_sesans)
->>> measure("SESANS Test", u=1000, d=1000, frames=6000)
+>>> measure("SESANS Test", frames=6000)
 Setup Larmor for event
 Setup Larmor for sesans
 Using the following Sample Parameters
@@ -360,6 +360,22 @@ Flipper Off
 In this example, the instrument scientist has written two functions
 :py:meth:`Larmor._begin_sesans` and :py:meth:`Larmor_waitfor_sesans`
 which handle the SESANS specific nature of the measurement.
+
+>>> measure("SESANS Test", u=1500, d=1500, frames=6000)
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thickness=1.0
+Measuring SESANS Test_SANS for 6000 frames
+Flipper On
+Flipper Off
+Flipper On
+Flipper Off
+
+These custom mode also allow more default parameters to be added onto
+``measure``.  In this instance, the ``u`` and ``d`` parameters set the
+number of frames in the up and down states.
 
 
 Under the hood
