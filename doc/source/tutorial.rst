@@ -64,8 +64,8 @@ A couple of things changed with this new command.
    the measurement.
 
 #. We specified the beam size.  The individual beamlines will have the
-   opportunity to decide their own aperature settings, but there
-   should hopefully reach a consensus on the names.
+   opportunity to decide their own aperature settings, but they should
+   hopefully reach a consensus on the names.
 
 #. You'll notice that there is no message about putting the instrument
    in event mode.  Since we were already in event mode, the instrument
@@ -81,12 +81,12 @@ Height=10
 Thickness=2.0
 Measuring Sample Name_TRANS for 5 uamps
 
-Here we are directly setting the moving the CoarseZ motor on the
-sample stack to our desired position, instead of just picking a
-position for the sample changer.  We have also recorded that this run
-is on a 2 mm sample, unlike our previous 1 mm runs.  Finally, the
-instrument has converted into transmission mode, setting the
-appropriate wiring tables and moving the M4 monitor into the beam.
+Here we are directly setting the CoarseZ motor on the sample stack to
+our desired position, instead of just picking a position for the
+sample changer.  We have also recorded that this run is on a 2 mm
+sample, unlike our previous 1 mm runs.  Finally, the instrument has
+converted into transmission mode, setting the appropriate wiring
+tables and moving the M4 monitor into the beam.
 
 >>> measure("Sample Name", "CT", SampleX=10, Julabo1_SP=35, uamps=5)
 Setup Larmor for event
@@ -136,18 +136,15 @@ Height=10
 Thickness=1.0
 Measuring Beam stop_SANS for 300 frames
 
-The default DAE mode for all SANS measurements is evnet mode.  This
+The default DAE mode for all SANS measurements is event mode.  This
 can be overridden with the
 :py:meth:`ScanningInstrument.set_default_dae` function, which will
 assign a new default SANS method.  This new event mode will be used
 for all future SANS measurements.  For brevity, the
 :py:meth:`ScanningInstrument.set_default_dae` will also take a string
-argument.  The line above can also be run as
+argument.  The first line can also be run as
 
 >>> set_default_dae("bsalignment")
-
-Notice that nothing was printed by the line above, since we were
-already in beam stop alignment mode.
 
 >>> measure("Beam stop", dae="event", frames=300)
 Setup Larmor for event
@@ -160,7 +157,8 @@ Measuring Beam stop_SANS for 300 frames
 
 The :py:meth:`ScanningInstrument.measure` function also has a ``dae``
 keyword parameter that is automatically passed to
-:py:meth:`setup_default_dae`.
+:py:meth:`setup_default_dae`.  The above example puts the instrument
+back into event mode.
 
 Automated script checking
 =========================
@@ -193,9 +191,9 @@ positions to "CT" then gives:
 >>> @user_script
 ... def trial():
 ...     measure("Test1", "BT", uamps=30)
-...     measure("Test2", "TT", uamps=30)
+...     measure("Test2", "CT", uamps=30)
 ...     measure("Test1", "BT", trans=True, uanps=10)
-...     measure("Test2", "TT", trans=True, uamps=10)
+...     measure("Test2", "CT", trans=True, uamps=10)
 >>> trial()
 Traceback (most recent call last):
 ...
@@ -207,9 +205,9 @@ found until two in the morning.
 >>> @user_script
 ... def trial():
 ...     measure("Test1", "BT", uamps=30)
-...     measure("Test2", "TT", uamps=30)
+...     measure("Test2", "CT", uamps=30)
 ...     measure("Test1", "BT", trans=True, uamps=10)
-...     measure("Test2", "TT", trans=True, uamps=10)
+...     measure("Test2", "CT", trans=True, uamps=10)
 >>> trial() #doctest:+ELLIPSIS
 The script should finish in 2.0 hours
 ...
@@ -275,13 +273,15 @@ The script should finish in 0.5 hours
 ...
 Measuring Sample2_TRANS for 10 uamps
 
->> measure_file("tests/good_julabo.csv", forever=True)
+The scan then runs as normal.
 
-The scan then runs as normal.  If the users are leaving and you want
-to ensure that the script keeps taking data until they return, the
-``forever`` flag causes the instrument to repeatedly cycle through the
-script until there is a manual intervention at the keyboard.  The
-output is not shown above because there is infinite output.
+>>> measure_file("tests/good_julabo.csv", forever=True) # doctest: +SKIP
+
+If the users are leaving and you want to ensure that the script keeps
+taking data until they return, the ``forever`` flag causes the
+instrument to repeatedly cycle through the script until there is a
+manual intervention at the keyboard.  The output is not shown above
+because there is infinite output.
 
 
 Detector Status
@@ -332,11 +332,11 @@ True
 Custom Running Modes
 ====================
 
-Some mode may be much more complicated than a simple sans measurement.
-For example, a SESANS measurement needs to setup the DAE for two
-periods, manage the flipper state, and switch between those periods.
-From the user's perspective, this is all handled in the same manner as
-a normal measurement.
+Some modes may be much more complicated than a simple sans
+measurement.  For example, a SESANS measurement needs to setup the DAE
+for two periods, manage the flipper state, and switch between those
+periods.  From the user's perspective, this is all handled in the same
+manner as a normal measurement.
 
 >>> set_default_dae(setup_dae_sesans)
 >>> measure("SESANS Test", frames=6000)
@@ -358,7 +358,7 @@ Flipper Off
 .. py:currentmodule:: src.Larmor
 
 In this example, the instrument scientist has written two functions
-:py:meth:`Larmor._begin_sesans` and :py:meth:`Larmor_waitfor_sesans`
+:py:meth:`Larmor._begin_sesans` and :py:meth:`Larmor._waitfor_sesans`
 which handle the SESANS specific nature of the measurement.
 
 >>> measure("SESANS Test", u=1500, d=1500, uamps=10)
@@ -376,8 +376,9 @@ Flipper On
 Flipper Off
 
 These custom mode also allow more default parameters to be added onto
-``measure``.  In this instance, the ``u`` and ``d`` parameters set the
-number of frames in the up and down states.
+:py:meth:`ScanningInstrument.measure`.  In this instance, the ``u``
+and ``d`` parameters set the number of frames in the up and down
+states.
 
 
 Under the hood
