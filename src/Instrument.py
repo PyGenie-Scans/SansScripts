@@ -26,7 +26,7 @@ class ScanningInstrument(object):
         self.setup_sans = self.setup_dae_event
         self.setup_trans = self.setup_dae_transmission
 
-    def set_default_dae(self, mode, trans=False):
+    def set_default_dae(self, mode=None, trans=False):
         """Set the default DAE mode for SANS or TRANS measuremnts.
 
         Parameters
@@ -40,7 +40,9 @@ class ScanningInstrument(object):
           SANS mode.
 
         """
-        if isinstance(mode, str):
+        if mode is None:
+            pass
+        elif isinstance(mode, str):
             self.set_default_dae(
                 getattr(self, "setup_dae_"+mode))
         else:
@@ -391,8 +393,7 @@ class ScanningInstrument(object):
         if not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
-        if dae:
-            self.set_default_dae(dae, trans)
+        self.set_default_dae(dae, trans)
         if trans:
             self.configure_trans(size=aperature)
         else:
