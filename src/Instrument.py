@@ -491,5 +491,5 @@ class ScanningInstrument(object):
     def printsamplepars():
         """Display the basic sample parameters on the console."""
         pars = gen.get_sample_pars()
-        for par in ["Geometry", "Width", "Height", "Thickness"]:
+        for par in ["Geometry", "Width", "Height", "Thick"]:
             info("{}={}".format(par, pars[par.upper()]))
