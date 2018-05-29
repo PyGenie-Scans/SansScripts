@@ -411,7 +411,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thick=1.0
-Measuring SESANS Test_SANS for 10 uamps
+Measuring SESANS Test_SESANS for 10 uamps
 Flipper On
 Flipper Off
 Flipper On

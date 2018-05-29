@@ -305,7 +305,6 @@ class ScanningInstrument(object):
           the aperature not being changed
         """
         # setup to run in histogram or event mode
-        self.title_footer = "_SANS"
         self.setup_sans()
         self.set_aperature(size)
         self._configure_sans_custom(size)
@@ -320,7 +319,6 @@ class ScanningInstrument(object):
           A blank string (the default value) results in
           the aperature not being changed
         """
-        self.title_footer = "_TRANS"
         self.setup_trans()
         gen.waitfor_move()
         self.set_aperature(size)
