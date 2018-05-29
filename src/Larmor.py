@@ -327,7 +327,8 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     def _detector_is_on():
         """Is the detector currently on?"""
         voltage_status = all([
-            gen.get_pv("IN:LARMOR:CAEN:hv0:0:{}:status".format(x)).lower()=="on"
+            gen.get_pv(
+                "IN:LARMOR:CAEN:hv0:0:{}:status".format(x)).lower() == "on"
             for x in [8, 9, 10, 11]])
         return voltage_status
 

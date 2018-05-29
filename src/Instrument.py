@@ -487,7 +487,8 @@ class ScanningInstrument(object):
         else:
             inner()
 
-    def convert_file(self, file_path):
+    @staticmethod
+    def convert_file(file_path):
         """Turn a CSV run list into a full python script
 
         This function allows the user to create simple scripts with
@@ -498,12 +499,12 @@ class ScanningInstrument(object):
         import csv
         import ast
         import os.path
-        with open(file_path, "rb") as csvfile,\
-             open(file_path+".py", "w") as outfile:
-            outfile.write("@user_script\n")
-            outfile.write("def {}():\n".format(
-                os.path.splitext(os.path.basename(file_path))[0].replace(" ","_")))
-            reader = csv.DictReader(csvfile)
+        with open(file_path, "rb") as src, open(file_path+".py", "w") as out:
+            out.write("@user_script\n")
+            out.write("def {}():\n".format(
+                os.path.splitext(
+                    os.path.basename(file_path))[0].replace(" ", "_")))
+            reader = csv.DictReader(src)
             for row in reader:
                 for k in row.keys():
                     if row[k].strip() == "":
@@ -518,7 +519,7 @@ class ScanningInstrument(object):
                         except ValueError:
                             continue
                 params = ",".join([k + "=" + str(row[k]) for k in row])
-                outfile.write("    measure({})\n".format(params))
+                out.write("    measure({})\n".format(params))
 
     @staticmethod
     def printsamplepars():
