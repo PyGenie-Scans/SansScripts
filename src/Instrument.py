@@ -158,7 +158,7 @@ class ScanningInstrument(object):
         """Configure wiring tables for beamstop alignment."""
         pass
 
-    def _configure_sans_custom(self, size):
+    def _configure_sans_custom(self):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -166,16 +166,10 @@ class ScanningInstrument(object):
         This is a no-op for the default instrument but can be
         overwritten by other instruments to perform any actions they
         need to put the instrument into SANS mode.
-
-        Parameters
-        ----------
-        size : str
-          The aperature size (e.g. "Small" or "Medium").  A blank
-          string results in the aperature not being changed.
         """
         pass
 
-    def _configure_trans_custom(self, size):
+    def _configure_trans_custom(self):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -183,12 +177,6 @@ class ScanningInstrument(object):
         This is a no-op for the default instrument but can be
         overwritten by other instruments to perform any actions they
         need to put the instrument into SANS mode.
-
-        Parameters
-        ----------
-        size : str
-          The aperature size (e.g. "Small" or "Medium").  A blank
-          string results in the aperature not being changed.
         """
         pass
 
@@ -311,36 +299,6 @@ class ScanningInstrument(object):
         """
         return False
 
-    def configure_sans(self, size=""):
-        """Setup to the instrument for a SANS measurement
-
-        Parameters
-        ----------
-        size : str
-          The aperature size.  e.g. "Small" or "Medium"
-          A blank string (the default value) results in
-          the aperature not being changed
-        """
-        # setup to run in histogram or event mode
-        self.setup_sans()
-        self.set_aperature(size)
-        self._configure_sans_custom(size)
-
-    def configure_trans(self, size=""):
-        """Setup the instrument for a transmission measurement
-
-        Parameters
-        ----------
-        size : str
-          The aperature size.  e.g. "Small" or "Medium"
-          A blank string (the default value) results in
-          the aperature not being changed
-        """
-        self.setup_trans()
-        gen.waitfor_move()
-        self.set_aperature(size)
-        self._configure_trans_custom(size)
-
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False
 
@@ -356,7 +314,7 @@ class ScanningInstrument(object):
         return True
 
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                dae=None, aperature="", **kwargs):
+                dae=None, blank=False, aperature="", **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -390,6 +348,8 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
           changed.
+        blank : bool
+          If this sample should be considered a blank/can/solvent measurement
         **kwargs
           This function takes two kinds of keyword arguments.  If
           given a block name, it will move that block to the given
@@ -419,11 +379,20 @@ class ScanningInstrument(object):
             self.detector_on(True)
         self.set_default_dae(dae, trans)
         if trans:
-            self.set_measurement_type("transmission")
-            self.configure_trans(size=aperature)
+            if blank:
+                self.set_measurement_type("blank_transmission")
+            else:
+                self.set_measurement_type("transmission")
+            self.setup_trans()
+            self._configure_trans_custom()
         else:
-            self.set_measurement_type(self.measurement_type)
-            self.configure_sans(size=aperature)
+            if blank:
+                self.set_measurement_type("blank")
+            else:
+                self.set_measurement_type(self.measurement_type)
+            self.setup_sans()
+            self._configure_sans_custom()
+        self.set_aperature(aperature)
         if pos:
             if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):

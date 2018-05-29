@@ -463,8 +463,8 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
- call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
+ call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(SamplePos='BT'),
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
@@ -480,8 +480,8 @@ That's quite a few commands, so it's worth running through them.
 :3-6: Check that the detector is on
 :7: Check that the detector is on
 :8-19: Put the instrument in event mode
-:20: Set the upstream slits
-:21: Move the M4 transmission monitor out of the beam
+:20: Move the M4 transmission monitor out of the beam
+:21: Set the upstream slits
 :22: Move the sample into position
 :23: Let motors finish moving.
 :24: Set the sample thickness
