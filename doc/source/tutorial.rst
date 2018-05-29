@@ -42,7 +42,7 @@ The :py:meth:`ScanningInstrument.measure` command is the primary entry
 point for all types of SANS measurement.  We can pass it a sample
 changer position if we wish to measure at a specific location.
 
->>> measure("Sample Name", "QT", aperature="Medium", uamps=5)
+>>> measure("Sample Name", "QT", aperature="Medium", blank=True, uamps=5)
 Moving to sample changer position QT
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -70,6 +70,11 @@ A couple of things changed with this new command.
 #. You'll notice that there is no message about putting the instrument
    in event mode.  Since we were already in event mode, the instrument
    didn't perform the redundant step.
+
+#. The sample has been marked as a blank.  The MEASUREMENT:TYPE block
+   in the run's journal entry will be set to "blank", instead of
+   "sans".  Had this been a transmission measurement, the block would
+   have been set to "blank_transmission"
 
 >>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
 Setup Larmor for transmission
