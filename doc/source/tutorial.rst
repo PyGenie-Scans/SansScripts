@@ -469,6 +469,7 @@ genie-python isn't found.
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
  call.cset(m4trans=200.0),
+ call.set_pv('IN:LARMOR:PARS:SAMPLE:MEAS:LABEL', 'Test'),
  call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(SamplePos='BT'),
  call.waitfor_move(),

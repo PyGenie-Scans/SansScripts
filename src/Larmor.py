@@ -40,6 +40,9 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     def set_measurement_type(self, value):
         gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:TYPE", value)
 
+    def set_measurement_label(self, value):
+        gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:LABEL", value)
+
     def get_lrange(self):
         """Return the current wavelength range"""
         return self.lrange
