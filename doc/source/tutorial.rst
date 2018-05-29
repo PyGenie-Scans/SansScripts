@@ -344,6 +344,36 @@ Measuring Sample_TRANS for 100 frames
 Waiting For Detector To Power Up (180s)
 True
 
+If the detector needs to run in a special configuration (e.g. due to
+electrical problems), the detector state can be locked.  This will
+prevent attempts to turn the detector on and off and will bypass any
+checks for the detector state:
+
+>>> detector_lock()
+False
+>>> detector_on(False)
+Waiting For Detector To Power Down (60s)
+False
+>>> detector_lock(True)
+True
+>>> measure("Sample", frames=100)
+Setup Larmor for event
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thick=1.0
+Measuring Sample_SANS for 100 frames
+>>> detector_on(True)
+Traceback (most recent call last):
+...
+RuntimeError: The instrument scientist has locked the detector state
+>>> detector_lock(False)
+False
+>>> detector_on(True)
+Waiting For Detector To Power Up (180s)
+True
+
 Custom Running Modes
 ====================
 
@@ -355,7 +385,6 @@ manner as a normal measurement.
 
 >>> set_default_dae(setup_dae_sesans)
 >>> measure("SESANS Test", frames=6000)
-Setup Larmor for event
 Setup Larmor for sesans
 Using the following Sample Parameters
 Geometry=Flat Plate
