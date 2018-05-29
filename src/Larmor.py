@@ -37,6 +37,9 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
             return self._TIMINGS + ["u", "d"]
         return self._TIMINGS
 
+    def set_measurement_type(self, value):
+        gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:TYPE", value)
+
     def get_lrange(self):
         """Return the current wavelength range"""
         return self.lrange
@@ -84,28 +87,28 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                 "The only known lranges for the chopper "
                 "are '0.9-13.25' and '0.65-12.95'")
 
-    @dae_setter("SCAN")
+    @dae_setter("SCAN", "scan")
     def setup_dae_scanning(self):
         Larmor._generic_scan(
             spectra=r"C:\Instrument\Settings\Tables\spectra_scanning_80.dat",
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 100.0,
                    "trange": 1, "log": 0}])
 
-    @dae_setter("SCAN")
+    @dae_setter("SCAN", "scan")
     def setup_dae_nr(self):
         Larmor._generic_scan(
             spectra=r"C:\Instrument\Settings\Tables\spectra_nrscanning.dat",
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 100.0,
                    "trange": 1, "log": 0}])
 
-    @dae_setter("SCAN")
+    @dae_setter("SCAN", "scan")
     def setup_dae_nrscanning(self):
         Larmor._generic_scan(
             spectra=r"U:\Users\Masks\spectra_scanning_auto.dat",
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 100.0,
                    "trange": 1, "log": 0}])
 
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_event(self):
         # Normal event mode with full detector binning
         Larmor._generic_scan(
@@ -118,7 +121,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "log": 0, "regime": 2}])
         self._set_choppers(self.lrange)
 
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_event_fastsave(self):
         """Event mode with reduced detector histogram binning to decrease
         filesize."""
@@ -144,7 +147,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "log": 0, "regime": 3}])
         self._set_choppers(self.lrange)
 
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_histogram(self):
         gen.change_sync('isis')
         Larmor._generic_scan(
@@ -154,8 +157,9 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "trange": 2, "log": 0}])
         self._set_choppers(self.lrange)
 
-    @dae_setter("TRANS")
+    @dae_setter("TRANS", "transmission")
     def setup_dae_transmission(self):
+        gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:TYPE", "transmission")
         gen.change_sync('isis')
         Larmor._generic_scan(
             r"C:\Instrument\Settings\Tables\detector_monitors_only.dat",
@@ -168,7 +172,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         self._set_choppers(self.lrange)
 
     @staticmethod
-    @dae_setter("TRANS")
+    @dae_setter("TRANS", "transmission")
     def setup_dae_monotest():
         """Setup with a mono test?"""
         Larmor._generic_scan(
@@ -183,7 +187,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.cset(InstrumentDiskPhase=77650)
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_tshift(tlowdet=5.0, thighdet=100000.0, tlowmon=5.0,
                          thighmon=100000.0):
         """Allow m1 to count as normal but to shift the rest of the detectors
@@ -200,7 +204,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "log": 0, "regime": 3}])
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_diffraction():
         """Set the wiring tables for a diffraction measurement"""
         Larmor._generic_scan(
@@ -210,7 +214,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "trange": 2, "log": 0}])
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_polarised():
         """Set the wiring tables for a polarisation measurement."""
         Larmor._generic_scan(
@@ -218,7 +222,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                   {"low": 0.0, "high": 0.0, "step": 0.0,
                    "trange": 2, "log": 0}])
 
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_bsalignment(self):
         Larmor._generic_scan(
             tcbs=[{"low": 1000.0, "high": 100000.0, "step": 99000.0,
@@ -227,7 +231,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "trange": 2, "log": 0}])
 
     @staticmethod
-    @dae_setter("TRANS")
+    @dae_setter("TRANS", "transmission")
     def setup_dae_monitorsonly():
         """Set the wiring tables to record only the monitors."""
         Larmor._generic_scan(
@@ -238,7 +242,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
                    "trange": 2, "log": 0}])
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_resonantimaging():
         """Set the wiring table for resonant imaging"""
         Larmor._generic_scan(
@@ -251,7 +255,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
               "trange": 2, "log": 0}])
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_resonantimaging_choppers():  # pylint: disable=invalid-name
         """Set the wiring thable for resonant imaging choppers"""
         info("Setting Chopper phases")
@@ -260,7 +264,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         gen.cset(InstrumentDiskPhase=0)
 
     @staticmethod
-    @dae_setter("SANS")
+    @dae_setter("SANS", "sans")
     def setup_dae_4periods():
         """Setup the instrument with four periods."""
         Larmor._generic_scan(
@@ -271,7 +275,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
               "trange": 1, "log": 0},
              {"low": 0.0, "high": 0.0, "step": 0.0, "trange": 2, "log": 0}])
 
-    @dae_setter("SESANS")
+    @dae_setter("SESANS", "sesans")
     def setup_dae_sesans(self):
         """Setup the instrument for SESANS measurements."""
         self.setup_dae_event()

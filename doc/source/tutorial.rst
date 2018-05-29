@@ -450,6 +450,7 @@ genie-python isn't found.
  call.get_pv('IN:LARMOR:CAEN:hv0:0:9:status'),
  call.get_pv('IN:LARMOR:CAEN:hv0:0:10:status'),
  call.get_pv('IN:LARMOR:CAEN:hv0:0:11:status'),
+ call.set_pv('IN:LARMOR:PARS:SAMPLE:MEAS:TYPE', 'sesans'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),
@@ -477,14 +478,15 @@ That's quite a few commands, so it's worth running through them.
 
 :2: Ensure that the instrument is ready to start a measurement
 :3-6: Check that the detector is on
-:7-18: Put the instrument in event mode
-:19: Set the upstream slits
-:20: Move the M4 transmission monitor out of the beam
-:21: Move the sample into position
-:22: Let motors finish moving.
-:23: Set the sample thickness
-:24: Print and log the sample parameters
-:25: Set the sample title
-:26: Start the measurement.
-:27: Wait the requested time
-:28: Stop the measurement.
+:7: Check that the detector is on
+:8-19: Put the instrument in event mode
+:20: Set the upstream slits
+:21: Move the M4 transmission monitor out of the beam
+:22: Move the sample into position
+:23: Let motors finish moving.
+:24: Set the sample thickness
+:25: Print and log the sample parameters
+:26: Set the sample title
+:27: Start the measurement.
+:28: Wait the requested time
+:29: Stop the measurement.

@@ -21,6 +21,7 @@ class ScanningInstrument(object):
     _dae_mode = None
     _detector_lock = False
     title_footer = ""
+    measurement_type = "sans"
     _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
     def __init__(self):
@@ -103,6 +104,22 @@ class ScanningInstrument(object):
     def _needs_setup():
         if gen.get_runstate() != "SETUP":
             raise RuntimeError("Cannot start a measurement in a measurement")
+
+    @abstractmethod
+    def set_measurement_type(self, value):
+        """Set the measurement type in the journal.
+
+        Parameters
+        ==========
+        value : str
+          The new measurement type
+
+        This function should perform no physical changes to the
+        beamline.  The only change should be in the MEASUREMENT:TYPE
+        value stored in the journal for the next run, which should be
+        set to the new value.
+        """
+        pass
 
     @abstractmethod
     def setup_dae_scanning(self):
@@ -402,8 +419,10 @@ class ScanningInstrument(object):
             self.detector_on(True)
         self.set_default_dae(dae, trans)
         if trans:
+            self.set_measurement_type("transmission")
             self.configure_trans(size=aperature)
         else:
+            self.set_measurement_type(self.measurement_type)
             self.configure_sans(size=aperature)
         if pos:
             if isinstance(pos, str):
