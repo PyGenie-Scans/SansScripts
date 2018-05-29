@@ -362,7 +362,7 @@ Geometry=Flat Plate
 Width=10
 Height=10
 Thick=1.0
-Measuring SESANS Test_SANS for 6000 frames
+Measuring SESANS Test_SESANS for 6000 frames
 Flipper On
 Flipper Off
 Flipper On
