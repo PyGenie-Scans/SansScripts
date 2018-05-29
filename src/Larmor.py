@@ -326,27 +326,27 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     @staticmethod
     def _detector_is_on():
         """Is the detector currently on?"""
-        voltage_status = sum([
-            gen.get_pv("IN: LARMOR: CAEN: hv0: 0: {}: status".format(x))
+        voltage_status = all([
+            gen.get_pv("IN:LARMOR:CAEN:hv0:0:{}:status".format(x)).lower()=="on"
             for x in [8, 9, 10, 11]])
-        return voltage_status > 0
+        return voltage_status
 
     @staticmethod
     def _detector_turn_on(delay=True):
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "On")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "On")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:8:pwonoff", "On")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:9:pwonoff", "On")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:10:pwonoff", "On")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:11:pwonoff", "On")
         if delay:
             info("Waiting For Detector To Power Up (180s)")
             sleep(180)
 
     @staticmethod
     def _detector_turn_off(delay=True):
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 8: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 9: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 10: pwonoff", "Off")
-        gen.set_pv("IN: LARMOR: CAEN: hv0: 0: 11: pwonoff", "Off")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:8:pwonoff", "Off")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:9:pwonoff", "Off")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:10:pwonoff", "Off")
+        gen.set_pv("IN:LARMOR:CAEN:hv0:0:11:pwonoff", "Off")
         if delay:
             info("Waiting For Detector To Power Down (60s)")
             sleep(60)
