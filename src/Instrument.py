@@ -19,6 +19,7 @@ class ScanningInstrument(object):
     """The base class for scanning measurement instruments."""
 
     _dae_mode = None
+    _detector_lock = False
     title_footer = ""
     _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
@@ -208,6 +209,27 @@ class ScanningInstrument(object):
           the aperature not being changed."""
         pass
 
+    def detector_lock(self, state=None):
+        """Query or activate the detector lock
+
+        Parameters
+        ==========
+        state : bool or None
+          If None, return the current lock state.  Otherwise, set the
+          new lock state
+
+        Returns
+        =======
+        The current lock state as a bool
+
+        Locking the detector prevents turning the detector on or off
+        and bypasses the detector checks.
+
+        """
+        if state is not None:
+            self._detector_lock = state
+        return self._detector_lock
+
     def detector_on(self, powered=None, delay=True):
         """Query and set the detector's electrical state.
 
@@ -226,6 +248,9 @@ class ScanningInstrument(object):
 
         """
         if powered is not None:
+            if self.detector_lock():
+                raise RuntimeError("The instrument scientist has locked the"
+                                   " detector state")
             if powered is True:
                 self._detector_turn_on(delay=delay)
             else:
@@ -374,7 +399,7 @@ class ScanningInstrument(object):
 
         """
         self._needs_setup()
-        if not self.detector_on() and not trans:
+        if not self.detector_lock() and not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
         self.set_default_dae(dae, trans)
