@@ -120,6 +120,8 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
 
     @dae_setter
     def setup_dae_event_fastsave(self):
+        """Event mode with reduced detector histogram binning to decrease
+        filesize."""
         # Event mode with reduced detector histogram binning to
         # decrease filesize
         # This currently breaks mantid nexus read
@@ -210,6 +212,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     @staticmethod
     @dae_setter
     def setup_dae_polarised():
+        """Set the wiring tables for a polarisation measurement."""
         Larmor._generic_scan(
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 100.0, "trange": 1},
                   {"low": 0.0, "high": 0.0, "step": 0.0,
@@ -226,6 +229,7 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     @staticmethod
     @dae_setter
     def setup_dae_monitorsonly():
+        """Set the wiring tables to record only the monitors."""
         Larmor._generic_scan(
             spectra=r"C:\Instrument\Settings\Tables\spectra_phase1.dat",
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 20.0,

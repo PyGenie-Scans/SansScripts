@@ -131,29 +131,13 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def setup_dae_event_fastsave(self):
-        """Event mode with reduced detector histogram binning to decrease
-        filesize."""
-        pass
-
-    @abstractmethod
     def setup_dae_transmission(self):
         """Set the wiring tables for a transmission measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_polarised(self):
-        """Set the wiring tables for a polarisation measurement"""
-        pass
-
-    @abstractmethod
     def setup_dae_bsalignment(self):
         """Configure wiring tables for beamstop alignment."""
-        pass
-
-    @abstractmethod
-    def setup_dae_monitorsonly(self):
-        """Set the wiring tables to record only the monitors"""
         pass
 
     def _configure_sans_custom(self, size):
