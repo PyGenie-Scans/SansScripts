@@ -487,6 +487,39 @@ class ScanningInstrument(object):
         else:
             inner()
 
+    def convert_file(self, file_path):
+        """Turn a CSV run list into a full python script
+
+        This function allows the user to create simple scripts with
+        Excel, then turn them into full Python scripts that can be
+        edited and customised as needed.
+
+        """
+        import csv
+        import ast
+        import os.path
+        with open(file_path, "rb") as csvfile,\
+             open(file_path+".py", "w") as outfile:
+            outfile.write("@user_script\n")
+            outfile.write("def {}():\n".format(
+                os.path.splitext(os.path.basename(file_path))[0].replace(" ","_")))
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                for k in row.keys():
+                    if row[k].strip() == "":
+                        del row[k]
+                    elif row[k].upper() == "TRUE":
+                        row[k] = True
+                    elif row[k].upper() == "FALSE":
+                        row[k] = True
+                    else:
+                        try:
+                            row[k] = ast.literal_eval(row[k])
+                        except ValueError:
+                            continue
+                params = ",".join([k + "=" + str(row[k]) for k in row])
+                outfile.write("    measure({})\n".format(params))
+
     @staticmethod
     def printsamplepars():
         """Display the basic sample parameters on the console."""

@@ -283,6 +283,21 @@ instrument to repeatedly cycle through the script until there is a
 manual intervention at the keyboard.  The output is not shown above
 because there is infinite output.
 
+>>> from __future__ import print_function
+>>> convert_file("tests/good_julabo.csv")
+>>> with open("tests/good_julabo.csv.py", "r") as infile:
+...     for line in infile:
+...         print line,
+@user_script
+def good_julabo():
+    measure(title=Sample1,uamps=10,pos=AT,thickness=1)
+    measure(title=Sample2,uamps=10,pos=BT,thickness=1,trans=True,Julabo1_SP=7)
+
+When the user is ready to take the next step into full python
+scripting, the CSV file can be turned into a python source file that
+performs identical work.  This file can then be edited and customised
+to the user's desires.
+
 
 Detector Status
 ===============
