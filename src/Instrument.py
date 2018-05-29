@@ -313,6 +313,31 @@ class ScanningInstrument(object):
             return False
         return True
 
+    def _setup_measurement(self, trans, blank):
+        """Perform all of the software setup for a measurement
+
+        Parameters
+        ==========
+        trans : bool
+          Is this a transmission measurement
+        blank : bool
+          Is this a measurement on a sample blank
+        """
+        if trans:
+            if blank:
+                self.set_measurement_type("blank_transmission")
+            else:
+                self.set_measurement_type("transmission")
+            self.setup_trans()
+            self._configure_trans_custom()
+        else:
+            if blank:
+                self.set_measurement_type("blank")
+            else:
+                self.set_measurement_type(self.measurement_type)
+            self.setup_sans()
+            self._configure_sans_custom()
+
     def measure(self, title, pos=None, thickness=1.0, trans=False,
                 dae=None, blank=False, aperature="", **kwargs):
         """Take a sample measurement.
@@ -378,20 +403,7 @@ class ScanningInstrument(object):
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
         self.set_default_dae(dae, trans)
-        if trans:
-            if blank:
-                self.set_measurement_type("blank_transmission")
-            else:
-                self.set_measurement_type("transmission")
-            self.setup_trans()
-            self._configure_trans_custom()
-        else:
-            if blank:
-                self.set_measurement_type("blank")
-            else:
-                self.set_measurement_type(self.measurement_type)
-            self.setup_sans()
-            self._configure_sans_custom()
+        self._setup_measurement(trans, blank)
         self.set_aperature(aperature)
         if pos:
             if isinstance(pos, str):
