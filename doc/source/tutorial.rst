@@ -35,7 +35,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 600 frames
 
 The :py:meth:`ScanningInstrument.measure` command is the primary entry
@@ -48,7 +48,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 5 uamps
 
 A couple of things changed with this new command.
@@ -78,7 +78,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=2.0
+Thick=2.0
 Measuring Sample Name_TRANS for 5 uamps
 
 Here we are directly setting the CoarseZ motor on the sample stack to
@@ -97,7 +97,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 5 uamps
 
 We can combine a sample changer position with motor movements.  This
@@ -116,7 +116,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 10 uamps
 
 Finally, if the experiment requires a large number of custom
@@ -133,7 +133,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The default DAE mode for all SANS measurements is event mode.  This
@@ -152,7 +152,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The :py:meth:`ScanningInstrument.measure` function also has a ``dae``
@@ -324,7 +324,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample_SANS for 100 frames
 
 Performing transmission measurements does not require the detector
@@ -338,7 +338,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample_TRANS for 100 frames
 >>> detector_on(True)
 Waiting For Detector To Power Up (180s)
@@ -361,7 +361,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring SESANS Test_SANS for 6000 frames
 Flipper On
 Flipper Off
@@ -381,7 +381,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring SESANS Test_SANS for 10 uamps
 Flipper On
 Flipper Off
@@ -407,7 +407,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Test_SANS for 15 uamps
 
 This command returns no result, but should cause a large number of
@@ -417,10 +417,10 @@ genie-python isn't found.
 
 >>> print(gen.mock_calls)
 [call.get_runstate(),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:8:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:9:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:10:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:11:status'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),
