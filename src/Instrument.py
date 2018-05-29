@@ -138,6 +138,22 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
+    def set_measurement_id(self, value):
+        """Set the measurement id in the journal.
+
+        Parameters
+        ==========
+        value : str
+          The new id
+
+        This function should perform no physical changes to the
+        beamline.  The only change should be in the MEASUREMENT:ID
+        value stored in the journal for the next run, which should be
+        set to the new value.
+        """
+        pass
+
+    @abstractmethod
     def setup_dae_scanning(self):
         """Set the wiring tables for a scan"""
         pass
