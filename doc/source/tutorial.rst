@@ -429,6 +429,74 @@ These custom mode also allow more default parameters to be added onto
 and ``d`` parameters set the number of frames in the up and down
 states.
 
+Reduction Script Generation
+===========================
+
+A small amount of metadata is attached to each run.  It's possible to
+generate a reduction script from this metadata.
+
+>>> d = sesans_connection("tests/demo.xml", 29200, 29310)
+>>> d["silica in pure h2o"]["h2o blank"]["20.0"]
+{'Sample': [29288, 29298, 29307], 'P0Trans': [29289], 'P0': [29290, 29299, 29308], 'Trans': [29287]}
+>>> sesans_reduction("tests/sesans_out.py", d, {"silica in pure h2o": "h2o blank"})
+
+The above spits out the following source file
+
+.. include:: ../../tests/sesans_out.py
+   :code: python
+
+This file can be loaded in mantid.
+
+>>> def test_oracle(sample, blanks):
+...    print("What is the blank for the sample: {}".format(sample))
+...    for idx, blank in enumerate(blanks):
+...        print("{}: {}".format(idx+1, blank))
+...    if "dio" in sample:
+...       print("2")
+...       return "dio solvent 1mm cell"
+...    elif "h2o" in sample:
+...        print("3")
+...        return "h2o blank"
+...    elif "bear" in sample:
+...        print("1")
+...        return "air blank"
+
+>>> d = sans_connection("tests/demo.xml", 29270, 29310)
+>>> pairs = identify_pairs(d, oracle=test_oracle)
+What is the blank for the sample: dio solution 23 1mm cell
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+2
+What is the blank for the sample: polar bear p1 across hairs
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p1 along hairs
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p2 across hairs
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p2 along hairs
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: silica in pure h2o
+1: air blank
+2: dio solvent 1mm cell
+3: h2o blank
+3
+>>> sans_reduction("tests/sans_out.py", d, pairs, "Mask.txt", 23000)
+
+.. include:: ../../tests/sans_out.py
+   :code: python
 
 Under the hood
 ==============
