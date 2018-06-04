@@ -7,28 +7,30 @@ from collections import defaultdict
 SCHEMA = "{http://definition.nexusformat.org/schema/3.0}"
 
 
+def get_kind(run):
+    """What type of measuremented was performed?"""
+    return run.find("./{}measurement_type".format(SCHEMA)).text
+
+
 def is_blank_transmission(run):
     """Was the measurement in transmission mode and on a blank?"""
-    kind = run.find("./{}measurement_type".format(SCHEMA)).text
-    return kind == "blank_transmission"
+    return get_kind(run) == "blank_transmission"
 
 
 def is_sample(run):
     """Was the measurement in sesans mode and on a sample?"""
-    kind = run.find("./{}measurement_type".format(SCHEMA)).text
+    kind = get_kind(run)
     return kind == "sesans" or kind == "sans"
 
 
 def is_transmission(run):
     """Was the measurement in transmission mode and on a sample?"""
-    kind = run.find("./{}measurement_type".format(SCHEMA)).text
-    return kind == "transmission"
+    return get_kind(run) == "transmission"
 
 
 def is_blank(run):
     """Was the measurement in sesans mode and on a blank?"""
-    kind = run.find("./{}measurement_type".format(SCHEMA)).text
-    return kind == "blank"
+    return get_kind(run) == "blank"
 
 
 def get_sample(run):
