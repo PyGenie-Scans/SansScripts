@@ -74,7 +74,7 @@ def connect_samples(runs, test):
     return result
 
 
-def sans_connection(path, start, end):
+def sans_connection(start, end, path):
     """Connect the runs for a series of sesans measurements"""
     root = ET.parse(path)
     runs = root.findall("./{}NXentry".format(SCHEMA))
@@ -133,7 +133,7 @@ def sans_connection(path, start, end):
     return final_dict
 
 
-def sesans_connection(path, start, end):
+def sesans_connection(start, end, path):
     """Connect the runs for a series of sesans measurements"""
     root = ET.parse(path)
     runs = root.findall("./{}NXentry".format(SCHEMA))
@@ -274,7 +274,8 @@ def console_oracle(sample, blanks):
     the user.  The user can then pick an iterm off the list from the
     keyboard.
 
-    Parameters:
+    Parameters
+    ==========
     sample : str
       The name of the sample being queries
     blanks : list

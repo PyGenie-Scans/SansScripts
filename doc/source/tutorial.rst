@@ -432,15 +432,32 @@ states.
 Reduction Script Generation
 ===========================
 
+.. py:currentmodule:: src.reduction
+
 A small amount of metadata is attached to each run.  It's possible to
 generate a reduction script from this metadata.
 
->>> d = sesans_connection("tests/demo.xml", 29200, 29310)
+>>> d = sesans_connection(29200, 29310, path="tests/demo.xml")
+
+The variable d will hold every possible sesans measurement that could
+be collected from runs 29200 through 29309 in a nested dictionary.
+The orders of the keys will be the sample name, the blank name, and
+finally the magnet angle.
+
 >>> d["silica in pure h2o"]["h2o blank"]["20.0"]
 {'Sample': [29288, 29298, 29307], 'P0Trans': [29289], 'P0': [29290, 29299, 29308], 'Trans': [29287]}
+
+Once we've chose out instrument parameters, we get a labelled set of
+run numbers which describe the reduction that we want to perform.
+
 >>> sesans_reduction("tests/sesans_out.py", d, {"silica in pure h2o": "h2o blank"})
 
-The above spits out the following source file
+:py:meth:`sesans_reduction` take a file name, the connected sesans data, and a
+dictionary where the keys are the sample names and the values are the
+appropriate blanks for those samples.  A python script is written to
+the file which will perform the data reduction in Mantid for those
+given runs.
+
 
 .. include:: ../../tests/sesans_out.py
    :code: python
@@ -461,7 +478,7 @@ This file can be loaded in mantid.
 ...        print("1")
 ...        return "air blank"
 
->>> d = sans_connection("tests/demo.xml", 29270, 29310)
+>>> d = sans_connection(29270, 29310, path="tests/demo.xml")
 >>> pairs = identify_pairs(d, oracle=test_oracle)
 What is the blank for the sample: dio solution 23 1mm cell
 1: air blank
