@@ -42,7 +42,7 @@ The :py:meth:`ScanningInstrument.measure` command is the primary entry
 point for all types of SANS measurement.  We can pass it a sample
 changer position if we wish to measure at a specific location.
 
->>> measure("Sample Name", "QT", aperature="Medium", uamps=5)
+>>> measure("Sample Name", "QT", aperature="Medium", blank=True, uamps=5)
 Moving to sample changer position QT
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -70,6 +70,11 @@ A couple of things changed with this new command.
 #. You'll notice that there is no message about putting the instrument
    in event mode.  Since we were already in event mode, the instrument
    didn't perform the redundant step.
+
+#. The sample has been marked as a blank.  The MEASUREMENT:TYPE block
+   in the run's journal entry will be set to "blank", instead of
+   "sans".  Had this been a transmission measurement, the block would
+   have been set to "blank_transmission"
 
 >>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
 Setup Larmor for transmission
@@ -463,8 +468,9 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
- call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
+ call.set_pv('IN:LARMOR:PARS:SAMPLE:MEAS:LABEL', 'Test'),
+ call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(SamplePos='BT'),
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
@@ -480,8 +486,8 @@ That's quite a few commands, so it's worth running through them.
 :3-6: Check that the detector is on
 :7: Check that the detector is on
 :8-19: Put the instrument in event mode
-:20: Set the upstream slits
-:21: Move the M4 transmission monitor out of the beam
+:20: Move the M4 transmission monitor out of the beam
+:21: Set the upstream slits
 :22: Move the sample into position
 :23: Let motors finish moving.
 :24: Set the sample thickness

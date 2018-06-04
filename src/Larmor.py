@@ -40,6 +40,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
     def set_measurement_type(self, value):
         gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:TYPE", value)
 
+    def set_measurement_label(self, value):
+        gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:LABEL", value)
+
+    def set_measurement_id(self, value):
+        gen.set_pv("IN:LARMOR:PARS:SAMPLE:MEAS:ID", value)
+
     def get_lrange(self):
         """Return the current wavelength range"""
         return self.lrange
@@ -323,12 +329,12 @@ class Larmor(ScanningInstrument):  # pylint: disable=too-many-public-methods
         if size.upper() == "MEDIUM":
             gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
 
-    def _configure_sans_custom(self, size=""):
+    def _configure_sans_custom(self):
         # move the transmission monitor out
         gen.cset(m4trans=200.0)
 
-    def _configure_trans_custom(self, size=""):
-        # move the transmission monitor out
+    def _configure_trans_custom(self):
+        # move the transmission monitor in
         gen.cset(m4trans=0.0)
 
     @staticmethod
