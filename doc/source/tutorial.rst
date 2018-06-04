@@ -6,20 +6,19 @@ Tutorial
 
 .. py:currentmodule:: src.Instrument
 
-Boilerplate setup
-=================
+.. Boilerplate setup
 
-The commands below are for creating a simple testing system in the
-tutorial.  This merely guarantees that the tutorial is always in sync
-with the actual behaviour of the software.  The tutorial proper begins
-in the next section.
+    The commands below are for creating a simple testing system in the
+    tutorial.  This merely guarantees that the tutorial is always in sync
+    with the actual behaviour of the software.  The tutorial proper begins
+    in the next section.
 
->>> import logging
->>> import sys
->>> ch = logging.StreamHandler(sys.stdout)
->>> ch.setLevel(logging.DEBUG)
->>> logging.getLogger().setLevel(logging.DEBUG)
->>> logging.getLogger().addHandler(ch)
+    >>> import logging
+    >>> import sys
+    >>> ch = logging.StreamHandler(sys.stdout)
+    >>> ch.setLevel(logging.DEBUG)
+    >>> logging.getLogger().setLevel(logging.DEBUG)
+    >>> logging.getLogger().addHandler(ch)
 
 Basic examples
 ==============
@@ -462,28 +461,31 @@ given runs.
   .. literalinclude:: ../../tests/sesans_out.py
      :caption: sesans_out.py
 
+.. test
+   >>> with open("tests/sesans_out.py", "r") as infile:
+   ...     len(infile.readlines())
+   3
+
 The above code can use the sesans reduction library to create .SES
 files for all of the desired runs.
 
-Interactive sample locations
-----------------------------
+.. comment
+   The function below can be safely ignored.  It exists as part of our
+   testing framework to automate the interactive parts of our tests.
 
-The function below can be safely ignored.  It exists as part of our
-testing framework to automate the interactive parts of our tests.
-
->>> def test_oracle(sample, blanks):
-...    print("What is the blank for the sample: {}".format(sample))
-...    for idx, blank in enumerate(blanks):
-...        print("{}: {}".format(idx+1, blank))
-...    if "solution" in sample:
-...       print("2")
-...       return "example solvent 1mm cell"
-...    elif "h2o" in sample:
-...        print("3")
-...        return "h2o blank"
-...    elif "bear" in sample:
-...        print("1")
-...        return "air blank"
+   >>> def test_oracle(sample, blanks):
+   ...    print("What is the blank for the sample: {}".format(sample))
+   ...    for idx, blank in enumerate(blanks):
+   ...        print("{}: {}".format(idx+1, blank))
+   ...    if "solution" in sample:
+   ...       print("2")
+   ...       return "example solvent 1mm cell"
+   ...    elif "h2o" in sample:
+   ...        print("3")
+   ...        return "h2o blank"
+   ...    elif "bear" in sample:
+   ...        print("1")
+   ...        return "air blank"
 
 For the majority of simple cases, we can use the
 :py:meth:`identify_pairs` to save us on much of the boiler plate of
@@ -540,6 +542,11 @@ number for the direct run.
 
   .. literalinclude:: ../../tests/sans_out.py
      :caption: sans_out.py
+
+.. test
+   >>> with open("tests/sans_out.py", "r") as infile:
+   ...     len(infile.readlines())
+   40
 
 Under the hood
 ==============
