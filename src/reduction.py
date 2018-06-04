@@ -16,7 +16,7 @@ def is_blank_transmission(run):
 def is_sample(run):
     """Was the measurement in sesans mode and on a sample?"""
     kind = run.find("./{}measurement_type".format(SCHEMA)).text
-    return kind == "sesans"
+    return kind == "sesans" or kind == "sans"
 
 
 def is_transmission(run):

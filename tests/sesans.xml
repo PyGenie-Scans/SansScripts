@@ -99,7 +99,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1120,50.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example solution 23 1mm cell</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T17:14:54</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T17:25:24</ns0:end_time>
@@ -439,7 +439,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1121,75.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example solution 23 1mm cell</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T17:58:33</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T18:09:03</ns0:end_time>
@@ -694,7 +694,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1122,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">polar bear p2 along hairs</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T18:45:40</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T18:56:11</ns0:end_time>
@@ -779,7 +779,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1122,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">polar bear p1 along hairs</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T18:56:26</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T19:06:57</ns0:end_time>
@@ -1034,7 +1034,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1122,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">polar bear p2 across hairs</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T19:36:25</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T19:46:55</ns0:end_time>
@@ -1204,7 +1204,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1122,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">polar bear p1 across hairs</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T20:02:43</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T20:13:13</ns0:end_time>
@@ -1544,7 +1544,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1122,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T21:13:47</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T21:45:09</ns0:end_time>
@@ -1884,7 +1884,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1123,50.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T22:44:24</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-01T23:15:47</ns0:end_time>
@@ -2139,7 +2139,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1124,75.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-01T23:58:14</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T00:29:36</ns0:end_time>
@@ -2394,7 +2394,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1125,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-02T01:14:38</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T01:46:01</ns0:end_time>
@@ -2649,7 +2649,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1126,50.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-02T02:29:24</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T03:00:47</ns0:end_time>
@@ -2904,7 +2904,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1127,75.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-02T03:43:10</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T04:14:33</ns0:end_time>
@@ -3159,7 +3159,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1128,20.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-02T04:59:38</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T05:31:00</ns0:end_time>
@@ -3414,7 +3414,7 @@
       </ns0:measurement_first_run>
       <ns0:measurement_id NAPItype="NX_CHAR[11]">1129,50.0</ns0:measurement_id>
       <ns0:measurement_label NAPItype="NX_CHAR[11]">example in pure h2o</ns0:measurement_label>
-      <ns0:measurement_type NAPItype="NX_CHAR[11]">sans</ns0:measurement_type>
+      <ns0:measurement_type NAPItype="NX_CHAR[11]">sesans</ns0:measurement_type>
       <ns0:measurement_subid NAPItype="NX_CHAR[11]">UNSPECIFIED</ns0:measurement_subid>
       <ns0:start_time NAPItype="NX_CHAR[19]">2018-05-02T06:14:26</ns0:start_time>
       <ns0:end_time NAPItype="NX_CHAR[19]">2018-05-02T06:45:48</ns0:end_time>

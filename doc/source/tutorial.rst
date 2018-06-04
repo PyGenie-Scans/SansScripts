@@ -489,7 +489,7 @@ For the majority of simple cases, we can use the
 :py:meth:`identify_pairs` to save us on much of the boiler plate of
 reducing samples.
 
->>> d = sans_connection(70, 110, path="tests/sans.xml")
+>>> d = sans_connection(70, 110, path="tests/sesans.xml")
 >>> pairs = identify_pairs(d, oracle=test_oracle)
 What is the blank for the sample: example in pure h2o
 1: air blank
