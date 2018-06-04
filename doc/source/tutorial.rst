@@ -528,10 +528,11 @@ In the above, :py:meth:`identify pairs` asked the user to find the
 correct blank for each sample, which the user gave by submitting a
 number.  This then creates the pairs dictionary, like the one manually
 created above, but with less effort and typing.  This can then be used
-in the sans_reduction or sesans_reduction, as normal.  Note that the
-`oracle` parameter was only needed in this instance because we're
-inside the test framework.  Under normal conditions, that parameter
-can be ignored.
+in the sans_reduction or sesans_reduction, as normal.
+
+.. note:: The `oracle` parameter was only needed in this instance
+   because we're inside the test framework.  Under normal conditions,
+   that parameter can be ignored.
 
 >>> sans_reduction("tests/sans_out.py", d, pairs, "Mask.txt", direct=85)
 
