@@ -462,7 +462,14 @@ given runs.
 .. include:: ../../tests/sesans_out.py
    :code: python
 
-This file can be loaded in mantid.
+The above code can use the sesans reduction library to create .SES
+files for all of the desired runs.
+
+Interactive sample locations
+----------------------------
+
+The function below can be safely ignored.  It exists as part of our
+testing framework to automate the interactive parts of our tests.
 
 >>> def test_oracle(sample, blanks):
 ...    print("What is the blank for the sample: {}".format(sample))
@@ -477,6 +484,10 @@ This file can be loaded in mantid.
 ...    elif "bear" in sample:
 ...        print("1")
 ...        return "air blank"
+
+For the majority of simple cases, we can use the
+:py:meth:`identify_pairs` to save us on much of the boiler plate of
+reducing samples.
 
 >>> d = sans_connection(29270, 29310, path="tests/demo.xml")
 >>> pairs = identify_pairs(d, oracle=test_oracle)
@@ -510,7 +521,22 @@ What is the blank for the sample: silica in pure h2o
 2: dio solvent 1mm cell
 3: h2o blank
 3
+
+In the above, :py:meth:`identify pairs` asked the user to find the
+correct blank for each sample, which the user gave by submitting a
+number.  This then creates the pairs dictionary, like the one manually
+created above, but with less effort and typing.  This can then be used
+in the sans_reduction or sesans_reduction, as normal.  Note that the
+`oracle` parameter was only needed in this instance because we're
+inside the test framework.  Under normal conditions, that parameter
+can be ignored.
+
 >>> sans_reduction("tests/sans_out.py", d, pairs, "Mask.txt", 23000)
+
+The :py:meth:`sans_reduction` function takes the same parameters as
+:py:meth:`sesans_reduction`, plus two more.  The first is a mask file,
+as is used by all SANS reduction scripts.  The second is the run
+number for the direct run.
 
 .. include:: ../../tests/sans_out.py
    :code: python
