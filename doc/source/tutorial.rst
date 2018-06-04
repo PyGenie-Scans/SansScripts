@@ -450,7 +450,7 @@ finally the magnet angle.
 Once we've chose out instrument parameters, we get a labelled set of
 run numbers which describe the reduction that we want to perform.
 
->>> sesans_reduction("tests/sesans_out.py", d, {"silica in pure h2o": "h2o blank"})
+>>> sesans_reduction("tests/sesans_out.py", d, {"example in pure h2o": "h2o blank"})
 
 :py:meth:`sesans_reduction` take a file name, the connected sesans data, and a
 dictionary where the keys are the sample names and the values are the
@@ -459,8 +459,8 @@ the file which will perform the data reduction in Mantid for those
 given runs.
 
 
-.. include:: ../../tests/sesans_out.py
-   :code: python
+  .. literalinclude:: ../../tests/sesans_out.py
+     :caption: sesans_out.py
 
 The above code can use the sesans reduction library to create .SES
 files for all of the desired runs.
@@ -538,8 +538,8 @@ The :py:meth:`sans_reduction` function takes the same parameters as
 as is used by all SANS reduction scripts.  The second is the run
 number for the direct run.
 
-.. include:: ../../tests/sans_out.py
-   :code: python
+  .. literalinclude:: ../../tests/sans_out.py
+     :caption: sans_out.py
 
 Under the hood
 ==============
