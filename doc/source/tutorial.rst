@@ -35,7 +35,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 600 frames
 
 The :py:meth:`ScanningInstrument.measure` command is the primary entry
@@ -48,7 +48,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 5 uamps
 
 A couple of things changed with this new command.
@@ -78,7 +78,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=2.0
+Thick=2.0
 Measuring Sample Name_TRANS for 5 uamps
 
 Here we are directly setting the CoarseZ motor on the sample stack to
@@ -97,7 +97,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 5 uamps
 
 We can combine a sample changer position with motor movements.  This
@@ -116,7 +116,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample Name_SANS for 10 uamps
 
 Finally, if the experiment requires a large number of custom
@@ -133,7 +133,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The default DAE mode for all SANS measurements is event mode.  This
@@ -152,7 +152,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Beam stop_SANS for 300 frames
 
 The :py:meth:`ScanningInstrument.measure` function also has a ``dae``
@@ -283,6 +283,21 @@ instrument to repeatedly cycle through the script until there is a
 manual intervention at the keyboard.  The output is not shown above
 because there is infinite output.
 
+>>> from __future__ import print_function
+>>> convert_file("tests/good_julabo.csv")
+>>> with open("tests/good_julabo.csv.py", "r") as infile:
+...     for line in infile:
+...         print line,
+@user_script
+def good_julabo():
+    measure(title=Sample1,uamps=10,pos=AT,thickness=1)
+    measure(title=Sample2,uamps=10,pos=BT,thickness=1,trans=True,Julabo1_SP=7)
+
+When the user is ready to take the next step into full python
+scripting, the CSV file can be turned into a python source file that
+performs identical work.  This file can then be edited and customised
+to the user's desires.
+
 
 Detector Status
 ===============
@@ -309,7 +324,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample_SANS for 100 frames
 
 Performing transmission measurements does not require the detector
@@ -323,8 +338,38 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Sample_TRANS for 100 frames
+>>> detector_on(True)
+Waiting For Detector To Power Up (180s)
+True
+
+If the detector needs to run in a special configuration (e.g. due to
+electrical problems), the detector state can be locked.  This will
+prevent attempts to turn the detector on and off and will bypass any
+checks for the detector state:
+
+>>> detector_lock()
+False
+>>> detector_on(False)
+Waiting For Detector To Power Down (60s)
+False
+>>> detector_lock(True)
+True
+>>> measure("Sample", frames=100)
+Setup Larmor for event
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thick=1.0
+Measuring Sample_SANS for 100 frames
+>>> detector_on(True)
+Traceback (most recent call last):
+...
+RuntimeError: The instrument scientist has locked the detector state
+>>> detector_lock(False)
+False
 >>> detector_on(True)
 Waiting For Detector To Power Up (180s)
 True
@@ -340,14 +385,13 @@ manner as a normal measurement.
 
 >>> set_default_dae(setup_dae_sesans)
 >>> measure("SESANS Test", frames=6000)
-Setup Larmor for event
 Setup Larmor for sesans
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
-Measuring SESANS Test_SANS for 6000 frames
+Thick=1.0
+Measuring SESANS Test_SESANS for 6000 frames
 Flipper On
 Flipper Off
 Flipper On
@@ -366,8 +410,8 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
-Measuring SESANS Test_SANS for 10 uamps
+Thick=1.0
+Measuring SESANS Test_SESANS for 10 uamps
 Flipper On
 Flipper Off
 Flipper On
@@ -392,7 +436,7 @@ Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
 Height=10
-Thickness=1.0
+Thick=1.0
 Measuring Test_SANS for 15 uamps
 
 This command returns no result, but should cause a large number of
@@ -402,10 +446,10 @@ genie-python isn't found.
 
 >>> print(gen.mock_calls)
 [call.get_runstate(),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 8: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 9: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 10: status'),
- call.get_pv('IN: LARMOR: CAEN: hv0: 0: 11: status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:8:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:9:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:10:status'),
+ call.get_pv('IN:LARMOR:CAEN:hv0:0:11:status'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),

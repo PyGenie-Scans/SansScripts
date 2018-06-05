@@ -1,2 +1,3 @@
 *.pyc
 /doc/build
+/tests/good_julabo.csv.py

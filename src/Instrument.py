@@ -19,6 +19,7 @@ class ScanningInstrument(object):
     """The base class for scanning measurement instruments."""
 
     _dae_mode = None
+    _detector_lock = False
     title_footer = ""
     _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
@@ -131,29 +132,13 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def setup_dae_event_fastsave(self):
-        """Event mode with reduced detector histogram binning to decrease
-        filesize."""
-        pass
-
-    @abstractmethod
     def setup_dae_transmission(self):
         """Set the wiring tables for a transmission measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_polarised(self):
-        """Set the wiring tables for a polarisation measurement"""
-        pass
-
-    @abstractmethod
     def setup_dae_bsalignment(self):
         """Configure wiring tables for beamstop alignment."""
-        pass
-
-    @abstractmethod
-    def setup_dae_monitorsonly(self):
-        """Set the wiring tables to record only the monitors"""
         pass
 
     def _configure_sans_custom(self, size):
@@ -224,6 +209,27 @@ class ScanningInstrument(object):
           the aperature not being changed."""
         pass
 
+    def detector_lock(self, state=None):
+        """Query or activate the detector lock
+
+        Parameters
+        ==========
+        state : bool or None
+          If None, return the current lock state.  Otherwise, set the
+          new lock state
+
+        Returns
+        =======
+        The current lock state as a bool
+
+        Locking the detector prevents turning the detector on or off
+        and bypasses the detector checks.
+
+        """
+        if state is not None:
+            self._detector_lock = state
+        return self._detector_lock
+
     def detector_on(self, powered=None, delay=True):
         """Query and set the detector's electrical state.
 
@@ -242,6 +248,9 @@ class ScanningInstrument(object):
 
         """
         if powered is not None:
+            if self.detector_lock():
+                raise RuntimeError("The instrument scientist has locked the"
+                                   " detector state")
             if powered is True:
                 self._detector_turn_on(delay=delay)
             else:
@@ -296,7 +305,6 @@ class ScanningInstrument(object):
           the aperature not being changed
         """
         # setup to run in histogram or event mode
-        self.title_footer = "_SANS"
         self.setup_sans()
         self.set_aperature(size)
         self._configure_sans_custom(size)
@@ -311,7 +319,6 @@ class ScanningInstrument(object):
           A blank string (the default value) results in
           the aperature not being changed
         """
-        self.title_footer = "_TRANS"
         self.setup_trans()
         gen.waitfor_move()
         self.set_aperature(size)
@@ -390,7 +397,7 @@ class ScanningInstrument(object):
 
         """
         self._needs_setup()
-        if not self.detector_on() and not trans:
+        if not self.detector_lock() and not self.detector_on() and not trans:
             warning("The detector was off.  Turning on the detector")
             self.detector_on(True)
         self.set_default_dae(dae, trans)
@@ -486,6 +493,40 @@ class ScanningInstrument(object):
                 inner()
         else:
             inner()
+
+    @staticmethod
+    def convert_file(file_path):
+        """Turn a CSV run list into a full python script
+
+        This function allows the user to create simple scripts with
+        Excel, then turn them into full Python scripts that can be
+        edited and customised as needed.
+
+        """
+        import csv
+        import ast
+        import os.path
+        with open(file_path, "rb") as src, open(file_path+".py", "w") as out:
+            out.write("@user_script\n")
+            out.write("def {}():\n".format(
+                os.path.splitext(
+                    os.path.basename(file_path))[0].replace(" ", "_")))
+            reader = csv.DictReader(src)
+            for row in reader:
+                for k in row.keys():
+                    if row[k].strip() == "":
+                        del row[k]
+                    elif row[k].upper() == "TRUE":
+                        row[k] = True
+                    elif row[k].upper() == "FALSE":
+                        row[k] = True
+                    else:
+                        try:
+                            row[k] = ast.literal_eval(row[k])
+                        except ValueError:
+                            continue
+                params = ",".join([k + "=" + str(row[k]) for k in row])
+                out.write("    measure({})\n".format(params))
 
     @staticmethod
     def printsamplepars():

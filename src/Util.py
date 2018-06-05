@@ -4,8 +4,17 @@ import logging
 from logging import info
 
 
-def dae_setter(inner):
+def dae_setter(suffix):
     """Declare that a method sets the DAE wiring table
+
+    Parameters
+    ==========
+    suffix : str
+      The footer to be put on all run titles in this mode
+
+    Returns
+    =======
+    A decorator for setting the dae mode
 
     This decorator was designed to work on subclasses of the
     :py:class:`src.Instrument.ScanningInstrument` class.  The
@@ -26,17 +35,21 @@ def dae_setter(inner):
     of the wiring table.
 
     """
-    @wraps(inner)
-    def wrapper(self, *args, **kwargs):
-        """Memoize the dae mode"""
-        request = inner.__name__[10:]
-        if request == self._dae_mode:  # pylint: disable=protected-access
-            return
-        inner(self, *args, **kwargs)
-        info("Setup {} for {}".format(type(self).__name__,
-                                      request.replace("_", " ")))
-        self._dae_mode = request  # pylint: disable=protected-access
-    return wrapper
+    def decorator(inner):
+        """The actual decorator with the given parameters"""
+        @wraps(inner)
+        def wrapper(self, *args, **kwargs):
+            """Memoize the dae mode"""
+            request = inner.__name__[10:]
+            if request == self._dae_mode:  # pylint: disable=protected-access
+                return
+            inner(self, *args, **kwargs)
+            info("Setup {} for {}".format(type(self).__name__,
+                                          request.replace("_", " ")))
+            self._dae_mode = request  # pylint: disable=protected-access
+            self.title_footer = "_" + suffix
+        return wrapper
+    return decorator
 
 
 SCALES = {"uamps": 90, "frames": 0.1, "seconds": 1,

@@ -49,7 +49,7 @@ mock_gen.mock_sample_pars = {
     "GEOMETRY": "Flat Plate",
     "WIDTH": 10,
     "HEIGHT": 10,
-    "THICKNESS": 1}
+    "THICK": 1}
 mock_gen.get_sample_pars.side_effect = lambda: mock_gen.mock_sample_pars
 mock_gen.get_frames = lambda: mock_gen.mock_frames
 mock_gen.get_uamps = lambda: mock_gen.mock_frames/900.0
@@ -75,7 +75,7 @@ mock_gen.waitfor.side_effect = waitfor
 def change_sample_pars(key, value):
     """Fake change the sample parameters."""
     if key.upper() == "THICK":
-        mock_gen.mock_sample_pars["THICKNESS"] = value
+        mock_gen.mock_sample_pars["THICK"] = value
 
 
 mock_gen.change_sample_par.side_effect = change_sample_pars
@@ -91,8 +91,8 @@ def get_pv(pv_name):
     """Fake getting a PV value"""
     if "hv0" in pv_name:
         if mock_gen.mock_detector_on == "On":
-            return 1
-        return 0
+            return "On"
+        return "Off"
     return mock_gen.mock_get_pv(pv_name)
 
 
