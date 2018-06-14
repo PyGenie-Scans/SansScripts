@@ -517,7 +517,7 @@ class ScanningInstrument(object):
                         elif row[k].upper() == "TRUE":
                             row[k] = True
                         elif row[k].upper() == "FALSE":
-                            row[k] = True
+                            row[k] = False
                         else:
                             try:
                                 row[k] = ast.literal_eval(row[k])
@@ -555,13 +555,13 @@ class ScanningInstrument(object):
                     elif row[k].upper() == "TRUE":
                         row[k] = True
                     elif row[k].upper() == "FALSE":
-                        row[k] = True
+                        row[k] = False
                     else:
                         try:
                             row[k] = ast.literal_eval(row[k])
                         except ValueError:
                             continue
-                params = ",".join([k + "=" + str(row[k]) for k in row])
+                params = ", ".join([k + "=" + str(row[k]) for k in row])
                 out.write("    measure({})\n".format(params))
 
     @staticmethod

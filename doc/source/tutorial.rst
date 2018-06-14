@@ -75,7 +75,7 @@ A couple of things changed with this new command.
    "sans".  Had this been a transmission measurement, the block would
    have been set to "blank_transmission"
 
->>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
+>>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True, blank=True)
 Setup Larmor for transmission
 Moving CoarseZ to 25
 Using the following Sample Parameters
@@ -278,9 +278,9 @@ If we fix the script file
   :header-rows: 1
 
 >>> measure_file("tests/good_julabo.csv") #doctest:+ELLIPSIS
-The script should finish in 0.5 hours
+The script should finish in 0.75 hours
 ...
-Measuring Sample2_TRANS for 10 uamps
+Measuring Sample3_SANS for 10 uamps
 
 The scan then runs as normal.
 
@@ -299,8 +299,9 @@ because there is infinite output.
 ...         print line,
 @user_script
 def good_julabo():
-    measure(title=Sample1,uamps=10,pos=AT,thickness=1)
-    measure(title=Sample2,uamps=10,pos=BT,thickness=1,trans=True,Julabo1_SP=7)
+    measure(title=Sample1, uamps=10, pos=AT, thickness=1)
+    measure(title=Sample2, uamps=10, pos=BT, thickness=1, trans=True, Julabo1_SP=7)
+    measure(title=Sample3, uamps=10, pos=CT, thickness=2, trans=False, Julabo1_SP=7)
 
 When the user is ready to take the next step into full python
 scripting, the CSV file can be turned into a python source file that
@@ -336,6 +337,7 @@ Performing transmission measurements does not require the detector
 Waiting For Detector To Power Down (60s)
 False
 >>> measure("Sample", trans=True, frames=100)
+Setup Larmor for transmission
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
