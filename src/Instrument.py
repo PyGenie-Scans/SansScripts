@@ -57,7 +57,7 @@ class ScanningInstrument(object):
     @property
     def TIMINGS(self):  # pylint: disable=invalid-name
         """The list of valid waitfor keywords."""
-        return self._TIMINGS
+        return self._TIMINGS  # pragma: no cover
 
     def sanitised_timings(self, kwargs):
         """Include only the keyword arguments for run timings.
@@ -103,7 +103,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     def _needs_setup():
-        if gen.get_runstate() != "SETUP":
+        if gen.get_runstate() != "SETUP":  # pragma: no cover
             raise RuntimeError("Cannot start a measurement in a measurement")
 
     @abstractmethod
@@ -120,7 +120,7 @@ class ScanningInstrument(object):
         value stored in the journal for the next run, which should be
         set to the new value.
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def set_measurement_label(self, value):  # pragma: no cover
@@ -136,7 +136,7 @@ class ScanningInstrument(object):
         value stored in the journal for the next run, which should be
         set to the new value.
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def set_measurement_id(self, value):  # pragma: no cover
@@ -524,7 +524,7 @@ class ScanningInstrument(object):
                             except ValueError:
                                 continue
                     self.measure(**row)
-        if forever:
+        if forever:  # pragma: no cover
             while True:
                 inner()
         else:
