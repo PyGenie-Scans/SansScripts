@@ -4,13 +4,15 @@ import logging
 from logging import info
 
 
-def dae_setter(suffix):
+def dae_setter(suffix, measurement_type):
     """Declare that a method sets the DAE wiring table
 
     Parameters
     ==========
     suffix : str
       The footer to be put on all run titles in this mode
+    measurement_type : str
+      The default measurement_type to be recorded in the journal
 
     Returns
     =======
@@ -48,6 +50,7 @@ def dae_setter(suffix):
                                           request.replace("_", " ")))
             self._dae_mode = request  # pylint: disable=protected-access
             self.title_footer = "_" + suffix
+            self.measurement_type = measurement_type
         return wrapper
     return decorator
 
@@ -105,9 +108,9 @@ def user_script(script):
         from mock import Mock
         from .genie import mock_gen
         code = script.__name__ + "("
-        code += ", ".join(args)
+        code += ", ".join(map(str, args))
         for k in kwargs:
-            code += ", " + k + "=" + kwargs[k]
+            code += ", " + k + "=" + str(kwargs[k])
         code += ")"
         mock_gen.reset_mock()
         logging.getLogger().disabled = True

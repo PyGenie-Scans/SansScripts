@@ -6,20 +6,19 @@ Tutorial
 
 .. py:currentmodule:: src.Instrument
 
-Boilerplate setup
-=================
+.. Boilerplate setup
 
-The commands below are for creating a simple testing system in the
-tutorial.  This merely guarantees that the tutorial is always in sync
-with the actual behaviour of the software.  The tutorial proper begins
-in the next section.
+    The commands below are for creating a simple testing system in the
+    tutorial.  This merely guarantees that the tutorial is always in sync
+    with the actual behaviour of the software.  The tutorial proper begins
+    in the next section.
 
->>> import logging
->>> import sys
->>> ch = logging.StreamHandler(sys.stdout)
->>> ch.setLevel(logging.DEBUG)
->>> logging.getLogger().setLevel(logging.DEBUG)
->>> logging.getLogger().addHandler(ch)
+    >>> import logging
+    >>> import sys
+    >>> ch = logging.StreamHandler(sys.stdout)
+    >>> ch.setLevel(logging.DEBUG)
+    >>> logging.getLogger().setLevel(logging.DEBUG)
+    >>> logging.getLogger().addHandler(ch)
 
 Basic examples
 ==============
@@ -42,7 +41,7 @@ The :py:meth:`ScanningInstrument.measure` command is the primary entry
 point for all types of SANS measurement.  We can pass it a sample
 changer position if we wish to measure at a specific location.
 
->>> measure("Sample Name", "QT", aperature="Medium", uamps=5)
+>>> measure("Sample Name", "QT", aperature="Medium", blank=True, uamps=5)
 Moving to sample changer position QT
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -71,7 +70,12 @@ A couple of things changed with this new command.
    in event mode.  Since we were already in event mode, the instrument
    didn't perform the redundant step.
 
->>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True)
+#. The sample has been marked as a blank.  The MEASUREMENT:TYPE block
+   in the run's journal entry will be set to "blank", instead of
+   "sans".  Had this been a transmission measurement, the block would
+   have been set to "blank_transmission"
+
+>>> measure("Sample Name", CoarseZ=25, uamps=5, thickness=2.0, trans=True, blank=True)
 Setup Larmor for transmission
 Moving CoarseZ to 25
 Using the following Sample Parameters
@@ -146,6 +150,11 @@ argument.  The first line can also be run as
 
 >>> set_default_dae("bsalignment")
 
+It's similarly possible to set the default dae for transmission measurements.
+
+>>> set_default_dae("bsalignment", trans=True)
+>>> set_default_dae("transmission", trans=True)
+
 >>> measure("Beam stop", dae="event", frames=300)
 Setup Larmor for event
 Using the following Sample Parameters
@@ -173,12 +182,12 @@ the morning.  All that's required of the user is putting
 ``@user_script`` on the line before any functions that they define.
 
 >>> @user_script
-... def trial():
-...     measure("Test1", "BT", uamps=30)
-...     measure("Test2", "VT", uamps=30)
-...     measure("Test1", "BT", trans=True, uanps=10)
-...     measure("Test2", "VT", trans=True, uamps=10)
->>> trial()
+... def trial(time, trans):
+...     measure("Test1", "BT", uamps=time)
+...     measure("Test2", "VT", uamps=time)
+...     measure("Test1", "BT", trans=True, uanps=trans)
+...     measure("Test2", "VT", trans=True, uamps=trans)
+>>> trial(30, trans=10)
 Traceback (most recent call last):
 ...
 RuntimeError: Position VT does not exist
@@ -269,9 +278,9 @@ If we fix the script file
   :header-rows: 1
 
 >>> measure_file("tests/good_julabo.csv") #doctest:+ELLIPSIS
-The script should finish in 0.5 hours
+The script should finish in 0.75 hours
 ...
-Measuring Sample2_TRANS for 10 uamps
+Measuring Sample3_SANS for 10 uamps
 
 The scan then runs as normal.
 
@@ -290,8 +299,9 @@ because there is infinite output.
 ...         print line,
 @user_script
 def good_julabo():
-    measure(title=Sample1,uamps=10,pos=AT,thickness=1)
-    measure(title=Sample2,uamps=10,pos=BT,thickness=1,trans=True,Julabo1_SP=7)
+    measure(title=Sample1, uamps=10, pos=AT, thickness=1)
+    measure(title=Sample2, uamps=10, pos=BT, thickness=1, trans=True, Julabo1_SP=7)
+    measure(title=Sample3, uamps=10, pos=CT, thickness=2, trans=False, Julabo1_SP=7)
 
 When the user is ready to take the next step into full python
 scripting, the CSV file can be turned into a python source file that
@@ -327,6 +337,7 @@ Performing transmission measurements does not require the detector
 Waiting For Detector To Power Down (60s)
 False
 >>> measure("Sample", trans=True, frames=100)
+Setup Larmor for transmission
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
@@ -417,6 +428,126 @@ These custom mode also allow more default parameters to be added onto
 and ``d`` parameters set the number of frames in the up and down
 states.
 
+Reduction Script Generation
+===========================
+
+.. py:currentmodule:: src.reduction
+
+A small amount of metadata is attached to each run.  It's possible to
+generate a reduction script from this metadata.
+
+>>> d = sesans_connection(0, 110, path="tests/sans.xml")
+
+The variable d will hold every possible sesans measurement that could
+be collected from runs 29200 through 29309 in a nested dictionary.
+The orders of the keys will be the sample name, the blank name, and
+finally the magnet angle.
+
+>>> d["example in pure h2o"]["h2o blank"]["20.0"]
+{'Sample': [88, 98, 107], 'P0Trans': [89], 'P0': [90, 99, 108], 'Trans': [87]}
+
+Once we've chose out instrument parameters, we get a labelled set of
+run numbers which describe the reduction that we want to perform.
+
+>>> sesans_reduction("tests/sesans_out.py", d, {"example in pure h2o": "h2o blank"})
+
+:py:meth:`sesans_reduction` take a file name, the connected sesans data, and a
+dictionary where the keys are the sample names and the values are the
+appropriate blanks for those samples.  A python script is written to
+the file which will perform the data reduction in Mantid for those
+given runs.
+
+
+  .. literalinclude:: ../../tests/sesans_out.py
+     :caption: sesans_out.py
+
+.. test
+   >>> with open("tests/sesans_out.py", "r") as infile:
+   ...     len(infile.readlines())
+   3
+
+The above code can use the sesans reduction library to create .SES
+files for all of the desired runs.
+
+.. comment
+   The function below can be safely ignored.  It exists as part of our
+   testing framework to automate the interactive parts of our tests.
+
+   >>> def test_oracle(sample, blanks):
+   ...    print("What is the blank for the sample: {}".format(sample))
+   ...    for idx, blank in enumerate(blanks):
+   ...        print("{}: {}".format(idx+1, blank))
+   ...    if "solution" in sample:
+   ...       print("2")
+   ...       return "example solvent 1mm cell"
+   ...    elif "h2o" in sample:
+   ...        print("3")
+   ...        return "h2o blank"
+   ...    elif "bear" in sample:
+   ...        print("1")
+   ...        return "air blank"
+
+For the majority of simple cases, we can use the
+:py:meth:`identify_pairs` to save us on much of the boiler plate of
+reducing samples.
+
+>>> d = sans_connection(70, 110, path="tests/sesans.xml")
+>>> pairs = identify_pairs(d, oracle=test_oracle)
+What is the blank for the sample: example in pure h2o
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+3
+What is the blank for the sample: example solution 23 1mm cell
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+2
+What is the blank for the sample: polar bear p1 across hairs
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p1 along hairs
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p2 across hairs
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+1
+What is the blank for the sample: polar bear p2 along hairs
+1: air blank
+2: example solvent 1mm cell
+3: h2o blank
+1
+
+In the above, :py:meth:`identify pairs` asked the user to find the
+correct blank for each sample, which the user gave by submitting a
+number.  This then creates the pairs dictionary, like the one manually
+created above, but with less effort and typing.  This can then be used
+in the sans_reduction or sesans_reduction, as normal.
+
+.. note:: The `oracle` parameter was only needed in this instance
+   because we're inside the test framework.  Under normal conditions,
+   that parameter can be ignored.
+
+>>> sans_reduction("tests/sans_out.py", d, pairs, "Mask.txt", direct=85)
+
+The :py:meth:`sans_reduction` function takes the same parameters as
+:py:meth:`sesans_reduction`, plus two more.  The first is a mask file,
+as is used by all SANS reduction scripts.  The second is the run
+number for the direct run.
+
+  .. literalinclude:: ../../tests/sans_out.py
+     :caption: sans_out.py
+
+.. test
+   >>> with open("tests/sans_out.py", "r") as infile:
+   ...     len(infile.readlines())
+   40
 
 Under the hood
 ==============
@@ -443,6 +574,7 @@ genie-python isn't found.
  call.get_pv('IN:LARMOR:CAEN:hv0:0:9:status'),
  call.get_pv('IN:LARMOR:CAEN:hv0:0:10:status'),
  call.get_pv('IN:LARMOR:CAEN:hv0:0:11:status'),
+ call.set_pv('IN:LARMOR:PARS:SAMPLE:MEAS:TYPE', 'sesans'),
  call.change(nperiods=1),
  call.change_start(),
  call.change_tables(detector='C:\\Instrument\\Settings\\Tables\\detector.dat'),
@@ -455,8 +587,9 @@ genie-python isn't found.
  call.cset(T0Phase=0),
  call.cset(TargetDiskPhase=2750),
  call.cset(InstrumentDiskPhase=2450),
- call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(m4trans=200.0),
+ call.set_pv('IN:LARMOR:PARS:SAMPLE:MEAS:LABEL', 'Test'),
+ call.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0),
  call.cset(SamplePos='BT'),
  call.waitfor_move(),
  call.change_sample_par('Thick', 1.0),
@@ -470,14 +603,15 @@ That's quite a few commands, so it's worth running through them.
 
 :2: Ensure that the instrument is ready to start a measurement
 :3-6: Check that the detector is on
-:7-18: Put the instrument in event mode
-:19: Set the upstream slits
+:7: Check that the detector is on
+:8-19: Put the instrument in event mode
 :20: Move the M4 transmission monitor out of the beam
-:21: Move the sample into position
-:22: Let motors finish moving.
-:23: Set the sample thickness
-:24: Print and log the sample parameters
-:25: Set the sample title
-:26: Start the measurement.
-:27: Wait the requested time
-:28: Stop the measurement.
+:21: Set the upstream slits
+:22: Move the sample into position
+:23: Let motors finish moving.
+:24: Set the sample thickness
+:25: Print and log the sample parameters
+:26: Set the sample title
+:27: Start the measurement.
+:28: Wait the requested time
+:29: Stop the measurement.

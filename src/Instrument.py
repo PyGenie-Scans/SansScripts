@@ -21,6 +21,7 @@ class ScanningInstrument(object):
     _dae_mode = None
     _detector_lock = False
     title_footer = ""
+    measurement_type = "sans"
     _TIMINGS = ["uamps", "frames", "seconds", "minutes", "hours"]
 
     def __init__(self):
@@ -45,7 +46,8 @@ class ScanningInstrument(object):
             pass
         elif isinstance(mode, str):
             self.set_default_dae(
-                getattr(self, "setup_dae_"+mode))
+                getattr(self, "setup_dae_"+mode),
+                trans)
         else:
             if trans:
                 self.setup_trans = mode
@@ -55,7 +57,7 @@ class ScanningInstrument(object):
     @property
     def TIMINGS(self):  # pylint: disable=invalid-name
         """The list of valid waitfor keywords."""
-        return self._TIMINGS
+        return self._TIMINGS  # pragma: no cover
 
     def sanitised_timings(self, kwargs):
         """Include only the keyword arguments for run timings.
@@ -94,54 +96,102 @@ class ScanningInstrument(object):
         gen.change_finish()
 
     @abstractproperty
-    def _poslist(self):
+    def _poslist(self):  # pragma: no cover
         """The list of named positions that the instrument can run through in
         the sample changer"""
         return []
 
     @staticmethod
     def _needs_setup():
-        if gen.get_runstate() != "SETUP":
+        if gen.get_runstate() != "SETUP":  # pragma: no cover
             raise RuntimeError("Cannot start a measurement in a measurement")
 
     @abstractmethod
-    def setup_dae_scanning(self):
+    def set_measurement_type(self, value):  # pragma: no cover
+        """Set the measurement type in the journal.
+
+        Parameters
+        ==========
+        value : str
+          The new measurement type
+
+        This function should perform no physical changes to the
+        beamline.  The only change should be in the MEASUREMENT:TYPE
+        value stored in the journal for the next run, which should be
+        set to the new value.
+        """
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def set_measurement_label(self, value):  # pragma: no cover
+        """Set the sample label in the journal.
+
+        Parameters
+        ==========
+        value : str
+          The new sample label
+
+        This function should perform no physical changes to the
+        beamline.  The only change should be in the MEASUREMENT:LABEL
+        value stored in the journal for the next run, which should be
+        set to the new value.
+        """
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def set_measurement_id(self, value):  # pragma: no cover
+        """Set the measurement id in the journal.
+
+        Parameters
+        ==========
+        value : str
+          The new id
+
+        This function should perform no physical changes to the
+        beamline.  The only change should be in the MEASUREMENT:ID
+        value stored in the journal for the next run, which should be
+        set to the new value.
+        """
+        pass
+
+    @abstractmethod
+    def setup_dae_scanning(self):  # pragma: no cover
         """Set the wiring tables for a scan"""
         pass
 
     @abstractmethod
-    def setup_dae_nr(self):
+    def setup_dae_nr(self):  # pragma: no cover
         """Set the wiring tables for a neutron
         reflectivity measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_nrscanning(self):
+    def setup_dae_nrscanning(self):  # pragma: no cover
         """Set the wiring tables for performing
         scans during neutron reflectivity"""
         pass
 
     @abstractmethod
-    def setup_dae_event(self):
+    def setup_dae_event(self):  # pragma: no cover
         """Set the wiring tables for event mode"""
         pass
 
     @abstractmethod
-    def setup_dae_histogram(self):
+    def setup_dae_histogram(self):  # pragma: no cover
         """Set the wiring tables for histogram mode"""
         pass
 
     @abstractmethod
-    def setup_dae_transmission(self):
+    def setup_dae_transmission(self):  # pragma: no cover
         """Set the wiring tables for a transmission measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_bsalignment(self):
+    def setup_dae_bsalignment(self):  # pragma: no cover
         """Configure wiring tables for beamstop alignment."""
         pass
 
-    def _configure_sans_custom(self, size):
+    def _configure_sans_custom(self):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -149,16 +199,10 @@ class ScanningInstrument(object):
         This is a no-op for the default instrument but can be
         overwritten by other instruments to perform any actions they
         need to put the instrument into SANS mode.
-
-        Parameters
-        ----------
-        size : str
-          The aperature size (e.g. "Small" or "Medium").  A blank
-          string results in the aperature not being changed.
         """
         pass
 
-    def _configure_trans_custom(self, size):
+    def _configure_trans_custom(self):
         """The specific actions required by the instrument
         to run a SANS measurement (e.g. remove the monitor
         from the beam).
@@ -166,12 +210,6 @@ class ScanningInstrument(object):
         This is a no-op for the default instrument but can be
         overwritten by other instruments to perform any actions they
         need to put the instrument into SANS mode.
-
-        Parameters
-        ----------
-        size : str
-          The aperature size (e.g. "Small" or "Medium").  A blank
-          string results in the aperature not being changed.
         """
         pass
 
@@ -198,7 +236,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def set_aperature(size):
+    def set_aperature(size):  # pragma: no cover
         """Set the beam aperature to the desired size
 
         Parameters
@@ -259,7 +297,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_is_on():
+    def _detector_is_on():  # pragma: no cover
         """Determine the current state of the detector.
 
         Returns
@@ -272,7 +310,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_turn_on(delay=True):
+    def _detector_turn_on(delay=True):  # pragma: no cover
         """Power on the detector
 
         Parameters
@@ -284,7 +322,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_turn_off(delay=True):
+    def _detector_turn_off(delay=True):  # pragma: no cover
         """Remove detector power
 
         Parameters
@@ -293,36 +331,6 @@ class ScanningInstrument(object):
           Wait for the detector to cool down before continuing
         """
         return False
-
-    def configure_sans(self, size=""):
-        """Setup to the instrument for a SANS measurement
-
-        Parameters
-        ----------
-        size : str
-          The aperature size.  e.g. "Small" or "Medium"
-          A blank string (the default value) results in
-          the aperature not being changed
-        """
-        # setup to run in histogram or event mode
-        self.setup_sans()
-        self.set_aperature(size)
-        self._configure_sans_custom(size)
-
-    def configure_trans(self, size=""):
-        """Setup the instrument for a transmission measurement
-
-        Parameters
-        ----------
-        size : str
-          The aperature size.  e.g. "Small" or "Medium"
-          A blank string (the default value) results in
-          the aperature not being changed
-        """
-        self.setup_trans()
-        gen.waitfor_move()
-        self.set_aperature(size)
-        self._configure_trans_custom(size)
 
     def check_move_pos(self, pos):
         """Check whether the position is valid and return True or False
@@ -338,8 +346,33 @@ class ScanningInstrument(object):
             return False
         return True
 
+    def _setup_measurement(self, trans, blank):
+        """Perform all of the software setup for a measurement
+
+        Parameters
+        ==========
+        trans : bool
+          Is this a transmission measurement
+        blank : bool
+          Is this a measurement on a sample blank
+        """
+        if trans:
+            if blank:
+                self.set_measurement_type("blank_transmission")
+            else:
+                self.set_measurement_type("transmission")
+            self.setup_trans()
+            self._configure_trans_custom()
+        else:
+            if blank:
+                self.set_measurement_type("blank")
+            else:
+                self.set_measurement_type(self.measurement_type)
+            self.setup_sans()
+            self._configure_sans_custom()
+
     def measure(self, title, pos=None, thickness=1.0, trans=False,
-                dae=None, aperature="", **kwargs):
+                dae=None, blank=False, aperature="", **kwargs):
         """Take a sample measurement.
 
         Parameters
@@ -373,6 +406,8 @@ class ScanningInstrument(object):
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
           changed.
+        blank : bool
+          If this sample should be considered a blank/can/solvent measurement
         **kwargs
           This function takes two kinds of keyword arguments.  If
           given a block name, it will move that block to the given
@@ -403,10 +438,9 @@ class ScanningInstrument(object):
                 "use the detector_lock(True) to indicate that the detector "
                 "is off intentionally")
         self.set_default_dae(dae, trans)
-        if trans:
-            self.configure_trans(size=aperature)
-        else:
-            self.configure_sans(size=aperature)
+        self._setup_measurement(trans, blank)
+        self.set_measurement_label(title)
+        self.set_aperature(aperature)
         if pos:
             if isinstance(pos, str):
                 if self.check_move_pos(pos=pos):
@@ -483,14 +517,14 @@ class ScanningInstrument(object):
                         elif row[k].upper() == "TRUE":
                             row[k] = True
                         elif row[k].upper() == "FALSE":
-                            row[k] = True
+                            row[k] = False
                         else:
                             try:
                                 row[k] = ast.literal_eval(row[k])
                             except ValueError:
                                 continue
                     self.measure(**row)
-        if forever:
+        if forever:  # pragma: no cover
             while True:
                 inner()
         else:
@@ -521,13 +555,13 @@ class ScanningInstrument(object):
                     elif row[k].upper() == "TRUE":
                         row[k] = True
                     elif row[k].upper() == "FALSE":
-                        row[k] = True
+                        row[k] = False
                     else:
                         try:
                             row[k] = ast.literal_eval(row[k])
                         except ValueError:
                             continue
-                params = ",".join([k + "=" + str(row[k]) for k in row])
+                params = ", ".join([k + "=" + str(row[k]) for k in row])
                 out.write("    measure({})\n".format(params))
 
     @staticmethod

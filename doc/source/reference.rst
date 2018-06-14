@@ -9,6 +9,11 @@ Instrument
 .. automodule:: src.Instrument
    :members:
 
+reduction
+---------
+.. automodule:: src.reduction
+   :members:
+
 Util
 ---------
 .. automodule:: src.Util

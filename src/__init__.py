@@ -10,6 +10,9 @@ from socket import gethostname
 from functools import wraps
 from .Instrument import ScanningInstrument
 from .Util import user_script  # noqa: F401
+from .reduction import sesans_reduction, sesans_connection  # noqa: F401
+from .reduction import identify_pairs, sans_reduction  # noqa: F401
+from .reduction import sans_connection  # noqa: F401
 
 SCANNING = None
 
@@ -19,7 +22,7 @@ def is_instrument(title):
     return title.upper() in gethostname().upper()
 
 
-if is_instrument("Larmor"):
+if is_instrument("Larmor"):  # pragma: no cover
     from .Larmor import Larmor
     SCANNING = Larmor()
 # if is_instrument("Zoom"):
