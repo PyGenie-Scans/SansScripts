@@ -398,8 +398,10 @@ class ScanningInstrument(object):
         """
         self._needs_setup()
         if not self.detector_lock() and not self.detector_on() and not trans:
-            warning("The detector was off.  Turning on the detector")
-            self.detector_on(True)
+            raise RuntimeError(
+                "The detector is off.  Either turn on the detector or "
+                "use the detector_lock(True) to indicate that the detector "
+                "is off intentionally")
         self.set_default_dae(dae, trans)
         if trans:
             self.configure_trans(size=aperature)

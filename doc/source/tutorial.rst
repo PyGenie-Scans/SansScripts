@@ -313,19 +313,13 @@ We can also power cycle the detector.
 Waiting For Detector To Power Down (60s)
 False
 
-If we try to start a measurement with the detector off, the detector
-will be turned back on.
+If we try to perform a measurement with the detector off, then the
+measurement will fail.
 
 >>> measure("Sample", frames=100)
-The detector was off.  Turning on the detector
-Waiting For Detector To Power Up (180s)
-Setup Larmor for event
-Using the following Sample Parameters
-Geometry=Flat Plate
-Width=10
-Height=10
-Thick=1.0
-Measuring Sample_SANS for 100 frames
+Traceback (most recent call last):
+...
+RuntimeError: The detector is off.  Either turn on the detector or use the detector_lock(True) to indicate that the detector is off intentionally
 
 Performing transmission measurements does not require the detector
 
@@ -333,7 +327,6 @@ Performing transmission measurements does not require the detector
 Waiting For Detector To Power Down (60s)
 False
 >>> measure("Sample", trans=True, frames=100)
-Setup Larmor for transmission
 Using the following Sample Parameters
 Geometry=Flat Plate
 Width=10
