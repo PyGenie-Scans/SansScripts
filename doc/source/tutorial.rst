@@ -130,6 +130,15 @@ sample changer position.  It's still possible to override or amend
 these custom positions with measurement specific values, as we have
 done above with the Julabo temperature again.
 
+>>> measure("Sample Name", 7, Julabo1_SP=37, uamps=10)
+Traceback (most recent call last):
+...
+TypeError: Cannot understand position 7
+
+If the position is gibberish, the instrument will raise an error and
+not try to start a measurement in an unknown position.
+
+
 >>> set_default_dae(setup_dae_bsalignment)
 >>> measure("Beam stop", frames=300)
 Setup Larmor for bsalignment

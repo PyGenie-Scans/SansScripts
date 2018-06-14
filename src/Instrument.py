@@ -223,7 +223,7 @@ class ScanningInstrument(object):
     def end(self):
         """End a measurement."""
         if hasattr(self, "_end_"+self._dae_mode):
-            getattr(self, "_end_"+self._dae_mode)()
+            getattr(self, "_end_"+self._dae_mode)()  # pragma: no cover
         else:
             gen.end()
 

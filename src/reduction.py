@@ -269,7 +269,7 @@ def sans_reduction(outfile, data, pairs, mask, direct):
             out.write("WavRangeReduction(3, 9)\n")
 
 
-def console_oracle(sample, blanks):
+def console_oracle(sample, blanks):  # pragma: no cover
     """Have the use identify the blank for a sample
 
     The list of possible blanks will be enumerated and displayed to
