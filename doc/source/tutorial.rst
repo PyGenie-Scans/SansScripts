@@ -177,12 +177,12 @@ the morning.  All that's required of the user is putting
 ``@user_script`` on the line before any functions that they define.
 
 >>> @user_script
-... def trial():
-...     measure("Test1", "BT", uamps=30)
-...     measure("Test2", "VT", uamps=30)
-...     measure("Test1", "BT", trans=True, uanps=10)
-...     measure("Test2", "VT", trans=True, uamps=10)
->>> trial()
+... def trial(time, trans):
+...     measure("Test1", "BT", uamps=time)
+...     measure("Test2", "VT", uamps=time)
+...     measure("Test1", "BT", trans=True, uanps=trans)
+...     measure("Test2", "VT", trans=True, uamps=trans)
+>>> trial(30, trans=10)
 Traceback (most recent call last):
 ...
 RuntimeError: Position VT does not exist
