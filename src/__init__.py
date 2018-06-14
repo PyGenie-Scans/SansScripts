@@ -22,7 +22,7 @@ def is_instrument(title):
     return title.upper() in gethostname().upper()
 
 
-if is_instrument("Larmor"):
+if is_instrument("Larmor"):  # pragma: no cover
     from .Larmor import Larmor
     SCANNING = Larmor()
 # if is_instrument("Zoom"):

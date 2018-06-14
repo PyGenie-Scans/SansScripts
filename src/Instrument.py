@@ -95,7 +95,7 @@ class ScanningInstrument(object):
         gen.change_finish()
 
     @abstractproperty
-    def _poslist(self):
+    def _poslist(self):  # pragma: no cover
         """The list of named positions that the instrument can run through in
         the sample changer"""
         return []
@@ -106,7 +106,7 @@ class ScanningInstrument(object):
             raise RuntimeError("Cannot start a measurement in a measurement")
 
     @abstractmethod
-    def set_measurement_type(self, value):
+    def set_measurement_type(self, value):  # pragma: no cover
         """Set the measurement type in the journal.
 
         Parameters
@@ -122,7 +122,7 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def set_measurement_label(self, value):
+    def set_measurement_label(self, value):  # pragma: no cover
         """Set the sample label in the journal.
 
         Parameters
@@ -138,7 +138,7 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def set_measurement_id(self, value):
+    def set_measurement_id(self, value):  # pragma: no cover
         """Set the measurement id in the journal.
 
         Parameters
@@ -154,39 +154,39 @@ class ScanningInstrument(object):
         pass
 
     @abstractmethod
-    def setup_dae_scanning(self):
+    def setup_dae_scanning(self):  # pragma: no cover
         """Set the wiring tables for a scan"""
         pass
 
     @abstractmethod
-    def setup_dae_nr(self):
+    def setup_dae_nr(self):  # pragma: no cover
         """Set the wiring tables for a neutron
         reflectivity measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_nrscanning(self):
+    def setup_dae_nrscanning(self):  # pragma: no cover
         """Set the wiring tables for performing
         scans during neutron reflectivity"""
         pass
 
     @abstractmethod
-    def setup_dae_event(self):
+    def setup_dae_event(self):  # pragma: no cover
         """Set the wiring tables for event mode"""
         pass
 
     @abstractmethod
-    def setup_dae_histogram(self):
+    def setup_dae_histogram(self):  # pragma: no cover
         """Set the wiring tables for histogram mode"""
         pass
 
     @abstractmethod
-    def setup_dae_transmission(self):
+    def setup_dae_transmission(self):  # pragma: no cover
         """Set the wiring tables for a transmission measurement"""
         pass
 
     @abstractmethod
-    def setup_dae_bsalignment(self):
+    def setup_dae_bsalignment(self):  # pragma: no cover
         """Configure wiring tables for beamstop alignment."""
         pass
 
@@ -235,7 +235,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def set_aperature(size):
+    def set_aperature(size):  # pragma: no cover
         """Set the beam aperature to the desired size
 
         Parameters
@@ -296,7 +296,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_is_on():
+    def _detector_is_on():  # pragma: no cover
         """Determine the current state of the detector.
 
         Returns
@@ -309,7 +309,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_turn_on(delay=True):
+    def _detector_turn_on(delay=True):  # pragma: no cover
         """Power on the detector
 
         Parameters
@@ -321,7 +321,7 @@ class ScanningInstrument(object):
 
     @staticmethod
     @abstractmethod
-    def _detector_turn_off(delay=True):
+    def _detector_turn_off(delay=True):  # pragma: no cover
         """Remove detector power
 
         Parameters
