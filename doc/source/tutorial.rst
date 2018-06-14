@@ -150,6 +150,11 @@ argument.  The first line can also be run as
 
 >>> set_default_dae("bsalignment")
 
+It's similarly possible to set the default dae for transmission measurements.
+
+>>> set_default_dae("bsalignment", trans=True)
+>>> set_default_dae("transmission", trans=True)
+
 >>> measure("Beam stop", dae="event", frames=300)
 Setup Larmor for event
 Using the following Sample Parameters

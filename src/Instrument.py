@@ -46,7 +46,8 @@ class ScanningInstrument(object):
             pass
         elif isinstance(mode, str):
             self.set_default_dae(
-                getattr(self, "setup_dae_"+mode))
+                getattr(self, "setup_dae_"+mode),
+                trans)
         else:
             if trans:
                 self.setup_trans = mode
