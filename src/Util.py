@@ -2,6 +2,7 @@
 from functools import wraps
 import logging
 from logging import info
+import genie
 
 
 def dae_setter(suffix, measurement_type):
@@ -115,9 +116,12 @@ def user_script(script):
         mock_gen.reset_mock()
         logging.getLogger().disabled = True
         try:
+            old = genie.MOCKING_MODE
+            genie.MOCKING_MODE = True
             eval(code,  # pylint: disable=eval-used
                  {"MOCKING_MODE": True, "logging": Mock()},
                  {script.__name__: script})
+            genie.MOCKING_MODE = old
         finally:
             logging.getLogger().disabled = False
         calls = mock_gen.mock_calls
