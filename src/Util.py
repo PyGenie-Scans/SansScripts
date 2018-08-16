@@ -116,7 +116,7 @@ def user_script(script):
         logging.getLogger().disabled = True
         try:
             eval(code,  # pylint: disable=eval-used
-                 {"gen": mock_gen, "logging": Mock()},
+                 {"MOCKING_MODE": True, "logging": Mock()},
                  {script.__name__: script})
         finally:
             logging.getLogger().disabled = False
