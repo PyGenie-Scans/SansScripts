@@ -474,6 +474,32 @@ class ScanningInstrument(object):
         self.waitfor(**times)
         self.end()
 
+    def do_sans(self, title, pos=None, thickness=1.0, dae=None, blank=False,
+                aperature="", **kwargs):
+        """A wrapper around ``measure`` which ensures that the instrument is
+not in transmission mode
+
+Look at the documentation for ``measure`` to see the full set
+of parameters accepted. """
+        if "trans" in kwargs:
+            del kwargs["trans"]
+        self.measure(title, trans=False, pos=pos, thickness=thickness,
+                     dae=dae, blank=blank, aperature=aperature,
+                     **kwargs)
+
+    def do_trans(self, title, pos=None, thickness=1.0, dae=None, blank=False,
+                 aperature="", **kwargs):
+        """A wrapper around ``measure`` which ensures that the instrument is
+not in transmission mode.
+
+Look at the documentation for ``measure`` to see the full set
+of parameters accepted. """
+        if "trans" in kwargs:
+            del kwargs["trans"]
+        self.measure(title, trans=True, pos=pos, thickness=thickness,
+                     dae=dae, blank=blank, aperature=aperature,
+                     **kwargs)
+
     def measure_file(self, file_path, forever=False):
         """Perform a series of measurements based on a spreadsheet
 

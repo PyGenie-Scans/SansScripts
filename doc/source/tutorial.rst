@@ -19,6 +19,8 @@ Tutorial
     >>> ch.setLevel(logging.DEBUG)
     >>> logging.getLogger().setLevel(logging.DEBUG)
     >>> logging.getLogger().addHandler(ch)
+    >>> from src import *
+    >>> from src.genie import gen
 
 Basic examples
 ==============
@@ -26,9 +28,8 @@ Basic examples
 First, we'll just do a simple measurement on the main detector for 600
 frames.
 
->>> from src import *
->>> from src.genie import gen
->>> measure("Sample Name", frames=600)
+>>> from SansScripting import * # doctest: +SKIP
+>>> do_sans("Sample Name", frames=600)
 Setup Larmor for event
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -36,12 +37,25 @@ Width=10
 Height=10
 Thick=1.0
 Measuring Sample Name_SANS for 600 frames
+>>> do_trans("Sample Name", frames=180)
+Setup Larmor for transmission
+Using the following Sample Parameters
+Geometry=Flat Plate
+Width=10
+Height=10
+Thick=1.0
+Measuring Sample Name_TRANS for 180 frames
 
-The :py:meth:`ScanningInstrument.measure` command is the primary entry
-point for all types of SANS measurement.  We can pass it a sample
-changer position if we wish to measure at a specific location.
+The :py:meth:`ScanningInstrument.do_sans` and
+:py:meth:`ScanningInstrument.do_trans` functions are both simple
+wrappers around :py:meth:`ScanningInstrument.measure`.  ``measure`` is
+the primary entry point for all types of SANS measurement.  All of the
+parameters that will be covered for measure can also be applied to
+``do_sans`` and ``do_trans``. Below is an example of the extended
+information that can be passed to these functions.
 
 >>> measure("Sample Name", "QT", aperature="Medium", blank=True, uamps=5)
+Setup Larmor for event
 Moving to sample changer position QT
 Using the following Sample Parameters
 Geometry=Flat Plate
@@ -65,10 +79,6 @@ A couple of things changed with this new command.
 #. We specified the beam size.  The individual beamlines will have the
    opportunity to decide their own aperature settings, but they should
    hopefully reach a consensus on the names.
-
-#. You'll notice that there is no message about putting the instrument
-   in event mode.  Since we were already in event mode, the instrument
-   didn't perform the redundant step.
 
 #. The sample has been marked as a blank.  The MEASUREMENT:TYPE block
    in the run's journal entry will be set to "blank", instead of
