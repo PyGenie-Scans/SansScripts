@@ -67,14 +67,26 @@ class Zoom(ScanningInstrument):
     def set_aperature(size):
         raise NotImplemented("Aperature setting hasn't been written")
 
+    @staticmethod
     def _detector_is_on():
-        raise NotImplemented("Detector testing hasn't been written")
+        """Is the detector currently on?"""
+        voltage_status = all([
+            gen.get_pv(
+                "IN:ZOOM:CAEN:hv0:4:{}:status".format(x)).lower() == "on"
+            for x in range(8)])
+        return voltage_status
 
+    @staticmethod
     def _detector_turn_on():
-        raise NotImplemented("Detector toggling hasn't been written")
+        raise NotImplemented("Detector toggling is not supported Zoom")
+        # for x in range(8):
+        #     gen.set_pv("IN:ZOOM:CAEN:hv0:4:{}:pwonoff".format(x), "On")
 
+    @staticmethod
     def _detector_turn_off():
-        raise NotImplemented("Detector toggling hasn't been written")
+        raise NotImplemented("Detector toggling is not supported on Zoom")
+        # for x in range(8):
+        #     gen.set_pv("IN:ZOOM:CAEN:hv0:4:{}:pwonoff".format(x), "Off")
 
     def _configure_sans_custom(self):
         # move the transmission monitor out
