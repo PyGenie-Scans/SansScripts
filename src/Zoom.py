@@ -75,3 +75,18 @@ class Zoom(ScanningInstrument):
 
     def _detector_turn_off():
         raise NotImplemented("Detector toggling hasn't been written")
+
+    def _configure_sans_custom(self):
+        # move the transmission monitor out
+        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:EXTRACT","EXTRACT")
+
+    def _configure_trans_custom(self):
+        # move the transmission monitor in
+        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:INSERT","INSERT")
+
+    @staticmethod
+    def set_aperature(size):
+        if size.upper() == "MEDIUM":
+            # change the line below to match ZOOM motors
+            # gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
+            pass
