@@ -1,6 +1,7 @@
 """This is the instrument implementation for the Zoom beamline."""
 from .Instrument import ScanningInstrument
 from .genie import gen
+from .Util import dae_setter
 
 
 class Zoom(ScanningInstrument):
@@ -28,12 +29,15 @@ class Zoom(ScanningInstrument):
     def set_measurement_id(self, value):
         gen.set_pv("IN:ZOOM:PARS:SAMPLE:MEAS:ID", value)
 
+    @dae_setter("SCAN", "scan")
     def setup_dae_scanning(self):
         raise NotImplementedError("Scanning tables not yet set")
 
+    @dae_setter("SCAN", "scan")
     def setup_dae_nr(self):
         raise NotImplementedError("Neutron reflectivity tables not yet set")
 
+    @dae_setter("SCAN", "scan")
     def setup_dae_nrscanning(self):
         raise NotImplementedError(
             "Neutron reflectivity scanning tables not yet set")
@@ -48,22 +52,26 @@ class Zoom(ScanningInstrument):
         ScanningInstrument._generic_scan(
             base+detector, base+spectra, base+wiring, tcbs)
 
+    @dae_setter("SANS", "sans")
     def setup_dae_event(self):
         self._generic_scan(
             r"spec2det_280318_to_test_18_1.txt",
             r"wiring1det_event_200218.dat")
 
+    @dae_setter("SANS", "sans")
     def setup_dae_histogram(self):
         self._generic_scan(
             r"spec2det_130218.txt",
             r"wiring1det_histogram_200218.dat")
 
+    @dae_setter("TRANS", "transmission")
     def setup_dae_transmission(self):
         self._generic_scan(
             r"spectrum_8mon_1dae3card_00.dat",
             r"wiring_8mon_1dae3card_00_hist.dat",
             r"detector_8mon_1dae3card_00.dat")
 
+    @dae_setter("SANS", "sans")
     def setup_dae_bsalignment(self):
         raise NotImplementedError("Beam Stop Alignment tables not yet set")
 

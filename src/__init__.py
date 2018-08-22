@@ -25,10 +25,10 @@ def is_instrument(title):
 if is_instrument("Larmor"):  # pragma: no cover
     from .Larmor import Larmor
     SCANNING = Larmor()
-# if is_instrument("Zoom"):
-#     from .Zoom import Zoom
-#     SCANNING = Zoom()
-if not SCANNING:
+elif is_instrument("Zoom"):
+    from .Zoom import Zoom
+    SCANNING = Zoom()
+else:
     # Default to Larmor if we can't find an instrument
     # This is mostly for development
     from .Larmor import Larmor
