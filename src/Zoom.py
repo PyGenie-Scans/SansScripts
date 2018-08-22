@@ -41,13 +41,25 @@ class Zoom(ScanningInstrument):
             "Neutron reflectivity scanning tables not yet set")
 
     def setup_dae_event(self):
-        raise NotImplemented("Event mode tables not yet set")
+        self._generic_scan(
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spec2det_280318_to_test_18_1.txt",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring1det_event_200218.dat",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_1det_1dae3card.dat",
+            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
 
     def setup_dae_histogram(self):
-        raise NotImplemented("Histogram mode tables not yet set")
+        self._generic_scan(
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spec2det_130218.txt",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring1det_histogram_200218.dat",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_1det_1dae3card.dat",
+            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
 
     def setup_dae_transmission(self):
-        raise NotImplemented("Transmission tables not yet set")
+        self._generic_scan(
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spectrum_8mon_1dae3card_00.dat",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring_8mon_1dae3card_00_hist.dat",
+            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_8mon_1dae3card_00.dat",
+            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
 
     def setup_dae_bsalignment(self):
         raise NotImplemented("Beam Stop Alignment tables not yet set")
