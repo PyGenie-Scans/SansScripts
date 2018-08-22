@@ -105,21 +105,23 @@ try:
 except ImportError:
     genie = mock_gen
 
-MOCKING_MODE = False
 
 class SwitchGenie(object):
+    """A passthrough class that switches between a real and mock genie."""
+    MOCKING_MODE = False
+
     def __init__(self):
         pass
+
     def __getattr__(self, name):
-        if MOCKING_MODE:
+        if SwitchGenie.MOCKING_MODE:
             return getattr(mock_gen, name)
-        else:
-            return getattr(genie, name)
+        return getattr(genie, name)
 
     def __setattr__(self, name, value):
-        if MOCKING_MODE:
+        if SwitchGenie.MOCKING_MODE:
             return setattr(mock_gen, name, value)
-        else:
-            return setattr(genie, name, value)
+        return setattr(genie, name, value)
+
 
 gen = SwitchGenie()

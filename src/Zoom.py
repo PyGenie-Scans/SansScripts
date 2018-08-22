@@ -1,7 +1,5 @@
 """This is the instrument implementation for the Zoom beamline."""
-from logging import info
 from .Instrument import ScanningInstrument
-from .Util import dae_setter
 from .genie import gen
 
 
@@ -31,41 +29,50 @@ class Zoom(ScanningInstrument):
         gen.set_pv("IN:ZOOM:PARS:SAMPLE:MEAS:ID", value)
 
     def setup_dae_scanning(self):
-        raise NotImplemented("Scanning tables not yet set")
+        raise NotImplementedError("Scanning tables not yet set")
 
     def setup_dae_nr(self):
-        raise NotImplemented("Neutron reflectivity tables not yet set")
+        raise NotImplementedError("Neutron reflectivity tables not yet set")
 
     def setup_dae_nrscanning(self):
-        raise NotImplemented(
+        raise NotImplementedError(
             "Neutron reflectivity scanning tables not yet set")
+
+    @staticmethod
+    def _generic_scan(  # pylint: disable=dangerous-default-value
+            detector, spectra,
+            wiring=r"detector_1det_1dae3card.dat",
+            tcbs=[{"low": 5.0, "high": 100000.0, "step": 200.0,
+                   "trange": 1, "log": 0}]):
+        base = r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\\"
+        ScanningInstrument._generic_scan(
+            base+detector, base+spectra, base+wiring, tcbs)
 
     def setup_dae_event(self):
         self._generic_scan(
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spec2det_280318_to_test_18_1.txt",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring1det_event_200218.dat",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_1det_1dae3card.dat",
-            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
+            r"spec2det_280318_to_test_18_1.txt",
+            r"wiring1det_event_200218.dat")
 
     def setup_dae_histogram(self):
         self._generic_scan(
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spec2det_130218.txt",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring1det_histogram_200218.dat",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_1det_1dae3card.dat",
-            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
+            r"spec2det_130218.txt",
+            r"wiring1det_histogram_200218.dat")
 
     def setup_dae_transmission(self):
         self._generic_scan(
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\spectrum_8mon_1dae3card_00.dat",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\wiring_8mon_1dae3card_00_hist.dat",
-            r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\detector_8mon_1dae3card_00.dat",
-            [{"low": 5.0, "high": 100000.0, "step": 200.0, "trange": 1, "log": 0}])
+            r"spectrum_8mon_1dae3card_00.dat",
+            r"wiring_8mon_1dae3card_00_hist.dat",
+            r"detector_8mon_1dae3card_00.dat")
 
     def setup_dae_bsalignment(self):
-        raise NotImplemented("Beam Stop Alignment tables not yet set")
+        raise NotImplementedError("Beam Stop Alignment tables not yet set")
 
+    @staticmethod
     def set_aperature(size):
-        raise NotImplemented("Aperature setting hasn't been written")
+        if size.upper() == "MEDIUM":
+            # change the line below to match ZOOM motors
+            # gen.cset(a1hgap=20.0, a1vgap=20.0, s1hgap=14.0, s1vgap=14.0)
+            pass
 
     @staticmethod
     def _detector_is_on():
@@ -77,24 +84,24 @@ class Zoom(ScanningInstrument):
         return voltage_status
 
     @staticmethod
-    def _detector_turn_on():
-        raise NotImplemented("Detector toggling is not supported Zoom")
+    def _detector_turn_on(delay=True):
+        raise NotImplementedError("Detector toggling is not supported Zoom")
         # for x in range(8):
         #     gen.set_pv("IN:ZOOM:CAEN:hv0:4:{}:pwonoff".format(x), "On")
 
     @staticmethod
-    def _detector_turn_off():
-        raise NotImplemented("Detector toggling is not supported on Zoom")
+    def _detector_turn_off(delay=True):
+        raise NotImplementedError("Detector toggling is not supported on Zoom")
         # for x in range(8):
         #     gen.set_pv("IN:ZOOM:CAEN:hv0:4:{}:pwonoff".format(x), "Off")
 
     def _configure_sans_custom(self):
         # move the transmission monitor out
-        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:EXTRACT","EXTRACT")
+        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:EXTRACT", "EXTRACT")
 
     def _configure_trans_custom(self):
         # move the transmission monitor in
-        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:INSERT","INSERT")
+        gen.set_pv("IN:ZOOM:VACUUM:MONITOR:4:INSERT", "INSERT")
 
     @staticmethod
     def set_aperature(size):
