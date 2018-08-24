@@ -569,12 +569,31 @@ of parameters accepted. """
         import ast
         import os.path
         with open(file_path, "rb") as src, open(file_path+".py", "w") as out:
+            out.write("from SansScripting import *\n")
             out.write("@user_script\n")
             out.write("def {}():\n".format(
                 os.path.splitext(
                     os.path.basename(file_path))[0].replace(" ", "_")))
             reader = csv.DictReader(src)
             for row in reader:
+
+                if "trans" in row and row["trans"] == "TRUE":
+                    header = "do_trans"
+                else:
+                    header = "do_sans"
+
+                title = row["title"]
+                del row["title"]
+
+                if "trans" in row:
+                    del row["trans"]
+
+                out.write('    {}("{}", '.format(header, title))
+
+                if "pos" in row:
+                    out.write('"{}", '.format(row["pos"]))
+                    del row["pos"]
+
                 for k in row.keys():
                     if row[k].strip() == "":
                         del row[k]
@@ -586,9 +605,10 @@ of parameters accepted. """
                         try:
                             row[k] = ast.literal_eval(row[k])
                         except ValueError:
+                            row[k] = "\"" + row[k] + "\""
                             continue
                 params = ", ".join([k + "=" + str(row[k]) for k in row])
-                out.write("    measure({})\n".format(params))
+                out.write('{})\n'.format(params))
 
     @staticmethod
     def printsamplepars():

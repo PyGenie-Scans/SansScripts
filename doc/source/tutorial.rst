@@ -297,9 +297,9 @@ If we fix the script file
   :header-rows: 1
 
 >>> measure_file("tests/good_julabo.csv") #doctest:+ELLIPSIS
-The script should finish in 0.75 hours
+The script should finish in 1.0 hours
 ...
-Measuring Sample3_SANS for 10 uamps
+Measuring Sample3_SANS for 6000 frames
 
 The scan then runs as normal.
 
@@ -316,11 +316,15 @@ because there is infinite output.
 >>> with open("tests/good_julabo.csv.py", "r") as infile:
 ...     for line in infile:
 ...         print line,
+from SansScripting import *
 @user_script
 def good_julabo():
-    measure(title=Sample1, uamps=10, pos=AT, thickness=1)
-    measure(title=Sample2, uamps=10, pos=BT, thickness=1, trans=True, Julabo1_SP=7)
-    measure(title=Sample3, uamps=10, pos=CT, thickness=2, trans=False, Julabo1_SP=7)
+    do_sans("Sample1", "AT", uamps=10, thickness=1)
+    do_trans("Sample2", "AT", uamps=5, thickness=1)
+    do_trans("Sample2", "BT", uamps=5, thickness=1)
+    do_sans("Sample2", "BT", uamps=10, thickness=1)
+    do_trans("Sample3", "CT", thickness=2, frames=3000)
+    do_sans("Sample3", "CT", thickness=2, frames=6000)
 
 When the user is ready to take the next step into full python
 scripting, the CSV file can be turned into a python source file that
