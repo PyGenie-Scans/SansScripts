@@ -1,6 +1,7 @@
 [run]
 omit =
   src/Larmor.py
+  src/Zoom.py
   src/genie.py
 
 [report]

@@ -25,7 +25,7 @@ def is_instrument(title):
 if is_instrument("Larmor"):  # pragma: no cover
     from .Larmor import Larmor
     SCANNING = Larmor()
-elif is_instrument("Zoom"):
+elif is_instrument("Zoom"):  # pragma: no cover
     from .Zoom import Zoom
     SCANNING = Zoom()
 else:
