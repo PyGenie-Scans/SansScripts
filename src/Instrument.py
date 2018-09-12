@@ -215,21 +215,21 @@ class ScanningInstrument(object):
 
     def _begin(self, *args, **kwargs):
         """Start a measurement."""
-        if hasattr(self, "_begin_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_begin_"+self._dae_mode):
             getattr(self, "_begin_"+self._dae_mode)(*args, **kwargs)
         else:
             gen.begin(*args, **kwargs)
 
     def _end(self):
         """End a measurement."""
-        if hasattr(self, "_end_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_end_"+self._dae_mode):
             getattr(self, "_end_"+self._dae_mode)()  # pragma: no cover
         else:
             gen.end()
 
     def _waitfor(self, **kwargs):
         """Await the user's desired statistics."""
-        if hasattr(self, "_waitfor_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_waitfor_"+self._dae_mode):
             getattr(self, "_waitfor_"+self._dae_mode)(**kwargs)
         else:
             gen.waitfor(**kwargs)
