@@ -213,21 +213,21 @@ class ScanningInstrument(object):
         """
         pass
 
-    def begin(self, *args, **kwargs):
+    def _begin(self, *args, **kwargs):
         """Start a measurement."""
         if hasattr(self, "_begin_"+self._dae_mode):
             getattr(self, "_begin_"+self._dae_mode)(*args, **kwargs)
         else:
             gen.begin(*args, **kwargs)
 
-    def end(self):
+    def _end(self):
         """End a measurement."""
         if hasattr(self, "_end_"+self._dae_mode):
             getattr(self, "_end_"+self._dae_mode)()  # pragma: no cover
         else:
             gen.end()
 
-    def waitfor(self, **kwargs):
+    def _waitfor(self, **kwargs):
         """Await the user's desired statistics."""
         if hasattr(self, "_waitfor_"+self._dae_mode):
             getattr(self, "_waitfor_"+self._dae_mode)(**kwargs)
@@ -466,13 +466,13 @@ class ScanningInstrument(object):
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
 
-        self.begin()
+        self._begin()
         info("Measuring {title:} for {time:} {units:}".format(
             title=title+self.title_footer,
             units=list(times.keys())[0],
             time=times[list(times.keys())[0]]))
-        self.waitfor(**times)
-        self.end()
+        self._waitfor(**times)
+        self._end()
 
     def do_sans(self, title, pos=None, thickness=1.0, dae=None, blank=False,
                 aperature="", **kwargs):
