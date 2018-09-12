@@ -402,6 +402,8 @@ class ScanningInstrument(object):
           Is equivalent to
           >>> set_default_dae(foo)
           >>> measure("Test", frames=10)
+          To get a full list of the supported dae modes, run
+          >>> enumerate_dae()
         aperature : str
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
@@ -616,3 +618,7 @@ of parameters accepted. """
         pars = gen.get_sample_pars()
         for par in ["Geometry", "Width", "Height", "Thick"]:
             info("{}={}".format(par, pars[par.upper()]))
+
+    def enumerate_dae(self):
+        """List the supported DAE modes on this beamline."""
+        return [x[10:] for x in dir(self) if x.startswith("setup_dae_")]
