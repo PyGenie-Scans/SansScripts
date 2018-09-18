@@ -67,9 +67,9 @@ class Zoom(ScanningInstrument):
     @dae_setter("TRANS", "transmission")
     def setup_dae_transmission(self):
         self._generic_scan(
+            r"detector_8mon_1dae3card_00.dat",
             r"spectrum_8mon_1dae3card_00.dat",
-            r"wiring_8mon_1dae3card_00_hist.dat",
-            r"detector_8mon_1dae3card_00.dat")
+            r"wiring_8mon_1dae3card_00_hist.dat")
 
     @dae_setter("SANS", "sans")
     def setup_dae_bsalignment(self):
