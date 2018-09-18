@@ -44,8 +44,9 @@ class Zoom(ScanningInstrument):
 
     @staticmethod
     def _generic_scan(  # pylint: disable=dangerous-default-value
-            detector, spectra,
-            wiring=r"detector_1det_1dae3card.dat",
+            detector=r"detector_1det_1dae3card.dat",
+            spectra=r"spec2det_280318_to_test_18_1.txt",
+            wiring=r"wiring1det_event_200218.dat",
             tcbs=[{"low": 5.0, "high": 100000.0, "step": 200.0,
                    "trange": 1, "log": 0}]):
         base = r"C:\Instrument\Settings\config\NDXZOOM\configurations\tables\\"
@@ -54,22 +55,20 @@ class Zoom(ScanningInstrument):
 
     @dae_setter("SANS", "sans")
     def setup_dae_event(self):
-        self._generic_scan(
-            r"spec2det_280318_to_test_18_1.txt",
-            r"wiring1det_event_200218.dat")
+        self._generic_scan()
 
     @dae_setter("SANS", "sans")
     def setup_dae_histogram(self):
         self._generic_scan(
-            r"spec2det_130218.txt",
-            r"wiring1det_histogram_200218.dat")
+            # spectra=r"spec2det_130218.txt",
+            wiring=r"wiring1det_histogram_200218.dat")
 
     @dae_setter("TRANS", "transmission")
     def setup_dae_transmission(self):
         self._generic_scan(
-            r"detector_8mon_1dae3card_00.dat",
-            r"spectrum_8mon_1dae3card_00.dat",
-            r"wiring_8mon_1dae3card_00_hist.dat")
+            detector=r"detector_8mon_1dae3card_00.dat",
+            spectra=r"spectrum_8mon_1dae3card_00.dat",
+            wiring=r"wiring_8mon_1dae3card_00_hist.dat")
 
     @dae_setter("SANS", "sans")
     def setup_dae_bsalignment(self):
