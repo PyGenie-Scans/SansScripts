@@ -213,23 +213,23 @@ class ScanningInstrument(object):
         """
         pass
 
-    def begin(self, *args, **kwargs):
+    def _begin(self, *args, **kwargs):
         """Start a measurement."""
-        if hasattr(self, "_begin_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_begin_"+self._dae_mode):
             getattr(self, "_begin_"+self._dae_mode)(*args, **kwargs)
         else:
             gen.begin(*args, **kwargs)
 
-    def end(self):
+    def _end(self):
         """End a measurement."""
-        if hasattr(self, "_end_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_end_"+self._dae_mode):
             getattr(self, "_end_"+self._dae_mode)()  # pragma: no cover
         else:
             gen.end()
 
-    def waitfor(self, **kwargs):
+    def _waitfor(self, **kwargs):
         """Await the user's desired statistics."""
-        if hasattr(self, "_waitfor_"+self._dae_mode):
+        if self._dae_mode and hasattr(self, "_waitfor_"+self._dae_mode):
             getattr(self, "_waitfor_"+self._dae_mode)(**kwargs)
         else:
             gen.waitfor(**kwargs)
@@ -402,6 +402,8 @@ class ScanningInstrument(object):
           Is equivalent to
           >>> set_default_dae(foo)
           >>> measure("Test", frames=10)
+          To get a full list of the supported dae modes, run
+          >>> enumerate_dae()
         aperature : str
           The aperature size.  e.g. "Small" or "Medium" A blank string
           (the default value) results in the aperature not being
@@ -466,13 +468,13 @@ class ScanningInstrument(object):
         self.printsamplepars()
         gen.change(title=title+self.title_footer)
 
-        self.begin()
+        self._begin()
         info("Measuring {title:} for {time:} {units:}".format(
             title=title+self.title_footer,
             units=list(times.keys())[0],
             time=times[list(times.keys())[0]]))
-        self.waitfor(**times)
-        self.end()
+        self._waitfor(**times)
+        self._end()
 
     def do_sans(self, title, pos=None, thickness=1.0, dae=None, blank=False,
                 aperature="", **kwargs):
@@ -569,12 +571,31 @@ of parameters accepted. """
         import ast
         import os.path
         with open(file_path, "rb") as src, open(file_path+".py", "w") as out:
+            out.write("from SansScripting import *\n")
             out.write("@user_script\n")
             out.write("def {}():\n".format(
                 os.path.splitext(
                     os.path.basename(file_path))[0].replace(" ", "_")))
             reader = csv.DictReader(src)
             for row in reader:
+
+                if "trans" in row and row["trans"] == "TRUE":
+                    header = "do_trans"
+                else:
+                    header = "do_sans"
+
+                title = row["title"]
+                del row["title"]
+
+                if "trans" in row:
+                    del row["trans"]
+
+                out.write('    {}("{}", '.format(header, title))
+
+                if "pos" in row:
+                    out.write('"{}", '.format(row["pos"]))
+                    del row["pos"]
+
                 for k in row.keys():
                     if row[k].strip() == "":
                         del row[k]
@@ -586,9 +607,10 @@ of parameters accepted. """
                         try:
                             row[k] = ast.literal_eval(row[k])
                         except ValueError:
+                            row[k] = "\"" + row[k] + "\""
                             continue
                 params = ", ".join([k + "=" + str(row[k]) for k in row])
-                out.write("    measure({})\n".format(params))
+                out.write('{})\n'.format(params))
 
     @staticmethod
     def printsamplepars():
@@ -596,3 +618,7 @@ of parameters accepted. """
         pars = gen.get_sample_pars()
         for par in ["Geometry", "Width", "Height", "Thick"]:
             info("{}={}".format(par, pars[par.upper()]))
+
+    def enumerate_dae(self):
+        """List the supported DAE modes on this beamline."""
+        return [x[10:] for x in dir(self) if x.startswith("setup_dae_")]
